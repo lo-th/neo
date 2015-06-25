@@ -1126,7 +1126,7 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; ');
 
-            NEO.CC('NEO.content', 'width:100px; overflow:hidden; background:none;');
+            NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none;');
 
             
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
