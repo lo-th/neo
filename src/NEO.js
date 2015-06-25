@@ -203,10 +203,8 @@ NEO.Timeline = function(css, decal){
     // TOP TIMEBAR 
 
     this.timeBar = NEO.DOM('NEO timeBar');
-    
     this.timeBar.name = 'timeBar';
 
-    // special svg pattern
     this.pattern = NEO.DOM('NEO', 'defs', 'width:100%; height:20px; bottom:0;', {} );
     var p = NEO.DOM(null, 'pattern', '', {id:'timeBar', width:50, height:20, patternUnits:'userSpaceOnUse'}, this.pattern, 0 );
     var g = NEO.DOM(null, 'g', '', { stroke:'#888', 'stroke-width':'1', fill:'none'}, p, 0 );
@@ -249,8 +247,8 @@ NEO.Timeline = function(css, decal){
 
     // TIME MARKER
 
-    this.marker = NEO.DOM('NEO', 'rect', 'width:41px; height:60px;', {width:10, height:20, x:0.5, y:27.5, fill:'rgba(255,0,0,0.3)', stroke:'#F00', 'stroke-width':'1'} );
-    NEO.DOM(null, 'line', '', { x1:5.5, y1:47.5, x2:5.5, y2:'100%', stroke:'#F00', 'stroke-width':'1' }, this.marker );
+    this.marker = NEO.DOM('NEO', 'rect', 'width:41px; height:60px;', {width:10, height:20, x:0.5, y:37.5, fill:'rgba(255,0,0,0.3)', stroke:'#F00', 'stroke-width':'1'} );
+    NEO.DOM(null, 'line', '', { x1:5.5, y1:57.5, x2:5.5, y2:'100%', stroke:'#F00', 'stroke-width':'1' }, this.marker );
     
 
     this.content.appendChild(this.timeBar);
