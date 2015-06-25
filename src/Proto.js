@@ -2,38 +2,41 @@ NEO.Proto = function(obj){
 
     obj = obj || {};
 
+    this.h = 20;
+
     // define obj size
     /*this.setSize(obj.size);
     
-    this.h = 20;
-    if(obj.color) UIL.COLOR = obj.color;
-    this.color = UIL.COLOR;
+    */
+    if(obj.color) NEO.COLOR = obj.color;
+    this.color = NEO.COLOR;
+    
 
-    this.txt = obj.name || 'Proto';
+    //this.txt = obj.name || 'Proto';
     this.target = obj.target || null;
     this.callback = obj.callback || function(){};
 
     this.c = [];
     this.f = [];
 
-    this.c[0] = UIL.DOM('UIL base');
-    this.c[1] = UIL.DOM('UIL text');
-    this.c[1].textContent = this.txt;*/
+    this.c[0] = NEO.DOM('NEO base');
+    this.c[1] = NEO.DOM('NEO text');
+    this.c[1].textContent = this.type;
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
 
     init:function(){
-     /*   this.c[0].style.background = UIL.bgcolor(this.color);
+        this.c[0].style.background = NEO.bgcolor(this.color);
         for(var i = 0; i<this.c.length; i++){
             if(i==0){ 
                 if(this.target!==null) this.target.appendChild(this.c[0]);
-                else UIL.main.inner.appendChild(this.c[0]);
+                else NEO.main.inner.appendChild(this.c[0]);
             }
             else this.c[0].appendChild(this.c[i]);
         }
-        this.rSize();*/
+        //this.rSize();
     },
     /*setSize:function(sx){
         this.size = sx || UIL.WIDTH;

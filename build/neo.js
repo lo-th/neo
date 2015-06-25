@@ -1095,12 +1095,10 @@ var FRAME = ( function () {
 
 'use strict';
 
+// need uil http://lo-th.github.io/uil/build/uil.min.js
 var UIL;
 
 var NEO = NEO || ( function () {
-
-    
-
     return {
         main:null,
         REVISION: '0.1',
@@ -1119,7 +1117,7 @@ var NEO = NEO || ( function () {
             if(this.main) this.main.changeWidth();
         },
         classDefine:function(){
-            NEO.COLOR = 'N';
+            NEO.COLOR = 'NO';
             //NEO.SELECT = '#035fcf';
             //NEO.SELECTDOWN = '#024699';
             //NEO.SVGB = 'rgba(0,0,0,0.2)';
@@ -1134,14 +1132,17 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.topmenu', 'width:100%; height:19px; background:none; ');
             NEO.CC('NEO.timeBar', 'width:100%; height:32px; top:18px; background:none; pointer-events:auto; cursor:pointer;');
             NEO.CC('NEO.timescale', 'width:100%; height:18px; background:#0FF; bottom:0;');
-            NEO.CC('NEO.inner', 'width:100%; top:50px; height:auto; overflow:hidden; background:#FFF;');
+            NEO.CC('NEO.inner', 'width:100%; top:50px; height:auto; overflow:hidden; background:none;');
+
+            NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:20px; border-bottom:1px groove rgba(128,128,128,1); overflow:hidden;');
+            NEO.CC('NEO.text', NEO.txt1);
 
             /*NEO.CC('NEO.mask', 'width:400px; height:100%; margin-left:-50px; pointer-events:auto; cursor:col-resize; background:none; display:none;');
             NEO.CC('NEO.inner', 'width:300px; top:0; left:0; height:auto; overflow:hidden; background:none;');
 
-            NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:20px; border-bottom:1px groove rgba(0,0,0,0.2); overflow:hidden;');
+            
 
-            NEO.CC('NEO.text', NEO.txt1);
+            
 
             NEO.CC('input', 'border:solid 1px rgba(0,0,0,0.2); background:rgba(0,0,0,0.2); transition: 0.1s ease-out;', true);
             NEO.CC('input:focus', 'border: solid 1px rgba(0,0,0,0); background:rgba(0,0,0,0.6);', true);
@@ -1167,7 +1168,10 @@ var NEO = NEO || ( function () {
                     case 'no': case 'NO': a=0; break;
                 }
             }
-            return 'rgba('+r+','+g+','+b+','+a+')';
+
+            var color = 'rgba('+r+','+g+','+b+','+a+')';
+            if(a==0) color = 'none';
+            return color;
         },
         /*canvasURL:function(obj){
             var canvas = document.createElement( 'canvas' );
@@ -1223,13 +1227,12 @@ var NEO = NEO || ( function () {
             else style.sheet.insertRule(adds+name+"{"+rules+"}",0);
         }
     };
-
 })();
 
 
 NEO.Timeline = function(css, decal){
 
-    NEO.main = this;
+    
 
     this.frame = 0;
     this.fps = 30;
@@ -1345,6 +1348,8 @@ NEO.Timeline = function(css, decal){
 
     window.addEventListener("resize", function(e){this.resize(e)}.bind(this), false );
     this.resize();
+
+    NEO.main = this;
 }
 
 
@@ -1403,20 +1408,20 @@ NEO.Timeline.prototype = {
     },
     add:function(type, obj){
         var n;
-        /*switch(type){
+        switch(type){
             case 'bang':  n = new NEO.Bang(obj); break;
             case 'color': n = new NEO.Color(obj); break;
             case 'curve': n = new NEO.Curve(obj); break;
             case 'flag':  n = new NEO.Flag(obj);  break;
             case 'lfo':   n = new NEO.Lfo(obj);  break;
             case 'switch':  n = new NEO.Switch(obj);  break;
-            case 'audio':   n = new NEO.AudioTrack(obj);   break;
-            case 'video':   n = new NEO.VideoTrack(obj);   break;
+            case 'audio':   n = new NEO.Audio(obj);   break;
+            case 'video':   n = new NEO.Video(obj);   break;
         }
-        this.neo.push(n);*/
+        this.neo.push(n);
         //this.calc();
 
-        console.log(type);
+        //console.log(type);
         return n;
     },
     resize:function(e){
@@ -1465,38 +1470,41 @@ NEO.Proto = function(obj){
 
     obj = obj || {};
 
+    this.h = 20;
+
     // define obj size
     /*this.setSize(obj.size);
     
-    this.h = 20;
-    if(obj.color) UIL.COLOR = obj.color;
-    this.color = UIL.COLOR;
+    */
+    if(obj.color) NEO.COLOR = obj.color;
+    this.color = NEO.COLOR;
+    
 
-    this.txt = obj.name || 'Proto';
+    //this.txt = obj.name || 'Proto';
     this.target = obj.target || null;
     this.callback = obj.callback || function(){};
 
     this.c = [];
     this.f = [];
 
-    this.c[0] = UIL.DOM('UIL base');
-    this.c[1] = UIL.DOM('UIL text');
-    this.c[1].textContent = this.txt;*/
+    this.c[0] = NEO.DOM('NEO base');
+    this.c[1] = NEO.DOM('NEO text');
+    this.c[1].textContent = this.type;
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
 
     init:function(){
-     /*   this.c[0].style.background = UIL.bgcolor(this.color);
+        this.c[0].style.background = NEO.bgcolor(this.color);
         for(var i = 0; i<this.c.length; i++){
             if(i==0){ 
                 if(this.target!==null) this.target.appendChild(this.c[0]);
-                else UIL.main.inner.appendChild(this.c[0]);
+                else NEO.main.inner.appendChild(this.c[0]);
             }
             else this.c[0].appendChild(this.c[i]);
         }
-        this.rSize();*/
+        //this.rSize();
     },
     /*setSize:function(sx){
         this.size = sx || UIL.WIDTH;
@@ -1570,8 +1578,11 @@ NEO.Proto.prototype = {
         this.c[1].style.width = this.sa+'px';
     }*/
 }
-
 NEO.Bang = function(obj){
+
+    obj = obj || {};
+    
+    this.type = 'bang';
 
     NEO.Proto.call( this, obj );
 
@@ -1608,9 +1619,290 @@ NEO.Bang.prototype.rSize = function(){
     //this.setDom(2, 'left', this.sa);
     //this.setDom(3, 'left', this.sa);
 };
+NEO.Color = function(obj){
 
+    obj = obj || {};
+    
+    this.type = 'color';
 
+    NEO.Proto.call( this, obj );
 
+    this.value = obj.value || false;
 
+    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
+    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
 
+    if(!this.value) this.c[3].style.display = 'none';
 
+    this.f[0] = function(e){
+        if(this.value){
+            this.value = false;
+            this.c[3].style.display = 'none';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
+        } else {
+            this.value = true;
+            this.c[3].style.display = 'block';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
+        }
+        this.callback( this.value );
+    }.bind(this);
+
+    this.c[2].onclick = this.f[0];*/
+
+    this.init();
+}
+
+NEO.Color.prototype = Object.create( NEO.Proto.prototype );
+NEO.Color.prototype.constructor = NEO.Color;
+
+NEO.Color.prototype.rSize = function(){
+    //NEO.Proto.prototype.rSize.call( this );
+    //this.setDom(2, 'left', this.sa);
+    //this.setDom(3, 'left', this.sa);
+};
+NEO.Curve = function(obj){
+
+    obj = obj || {};
+    
+    this.type = 'curve';
+
+    NEO.Proto.call( this, obj );
+
+    this.value = obj.value || false;
+
+    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
+    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
+
+    if(!this.value) this.c[3].style.display = 'none';
+
+    this.f[0] = function(e){
+        if(this.value){
+            this.value = false;
+            this.c[3].style.display = 'none';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
+        } else {
+            this.value = true;
+            this.c[3].style.display = 'block';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
+        }
+        this.callback( this.value );
+    }.bind(this);
+
+    this.c[2].onclick = this.f[0];*/
+
+    this.init();
+}
+
+NEO.Curve.prototype = Object.create( NEO.Proto.prototype );
+NEO.Curve.prototype.constructor = NEO.Curve;
+
+NEO.Curve.prototype.rSize = function(){
+    //NEO.Proto.prototype.rSize.call( this );
+    //this.setDom(2, 'left', this.sa);
+    //this.setDom(3, 'left', this.sa);
+};
+NEO.Flag = function(obj){
+
+    obj = obj || {};
+    
+    this.type = 'flag';
+
+    NEO.Proto.call( this, obj );
+
+    this.value = obj.value || false;
+
+    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
+    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
+
+    if(!this.value) this.c[3].style.display = 'none';
+
+    this.f[0] = function(e){
+        if(this.value){
+            this.value = false;
+            this.c[3].style.display = 'none';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
+        } else {
+            this.value = true;
+            this.c[3].style.display = 'block';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
+        }
+        this.callback( this.value );
+    }.bind(this);
+
+    this.c[2].onclick = this.f[0];*/
+
+    this.init();
+}
+
+NEO.Flag.prototype = Object.create( NEO.Proto.prototype );
+NEO.Flag.prototype.constructor = NEO.Flag;
+
+NEO.Flag.prototype.rSize = function(){
+    //NEO.Proto.prototype.rSize.call( this );
+    //this.setDom(2, 'left', this.sa);
+    //this.setDom(3, 'left', this.sa);
+};
+NEO.Lfo = function(obj){
+
+    obj = obj || {};
+    
+    this.type = 'lfo';
+
+    NEO.Proto.call( this, obj );
+
+    this.value = obj.value || false;
+
+    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
+    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
+
+    if(!this.value) this.c[3].style.display = 'none';
+
+    this.f[0] = function(e){
+        if(this.value){
+            this.value = false;
+            this.c[3].style.display = 'none';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
+        } else {
+            this.value = true;
+            this.c[3].style.display = 'block';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
+        }
+        this.callback( this.value );
+    }.bind(this);
+
+    this.c[2].onclick = this.f[0];*/
+
+    this.init();
+}
+
+NEO.Lfo.prototype = Object.create( NEO.Proto.prototype );
+NEO.Lfo.prototype.constructor = NEO.Lfo;
+
+NEO.Lfo.prototype.rSize = function(){
+    //NEO.Proto.prototype.rSize.call( this );
+    //this.setDom(2, 'left', this.sa);
+    //this.setDom(3, 'left', this.sa);
+};
+NEO.Switch = function(obj){
+
+    obj = obj || {};
+    
+    this.type = 'switch';
+
+    NEO.Proto.call( this, obj );
+
+    this.value = obj.value || false;
+
+    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
+    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
+
+    if(!this.value) this.c[3].style.display = 'none';
+
+    this.f[0] = function(e){
+        if(this.value){
+            this.value = false;
+            this.c[3].style.display = 'none';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
+        } else {
+            this.value = true;
+            this.c[3].style.display = 'block';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
+        }
+        this.callback( this.value );
+    }.bind(this);
+
+    this.c[2].onclick = this.f[0];*/
+
+    this.init();
+}
+
+NEO.Switch.prototype = Object.create( NEO.Proto.prototype );
+NEO.Switch.prototype.constructor = NEO.Switch;
+
+NEO.Switch.prototype.rSize = function(){
+    //NEO.Proto.prototype.rSize.call( this );
+    //this.setDom(2, 'left', this.sa);
+    //this.setDom(3, 'left', this.sa);
+};
+NEO.Audio = function(obj){
+
+    obj = obj || {};
+    
+    this.type = 'audio';
+
+    NEO.Proto.call( this, obj );
+
+    this.value = obj.value || false;
+
+    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
+    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
+
+    if(!this.value) this.c[3].style.display = 'none';
+
+    this.f[0] = function(e){
+        if(this.value){
+            this.value = false;
+            this.c[3].style.display = 'none';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
+        } else {
+            this.value = true;
+            this.c[3].style.display = 'block';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
+        }
+        this.callback( this.value );
+    }.bind(this);
+
+    this.c[2].onclick = this.f[0];*/
+
+    this.init();
+}
+
+NEO.Audio.prototype = Object.create( NEO.Proto.prototype );
+NEO.Audio.prototype.constructor = NEO.Audio;
+
+NEO.Audio.prototype.rSize = function(){
+    //NEO.Proto.prototype.rSize.call( this );
+    //this.setDom(2, 'left', this.sa);
+    //this.setDom(3, 'left', this.sa);
+};
+NEO.Video = function(obj){
+
+    obj = obj || {};
+    
+    this.type = 'video';
+
+    NEO.Proto.call( this, obj );
+
+    this.value = obj.value || false;
+
+    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
+    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
+
+    if(!this.value) this.c[3].style.display = 'none';
+
+    this.f[0] = function(e){
+        if(this.value){
+            this.value = false;
+            this.c[3].style.display = 'none';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
+        } else {
+            this.value = true;
+            this.c[3].style.display = 'block';
+            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
+        }
+        this.callback( this.value );
+    }.bind(this);
+
+    this.c[2].onclick = this.f[0];*/
+
+    this.init();
+}
+
+NEO.Video.prototype = Object.create( NEO.Proto.prototype );
+NEO.Video.prototype.constructor = NEO.Video;
+
+NEO.Video.prototype.rSize = function(){
+    //NEO.Proto.prototype.rSize.call( this );
+    //this.setDom(2, 'left', this.sa);
+    //this.setDom(3, 'left', this.sa);
+};

@@ -1,5 +1,9 @@
 NEO.Bang = function(obj){
 
+    obj = obj || {};
+    
+    this.type = 'bang';
+
     NEO.Proto.call( this, obj );
 
     this.value = obj.value || false;

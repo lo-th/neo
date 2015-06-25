@@ -1,8 +1,8 @@
-NEO.Curve = function(obj){
+NEO.Video = function(obj){
 
     obj = obj || {};
     
-    this.type = 'curve';
+    this.type = 'video';
 
     NEO.Proto.call( this, obj );
 
@@ -31,10 +31,10 @@ NEO.Curve = function(obj){
     this.init();
 }
 
-NEO.Curve.prototype = Object.create( NEO.Proto.prototype );
-NEO.Curve.prototype.constructor = NEO.Curve;
+NEO.Video.prototype = Object.create( NEO.Proto.prototype );
+NEO.Video.prototype.constructor = NEO.Video;
 
-NEO.Curve.prototype.rSize = function(){
+NEO.Video.prototype.rSize = function(){
     //NEO.Proto.prototype.rSize.call( this );
     //this.setDom(2, 'left', this.sa);
     //this.setDom(3, 'left', this.sa);
