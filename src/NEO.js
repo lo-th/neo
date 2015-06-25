@@ -41,10 +41,10 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.content', 'width:100%; overflow:hidden;  background:none;');
 
             
-            NEO.CC('NEO.topmenu', 'width:100%; height:19px; background:none; ');
-            NEO.CC('NEO.timeBar', 'width:100%; height:32px; top:18px; background:none; pointer-events:auto; cursor:pointer;');
+            NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
+            NEO.CC('NEO.timeBar', 'width:100%; height:36px; top:24px; background:none; pointer-events:auto; cursor:pointer;');
             NEO.CC('NEO.timescale', 'width:100%; height:20px; background:none; bottom:0; pointer-events:auto; cursor:pointer;');
-            NEO.CC('NEO.inner', 'width:100%; top:50px; height:auto; overflow:hidden; background:none;');
+            NEO.CC('NEO.inner', 'width:100%; top:60px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
             NEO.CC('NEO.text', NEO.txt1);
@@ -168,7 +168,7 @@ NEO.Timeline = function(css, decal){
     // TOP MENU
 
     this.topmenu = NEO.DOM('NEO topmenu');
-    //this.content.appendChild(this.topmenu);
+    this.topmenu.appendChild(this.liner(1));
 
     var callbackSize = function(v){ this.scaletime(v); }.bind(this);
     var callbackFps = function(v){ this.fps = v; this.updateTime(); }.bind(this);
@@ -176,13 +176,13 @@ NEO.Timeline = function(css, decal){
     var callbackPlay = function(v){ this.play(); }.bind(this);
 
    
-    this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0'}});
-    this.setFps = new UIL.Number({target:this.topmenu, callback:callbackFps, name:'fps', min:12, max:60, value:60, step:1, color:'no', size:82, solo:true, pos:{left:'auto', right:'130px'}});
-    this.title = new UIL.Title({target:this.topmenu, name:'0:00:00', color:'no', size:120, height:20, pos:{} });
-    this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:150, pos:{left:'60px'} });
+    this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0', top:'2px' }});
+    this.setFps = new UIL.Number({target:this.topmenu, callback:callbackFps, name:'fps', min:12, max:60, value:60, step:1, color:'no', size:82, solo:true, pos:{left:'auto', right:'130px', top:'2px' }});
+    this.title = new UIL.Title({target:this.topmenu, name:'0:00:00', color:'no', size:120, height:20, pos:{top:'2px' } });
+    this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:150, pos:{left:'60px', top:'2px' } });
     this.addList.text('ADD');
 
-    this.playButton = new UIL.Button({target:this.topmenu, callback:callbackPlay, name:'X', color:'no', size:41, pos:{left:'200px'} });
+    this.playButton = new UIL.Button({target:this.topmenu, callback:callbackPlay, name:'X', color:'no', size:41, pos:{left:'200px', top:'2px' } });
     this.playIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='16px' height='16px'><path fill='#CCC' d='M 12 9 L 12 7 5 3 4 4 4 12 5 13 12 9 Z'/></svg>";
     this.pauseIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='16px' height='16px'><path fill='#CCC' d='M 12 3 L 9 3 9 13 12 13 12 3 M 7 3 L 4 3 4 13 7 13 7 3 Z'/></svg>";
     this.playButton.icon(this.playIcon);
