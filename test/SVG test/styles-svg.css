@@ -1,0 +1,34 @@
+/* SVG styles */
+path
+{
+    stroke-width: 8;
+    stroke: #000;
+    stroke-linecap: round;
+    fill: none;
+}
+
+path.fill
+{
+    fill: #3ff;
+}
+
+circle
+{
+    stroke-width: 2;
+    stroke: #c00;
+    fill: #fff;
+}
+
+circle:hover
+{
+    fill: #c00;
+    cursor: move;
+}
+
+line
+{
+    stroke-width: 1;
+    stroke: #999;
+    stroke-linecap: round;
+    stroke-dasharray: 5,3;
+}

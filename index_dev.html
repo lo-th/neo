@@ -18,7 +18,20 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 #logo{position:absolute; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
 </style>
 <script type="text/javascript" src="js/libs/uil.min.js"></script>
-<script type="text/javascript" src="build/neo.min.js"></script>
+
+<script type="text/javascript" src="src/Tween.js"></script>
+<script type="text/javascript" src="src/Frame.js"></script>
+<script type="text/javascript" src="src/NEO.js"></script>
+<script type="text/javascript" src="src/TimerGraph.js"></script>
+<script type="text/javascript" src="src/Proto.js"></script>
+<script type="text/javascript" src="src/AudioTrack.js"></script>
+<script type="text/javascript" src="src/Bang.js"></script>
+<script type="text/javascript" src="src/Color.js"></script>
+<script type="text/javascript" src="src/Curve.js"></script>
+<script type="text/javascript" src="src/Flag.js"></script>
+<script type="text/javascript" src="src/Lfo.js"></script>
+<script type="text/javascript" src="src/Switch.js"></script>
+<script type="text/javascript" src="src/VideoTrack.js"></script>
 </head>
 
 <body>
@@ -27,7 +40,6 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 <div id='version'></div>
 <div id='debug'></div>
 <script>
-
 document.getElementById('version').innerHTML = 'eo '+NEO.REVISION;
 var debug = document.getElementById('debug');
 

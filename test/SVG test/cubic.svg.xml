@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet href="styles-svg.css" type="text/css"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 499 499" preserveAspectRatio="xMidYMid meet">
+	<title>SVG curve</title>
+	<desc>example curves in SVG</desc>
+	<g id="main">
+		<circle id="p1" cx="100" cy="250" r="16" />
+		<circle id="p2" cx="400" cy="250" r="16" />
+		
+		<circle id="c1" cx="100" cy="100" r="8" />
+		<circle id="c2" cx="400" cy="100" r="8" />
+		
+		<line id="l1" x1="100" y1="250" x2="100" y2="100" />
+		<line id="l2" x1="400" y1="250" x2="400" y2="100" />
+	
+		<path id="curve" d="M100,250 C100,100 400,100 400,250" />
+	</g>
+</svg>
