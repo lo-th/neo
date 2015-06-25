@@ -43,10 +43,10 @@ var NEO = NEO || ( function () {
             
             NEO.CC('NEO.topmenu', 'width:100%; height:19px; background:none; ');
             NEO.CC('NEO.timeBar', 'width:100%; height:32px; top:18px; background:none; pointer-events:auto; cursor:pointer;');
-            NEO.CC('NEO.timescale', 'width:100%; height:18px; background:#0FF; bottom:0;');
+            NEO.CC('NEO.timescale', 'width:100%; height:20px; background:none; bottom:0; pointer-events:auto; cursor:pointer;');
             NEO.CC('NEO.inner', 'width:100%; top:50px; height:auto; overflow:hidden; background:none;');
 
-            NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:20px; border-bottom:1px groove rgba(128,128,128,1); overflow:hidden;');
+            NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
             NEO.CC('NEO.text', NEO.txt1);
 
             /*NEO.CC('NEO.mask', 'width:400px; height:100%; margin-left:-50px; pointer-events:auto; cursor:col-resize; background:none; display:none;');
@@ -147,7 +147,8 @@ NEO.Timeline = function(css, decal){
     
 
     this.frame = 0;
-    this.fps = 30;
+    this.fps = 60;
+    this.totalFrame = 750; // default flash
     this.time = 0;
     this.height = 30;
     this.framesize = 10;
@@ -163,6 +164,8 @@ NEO.Timeline = function(css, decal){
 
     this.top = parseFloat(this.content.style.top.substring(0,this.content.style.top.length-2));
 
+
+    // TOP MENU
 
     this.topmenu = NEO.DOM('NEO topmenu');
     //this.content.appendChild(this.topmenu);
@@ -184,44 +187,56 @@ NEO.Timeline = function(css, decal){
     this.pauseIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='16px' height='16px'><path fill='#CCC' d='M 12 3 L 9 3 9 13 12 13 12 3 M 7 3 L 4 3 4 13 7 13 7 3 Z'/></svg>";
     this.playButton.icon(this.playIcon);
 
-    //this.pauseButton = new UIL.Button({target:this.topmenu, callback:callbackPause, name:'X', color:'no', size:41, pos:{left:'220px'} });
-    //this.pauseButton.icon("<svg xmlns='http://www.w3.org/2000/svg' width='16px' height='16px'><path fill='#CCC' d='M 12 3 L 9 3 9 13 12 13 12 3 M 7 3 L 4 3 4 13 7 13 7 3 Z'/></svg>");
 
-    
-
+    // TOP TIMEBAR 
 
     this.timeBar = NEO.DOM('NEO timeBar');
-    this.content.appendChild(this.timeBar);
+    
     this.timeBar.name = 'timeBar';
-
 
     // special svg pattern
     this.pattern = NEO.DOM('NEO', 'defs', 'width:100%; height:20px; bottom:0;', {} );
     var p = NEO.DOM(null, 'pattern', '', {id:'timeBar', width:50, height:20, patternUnits:'userSpaceOnUse'}, this.pattern, 0 );
     var g = NEO.DOM(null, 'g', '', { stroke:'#888', 'stroke-width':'1', fill:'none'}, p, 0 );
-    NEO.DOM(null, 'path', '', { d:'M0.5 10 L0.5 18'}, g, 0 );
-    NEO.DOM(null, 'path', '', { d:'M10.5 15 L10.5 18'}, g, 0 );
-    NEO.DOM(null, 'path', '', { d:'M20.5 15 L20.5 18'}, g, 0 );
-    NEO.DOM(null, 'path', '', { d:'M30.5 15 L30.5 18'}, g, 0 );
-    NEO.DOM(null, 'path', '', { d:'M40.5 15 L40.5 18'}, g, 0 );
-    NEO.DOM(null, 'path', '', { d:'M-0.5 20 L50.5 20'}, g, 0 );
+    NEO.DOM(null, 'path', '', { d:'M0 0'}, g, 0 );
     NEO.DOM(null, 'rect', '', {width:100, height:20, x:0, fill:'url(#timeBar)'}, this.pattern );
 
     this.patternLine = g.childNodes[0];
 
     this.timeBar.appendChild(this.pattern);
 
+
+    // BOTTOM TIME SCALE
+
     this.timescale = NEO.DOM('NEO timescale');
-    this.content.appendChild(this.timescale);
+    
+    this.timescale.appendChild(this.liner(1));
+    this.timescale.appendChild(this.liner(20));
+    this.timescale.name = 'timescale';
+
+    this.pattern2 = NEO.DOM('NEO', 'defs', 'width:100%; height:10px; top:5px;', {} );
+    p = NEO.DOM(null, 'pattern', '', {id:'timeScale', width:10, height:10, patternUnits:'userSpaceOnUse'}, this.pattern2, 0 );
+    g = NEO.DOM(null, 'g', '', { stroke:'#888', 'stroke-width':'1', fill:'none'}, p, 0 );
+    NEO.DOM(null, 'path', '', { d:'M0 10 L10 0 M0 5 L5 0 M5 10 L10 5'}, g, 0 );
+    NEO.DOM(null, 'rect', '', {width:'100%', height:10, x:0, fill:'url(#timeScale)'}, this.pattern2 );
+    this.timescale.appendChild(this.pattern2);
+
+    // TRACK CONTENT
 
     this.inner = NEO.DOM('NEO inner');
-    this.content.appendChild(this.inner);
+    
+
+
+    // TIME MARKER
 
     this.marker = NEO.DOM('NEO', 'rect', 'width:41px; height:100%;', {width:10, height:20, x:0.5, y:27.5, fill:'rgba(255,0,0,0.3)', stroke:'#F00', 'stroke-width':'1'} );
-    NEO.DOM(null, 'line', '', { x1:5.5, y1:47.5, x2:5.5, y2:1000, stroke:'#F00', 'stroke-width':'1' }, this.marker );
-    //NEO.DOM(null, 'path', '', { d:'M5.5 47.5 L5.5 1000', stroke:'#F00', 'stroke-width':'1' }, this.marker );
-    this.content.appendChild(this.marker);
+    NEO.DOM(null, 'line', '', { x1:5.5, y1:47.5, x2:5.5, y2:'100%', stroke:'#F00', 'stroke-width':'1' }, this.marker );
+    
 
+    this.content.appendChild(this.timeBar);
+    this.content.appendChild(this.timescale);
+    this.content.appendChild(this.inner);
+    this.content.appendChild(this.marker);
     this.content.appendChild(this.topmenu);
 
 
@@ -303,11 +318,8 @@ NEO.Timeline.prototype = {
             Math.round(this.framesize*5)+0.5,
         ];
 
-        NEO.setSVG(this.patternLine, 'd', 'M'+n[0]+' 15 L'+n[0]+' 18', 1);
-        NEO.setSVG(this.patternLine, 'd', 'M'+n[1]+' 15 L'+n[1]+' 18', 2);
-        NEO.setSVG(this.patternLine, 'd', 'M'+n[2]+' 15 L'+n[2]+' 18', 3);
-        NEO.setSVG(this.patternLine, 'd', 'M'+n[3]+' 15 L'+n[3]+' 18', 4);
-        NEO.setSVG(this.patternLine, 'd', 'M-0.5 20 L'+n[4]+' 20', 5);
+        var path = 'M0.5 10 L0.5 18' + 'M'+n[0]+' 15 L'+n[0]+' 18' + 'M'+n[1]+' 15 L'+n[1]+' 18' + 'M'+n[2]+' 15 L'+n[2]+' 18' + 'M'+n[3]+' 15 L'+n[3]+' 18' + 'M-0.5 20 L'+n[4]+' 20';
+        NEO.setSVG(this.patternLine, 'd', path, 0);
 
         NEO.setSVG(this.pattern.childNodes[0], 'width', this.framesize*5, 0);
 
@@ -355,6 +367,20 @@ NEO.Timeline.prototype = {
 
         this.title.text2(this.frame);
         this.title.text( minutes + ':' + padding + seconds.toFixed( 2 ) );
+    },
+
+
+
+
+
+
+    liner:function(top){
+        var l = NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:'#888', 'stroke-width':1} );
+        return l;
+    },
+    pins:function(){
+        var p = NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
+        return p;
     }
 }
 

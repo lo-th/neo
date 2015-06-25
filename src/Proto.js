@@ -2,7 +2,8 @@ NEO.Proto = function(obj){
 
     obj = obj || {};
 
-    this.h = 20;
+    this.h = 80;
+    this.show = true;
 
     // define obj size
     /*this.setSize(obj.size);
@@ -20,12 +21,39 @@ NEO.Proto = function(obj){
     this.f = [];
 
     this.c[0] = NEO.DOM('NEO base');
-    this.c[1] = NEO.DOM('NEO text');
+    this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
+    this.c[2] = NEO.main.liner(20);
+    this.c[3] = NEO.main.liner(80);
+    this.c[4] = NEO.main.pins();
+
     this.c[1].textContent = this.type;
+
+    this.f[0] = function(e){
+        if(this.show) this.close();
+        else this.open();
+    }.bind(this);
+
+    this.c[4].onclick = this.f[0];
+
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
+    open:function(){
+        this.show = true;
+        this.setSvg(4, 'd','M 12 6 L 8 10 4 6');
+        this.h = 80;
+        this.applyHeight();
+    },
+    close:function(){
+        this.show = false;
+        this.setSvg(4, 'd','M 6 4 L 10 8 6 12');
+        this.h = 20;
+        this.applyHeight();
+    },
+    applyHeight:function(){
+        this.c[0].style.height = this.h+'px';
+    },
 
     init:function(){
         this.c[0].style.background = NEO.bgcolor(this.color);
@@ -38,6 +66,9 @@ NEO.Proto.prototype = {
         }
         //this.rSize();
     },
+    setSvg:function(domId, type, value, id){
+        this.c[domId].childNodes[id || 0].setAttributeNS(null, type, value );
+    },
     /*setSize:function(sx){
         this.size = sx || UIL.WIDTH;
         this.sa = (this.size/3).toFixed(0)*1;
@@ -46,9 +77,7 @@ NEO.Proto.prototype = {
     setDom:function(id, type, value){
         this.c[id].style[type] = value+'px';
     },
-    setSvg:function(domId, type, value, id){
-        this.c[domId].childNodes[id || 0].setAttributeNS(null, type, value );
-    },
+    
     clear:function(){
         var ev = UIL.events;
         var i = this.c.length, j;
