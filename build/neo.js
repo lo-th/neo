@@ -336,7 +336,7 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; ');
 
-            NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none; transition:height, 0.1s ease-out;');
+            NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none;pointer-events:auto; transition:height, 0.1s ease-out;');
 
             
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
@@ -576,13 +576,16 @@ NEO.Timeline = function(css, decal){
 
     // content.mouseMouve
     this.f[1] = function(e){
+        var x = e.clientX;
+        var y = e.clientY;
+        if(y<this.topLimite)this.f[2]();
+
         if(this.timerdown){
-            this.currentframe = Math.floor(e.clientX/this.framesize)+this.currentLeftFrame;
-            
+            this.currentframe = Math.floor(x/this.framesize)+this.currentLeftFrame;
             this.updateTime();
         }
         if(this.scrolldown){
-            this.posX = e.clientX;
+            this.posX = x;
             this.move();
         }
     }.bind(this);
@@ -595,7 +598,7 @@ NEO.Timeline = function(css, decal){
 
     this.content.onmousedown = this.f[0];
     this.content.onmousemove = this.f[1];
-    this.content.onmouseout = this.f[2];
+    //this.content.onmouseout = this.f[2];
     this.content.onmouseup = this.f[2];
 
 
@@ -646,9 +649,7 @@ NEO.Timeline.prototype = {
 
         var w = 100 * (100/(100*s));
 
-        this.framesize = Math.floor(s*10);//.toFixed(0)*1;
-        //this.viewFrame = this.width/this.framesize;
-        //console.log(w, this.framesize );
+        this.framesize = Math.floor(s*10);
 
         var ld = (this.framesize*0.5)+0.5;
 
@@ -722,6 +723,8 @@ NEO.Timeline.prototype = {
         this.setScaler();
         this.move();
 
+        this.topLimite = this.viewHeight-(this.height-10);
+
         //console.log(this.viewFrame);
 
 
@@ -750,6 +753,8 @@ NEO.Timeline.prototype = {
         this.height = 80+total;
         this.content.style.height = this.height+'px';
         this.marker.style.height = (this.height-20)+'px';
+
+        this.topLimite = this.viewHeight-(this.height-10);
         //if(total>this.height) this.showScroll(total);
         //else this.hideScroll();
     },
