@@ -53,6 +53,7 @@ NEO.Proto.prototype = {
     },
     applyHeight:function(){
         this.c[0].style.height = this.h+'px';
+        if(NEO.main)NEO.main.calc();
     },
 
     init:function(){
