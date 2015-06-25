@@ -147,6 +147,7 @@ NEO.Timeline = function(css, decal){
     this.time = 0;
     this.height = 80;
     this.width = 100;
+    this.maxTop = 145;
     this.decal = decal || 0;
 
     this.framesize = 10;
@@ -156,7 +157,6 @@ NEO.Timeline = function(css, decal){
     this.totalFrame = 750; // default flash
     this.totalSize = this.framesize*this.totalFrame;
     this.currentPosition = this.currentLeftFrame*this.framesize;
-    //this.currentLeftPosition = this.currentLeftFrame*this.framesize;
     this.ratio = this.totalFrame/this.width;
     this.viewFrame = this.width/this.framesize;
     this.posX = 0;
@@ -328,7 +328,6 @@ NEO.Timeline.prototype = {
             this.inPlay = true;
             this.playButton.icon(this.pauseIcon);
         }
-
     },
     show:function(){
         this.content.style.display = 'block';
@@ -342,9 +341,9 @@ NEO.Timeline.prototype = {
         this.currentScrollPosition = Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ).toFixed(0)*1;
         this.currentLeftFrame = Math.round(this.currentScrollPosition*this.ratio);
         this.currentPosition = this.currentLeftFrame*this.framesize;
-        this.scaler.style.left = this.currentScrollPosition;
+        this.scaler.style.left = this.currentScrollPosition+'px';
         this.timeBar.style.left = -this.currentPosition+'px';
-        this.marker.style.left = ((this.currentframe-+this.currentLeftFrame)*this.framesize)+'px';
+        this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
         this.miniFramePos.style.left = ((this.currentframe*(this.width/this.totalFrame)))+'px';
     },
     scaletime:function(s){
@@ -415,8 +414,12 @@ NEO.Timeline.prototype = {
         return n;
     },
     resize:function(e){
-        this.width = window.innerWidth - this.decal;
-        //this.height = window.innerHeight-this.top-5;
+        this.viewWidth = window.innerWidth;
+        this.viewHeight = window.innerHeight;
+
+        this.width = this.viewWidth - this.decal;
+        this.maxHeight = this.viewHeight-this.maxTop;
+
         this.content.style.height = this.height+'px';
         this.content.style.width = this.width+'px';
         this.timescale.style.width = this.width+'px';
@@ -465,7 +468,7 @@ NEO.Timeline.prototype = {
         return l;
     },
     vliner:function(top, color){
-        var l = NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color, 'stroke-width':1} );
+        var l = NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888', 'stroke-width':1} );
         return l;
     },
     pins:function(){

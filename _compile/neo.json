@@ -1,6 +1,6 @@
 [ 
     "src/Plus.js",
-    "src/Tween.js",
+    "src/tween.min.js",
     "src/Frame.js",
     "src/NEO.js",
     "src/TimerGraph.js",

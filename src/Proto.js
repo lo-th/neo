@@ -55,6 +55,9 @@ NEO.Proto.prototype = {
         this.c[0].style.height = this.h+'px';
         if(NEO.main)NEO.main.calc();
     },
+    move:function(){
+
+    },
 
     init:function(){
         this.c[0].style.background = NEO.bgcolor(this.color);
