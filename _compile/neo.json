@@ -1,0 +1,16 @@
+[ 
+    "src/Plus.js",
+    "src/Tween.js",
+    "src/Frame.js",
+    "src/NEO.js",
+    "src/TimerGraph.js",
+    "src/Proto.js",
+    "src/AudioTrack.js",
+    "src/Bang.js",
+    "src/Color.js",
+    "src/Curve.js",
+    "src/Flag.js",
+    "src/Lfo.js",
+    "src/Switch.js",
+    "src/VideoTrack.js"
+]
