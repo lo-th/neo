@@ -42,9 +42,9 @@ var NEO = NEO || ( function () {
 
             
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
-            NEO.CC('NEO.timeBar', 'width:100px; height:36px; top:24px; background:none; pointer-events:auto; cursor:pointer;');
+            NEO.CC('NEO.timeBar', 'width:100px; height:20px; top:20px; background:none; pointer-events:auto; cursor:pointer;');
             NEO.CC('NEO.timescale', 'width:100px; height:20px; background:none; bottom:0; pointer-events:auto; cursor:pointer;');
-            NEO.CC('NEO.inner', 'width:100%; top:60px; height:auto; overflow:hidden; background:none;');
+            NEO.CC('NEO.inner', 'width:100%; top:40px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
             NEO.CC('NEO.text', NEO.txt1);
@@ -145,7 +145,7 @@ var NEO = NEO || ( function () {
 NEO.Timeline = function(css, decal){
 
     this.time = 0;
-    this.height = 80;
+    this.height = 60;
     this.width = 100;
     this.maxTop = 145;
     this.decal = decal || 0;
@@ -231,7 +231,7 @@ NEO.Timeline = function(css, decal){
     NEO.DOM(null, 'rect', '', {width:'100%', height:10, x:0, fill:'url(#timeScale)'}, this.pattern2 );
     this.timescale.appendChild(this.pattern2);
 
-    this.scaler = NEO.DOM('NEO', 'rect', 'width:40px; height:16px; top:2px', {width:40, height:16, x:0, y:0, fill:'rgba(0,0,0,0.5)', stroke:'#888', 'stroke-width':'1'} );
+    this.scaler = NEO.DOM('NEO', 'rect', 'width:40px; height:16px; top:2px', {width:40, height:16, x:0, y:0, fill:'rgba(0,0,0,0.5)', stroke:'#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
     this.timescale.appendChild(this.scaler);
 
     this.miniFramePos = this.vliner(1, '#F00');
@@ -247,8 +247,8 @@ NEO.Timeline = function(css, decal){
 
     // TIME MARKER
 
-    this.marker = NEO.DOM('NEO', 'rect', 'width:41px; height:60px;', {width:10, height:20, x:0.5, y:37.5, fill:'rgba(255,0,0,0.3)', stroke:'#F00', 'stroke-width':'1'} );
-    NEO.DOM(null, 'line', '', { x1:5.5, y1:57.5, x2:5.5, y2:'100%', stroke:'#F00', 'stroke-width':'1' }, this.marker );
+    this.marker = NEO.DOM('NEO', 'rect', 'width:41px; height:60px;', {width:10, height:16, x:0.5, y:21.5, fill:'rgba(255,0,0,0.3)', stroke:'#F00', 'stroke-width':1, 'stroke-linecap':'butt'} );
+    NEO.DOM(null, 'line', '', { x1:5.5, y1:37, x2:5.5, y2:'100%', stroke:'#F00', 'stroke-width':1, 'stroke-linecap':'butt' }, this.marker );
     
 
     this.content.appendChild(this.timeBar);
@@ -452,7 +452,7 @@ NEO.Timeline.prototype = {
         var total = 0;
         var i = this.neo.length;
         while(i--) total+=this.neo[i].h;
-        this.height = 80+total;
+        this.height = 60+(total-1);
         this.content.style.height = this.height+'px';
         this.marker.style.height = (this.height-20)+'px';
 
