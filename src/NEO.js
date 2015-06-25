@@ -38,12 +38,12 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; ');
 
-            NEO.CC('NEO.content', 'width:100%; overflow:hidden; background:none;');
+            NEO.CC('NEO.content', 'width:100px; overflow:hidden; background:none;');
 
             
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
             NEO.CC('NEO.timeBar', 'width:100px; height:36px; top:24px; background:none; pointer-events:auto; cursor:pointer;');
-            NEO.CC('NEO.timescale', 'width:100%; height:20px; background:none; bottom:0; pointer-events:auto; cursor:pointer;');
+            NEO.CC('NEO.timescale', 'width:100px; height:20px; background:none; bottom:0; pointer-events:auto; cursor:pointer;');
             NEO.CC('NEO.inner', 'width:100%; top:60px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
@@ -159,6 +159,7 @@ NEO.Timeline = function(css, decal){
     //this.currentLeftPosition = this.currentLeftFrame*this.framesize;
     this.ratio = this.totalFrame/this.width;
     this.viewFrame = this.width/this.framesize;
+    this.posX = 0;
     
     
 
@@ -235,6 +236,9 @@ NEO.Timeline = function(css, decal){
     this.scaler = NEO.DOM('NEO', 'rect', 'width:40px; height:16px; top:2px', {width:40, height:16, x:0, y:0, fill:'rgba(0,0,0,0.5)', stroke:'#888', 'stroke-width':'1'} );
     this.timescale.appendChild(this.scaler);
 
+    this.miniFramePos = this.vliner(1, '#F00');
+    this.timescale.appendChild(this.miniFramePos);
+
 
 
     // TRACK CONTENT
@@ -255,6 +259,10 @@ NEO.Timeline = function(css, decal){
     this.content.appendChild(this.marker);
     this.content.appendChild(this.topmenu);
 
+
+
+    // FUNCTION
+
     // content.mouseDown
     this.f[0] = function(e){
         if(e.target.name){
@@ -274,17 +282,11 @@ NEO.Timeline = function(css, decal){
     this.f[1] = function(e){
         if(this.timerdown){
             this.currentframe = Math.floor(e.clientX/this.framesize)+this.currentLeftFrame;
-            this.marker.style.left = ((this.currentframe-+this.currentLeftFrame)*this.framesize)+'px';
+            
             this.updateTime();
         }
         if(this.scrolldown){
-            this.mid = this.miniScaleView*0.5;
-            this.currentScrollPosition = Math.min( this.width-this.miniScaleView, Math.max( 0, (e.clientX-this.mid) ) ).toFixed(0)*1;
-            this.currentLeftFrame = Math.floor(this.currentScrollPosition*this.ratio);
-            this.currentPosition = this.currentLeftFrame*this.framesize;
-
-            //this.scaler.style.left = this.currentScrollPosition;
-
+            this.posX = e.clientX;
             this.move();
         }
     }.bind(this);
@@ -335,16 +337,21 @@ NEO.Timeline.prototype = {
         this.content.style.display = 'none';
     },
     move:function(){
+        var x = this.posX;
+        this.mid = this.miniScaleView*0.5;
+        this.currentScrollPosition = Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ).toFixed(0)*1;
+        this.currentLeftFrame = Math.round(this.currentScrollPosition*this.ratio);
+        this.currentPosition = this.currentLeftFrame*this.framesize;
         this.scaler.style.left = this.currentScrollPosition;
         this.timeBar.style.left = -this.currentPosition+'px';
         this.marker.style.left = ((this.currentframe-+this.currentLeftFrame)*this.framesize)+'px';
-
+        this.miniFramePos.style.left = ((this.currentframe*(this.width/this.totalFrame)))+'px';
     },
     scaletime:function(s){
 
         var w = 100 * (100/(100*s));
 
-        this.framesize = (s*10).toFixed(0)*1;
+        this.framesize = Math.floor(s*10);//.toFixed(0)*1;
         //this.viewFrame = this.width/this.framesize;
         //console.log(w, this.framesize );
 
@@ -379,11 +386,12 @@ NEO.Timeline.prototype = {
         this.marker.style.left = ((this.currentframe*this.framesize)-this.currentPosition)+'px';
 
         this.setScaler();
+        this.move();
 
     },
     setScaler:function(){
         this.ratio = this.totalFrame/this.width;
-        this.viewFrame = Math.floor(this.width/this.framesize);
+        this.viewFrame = Math.round(this.width/this.framesize);
         this.miniScaleView = (this.width/this.totalFrame) * this.viewFrame;
         this.scaler.style.width = this.miniScaleView+'px';
         NEO.setSVG(this.scaler, 'width',this.miniScaleView);
@@ -411,8 +419,9 @@ NEO.Timeline.prototype = {
         //this.height = window.innerHeight-this.top-5;
         this.content.style.height = this.height+'px';
         this.content.style.width = this.width+'px';
-
+        this.timescale.style.width = this.width+'px';
         this.setScaler();
+        this.move();
 
         //console.log(this.viewFrame);
 
@@ -431,6 +440,9 @@ NEO.Timeline.prototype = {
 
         this.title.text2(this.currentframe);
         this.title.text( minutes + ':' + padding + seconds.toFixed( 2 ) );
+
+        this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
+        this.miniFramePos.style.left = ((this.currentframe*(this.width/this.totalFrame)))+'px';
     },
     calc:function(){
         var total = 0;
@@ -450,6 +462,10 @@ NEO.Timeline.prototype = {
 
     liner:function(top){
         var l = NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:'#888', 'stroke-width':1} );
+        return l;
+    },
+    vliner:function(top, color){
+        var l = NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color, 'stroke-width':1} );
         return l;
     },
     pins:function(){
