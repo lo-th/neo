@@ -169,6 +169,8 @@ NEO.Timeline = function(css, decal){
     var callbackFps = function(v){ this.setFps(v); }.bind(this);
     var callbackList = function(v){ this.add(v); this.addList.text('ADD'); }.bind(this);
     var callbackPlay = function(v){ this.play(); }.bind(this);
+    var callbackStart = function(v){ this.goTo(0); }.bind(this);
+    var callbackEnd = function(v){ this.goTo(this.maxFrame); }.bind(this);
 
    
     this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0', top:'2px' }});
@@ -177,12 +179,16 @@ NEO.Timeline = function(css, decal){
     this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:80, pos:{left:'100px', top:'2px' }, simple:true });
     this.addList.text('ADD');
 
-    this.playButton = new UIL.Button({target:this.topmenu, callback:callbackPlay, name:'X', color:'no', size:40, pos:{left:'190px', top:'2px' }, simple:true });
+    this.playButton = new UIL.Button({target:this.topmenu, callback:callbackPlay, name:'X', color:'no', size:40, pos:{left:'210px', top:'2px' }, simple:true });
+    this.startButton = new UIL.Button({target:this.topmenu, callback:callbackStart, name:'X', color:'no', size:20, pos:{left:'190px', top:'2px' }, simple:true });
+    this.endButton = new UIL.Button({target:this.topmenu, callback:callbackEnd, name:'X', color:'no', size:20, pos:{left:'250px', top:'2px' }, simple:true });
     this.playIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='18px' height='17px'><path fill='#CCC' d='M 14 8 L 5 3 4 4 4 13 5 14 14 9 14 8 Z'/></svg>";
     this.pauseIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='18px' height='17px'><path fill='#CCC' d='M 14 4 L 13 3 11 3 10 4 10 13 11 14 13 14 14 13 14 4 M 8 4 L 7 3 5 3 4 4 4 13 5 14 7 14 8 13 8 4 Z'/></svg>";
     this.startIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='18px' height='17px'><path fill='#CCC' d='M 11 12 L 11 10 14 10 14 7 11 7 11 5 8 8 8 9 11 12 M 7 12 L 6 12 6 5 7 5 7 3 4 3 4 14 7 14 7 12 Z'/></svg>";
     this.endIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='18px' height='17px'><path fill='#CCC' d='M 10 8 L 7 5 7 7 4 7 4 10 7 10 7 12 10 9 10 8 M 14 3 L 11 3 11 5 12 5 12 12 11 12 11 14 14 14 14 3 Z'/></svg>";
     this.playButton.icon(this.playIcon);
+    this.startButton.icon(this.startIcon);
+    this.endButton.icon(this.endIcon);
 
     // TOP TIMEBAR 
 
@@ -349,6 +355,11 @@ NEO.Timeline.prototype = {
 
         }
 
+    },
+    goTo:function(f){
+        this.currentframe = f;
+        this.updateTime();
+        this.move(this.width*(f/this.maxFrame));
     },
     show:function(){
         this.content.style.display = 'block';
