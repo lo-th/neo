@@ -51,27 +51,8 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:none; background:none; ');
             NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:auto; background:none; ');
-            //NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; background:-webkit-linear-gradient( 0deg, #111 0%, #F11 100%); ');
-            //NEO.CC('NEO.top', 'position:absolute; height:20px; width:100%; overflow:hidden;');
+    ;
             NEO.CC('NEO.text', NEO.txt1);
-
-            /*NEO.CC('NEO.mask', 'width:400px; height:100%; margin-left:-50px; pointer-events:auto; cursor:col-resize; background:none; display:none;');
-            NEO.CC('NEO.inner', 'width:300px; top:0; left:0; height:auto; overflow:hidden; background:none;');
-
-            
-
-            
-
-            NEO.CC('input', 'border:solid 1px rgba(0,0,0,0.2); background:rgba(0,0,0,0.2); transition: 0.1s ease-out;', true);
-            NEO.CC('input:focus', 'border: solid 1px rgba(0,0,0,0); background:rgba(0,0,0,0.6);', true);
-
-            NEO.CC('NEO.list', 'box-sizing:content-box; border:20px solid transparent; border-bottom:10px solid transparent; left:80px; top:0px; width:190px; height:90px; overflow:hidden; cursor:s-resize; pointer-events:auto; display:none;');
-            NEO.CC('NEO.list-in', 'left:0; top:0; width:100%; background:rgba(0,0,0,0.2); ');
-            NEO.CC('NEO.listItem', 'position:relative; height:18px; background:rgba(0,0,0,0.2); border-bottom:1px solid rgba(0,0,0,0.2); pointer-events:auto; cursor:pointer;'+NEO.txt1);
-            NEO.CC('NEO.listItem:hover', 'background:'+NEO.SELECT+'; color:#FFFFFF;')
-
-            NEO.CC('NEO.scroll-bg', 'cursor:w-resize; pointer-events:auto; background:rgba(256,0,0,0.2);');
-            NEO.CC('NEO.svgbox', 'left:100px; top:1px; width:190px; height:17px; pointer-events:auto; cursor:pointer; font-family:"Open Sans", sans-serif; font-size:11px; text-align:center;');*/
 
             NEO.DEF = true;
         },
@@ -91,24 +72,13 @@ var NEO = NEO || ( function () {
             if(a==0) color = 'none';
             return color;
         },
-        /*canvasURL:function(obj){
-            var canvas = document.createElement( 'canvas' );
-            canvas.width = obj.w || 20;
-            canvas.height = obj.h || 20;
-
-            var context = canvas.getContext( '2d' );
-            context.fillStyle = '#444';
-            context.fillRect( 0, 0, 20, 20 );
-            return canvas.toDataURL();
-        },*/
         setSVG:function(dom, type, value, id){
             dom.childNodes[id || 0].setAttributeNS(null, type, value );
         },
         setDOM:function(dom, type, value){
             dom.style[type] = value+'px';
         },
-
-        DOM:function(cc, type, css, obj, dom, id){ 
+        DOM:function(cc, type, css, obj, dom, id){
             type = type || 'div';
             if(type=='rect' || type=='path' || type=='polygon' || type=='text' || type=='pattern' || type=='defs' || type=='g' || type=='line' ){
                 if(dom==undefined) dom = document.createElementNS( this.svgns, 'svg' );
@@ -129,7 +99,6 @@ var NEO = NEO || ( function () {
             }
             
             if(css) dom.style.cssText = css; 
-
 
             if(id==undefined) return dom;
             else return dom.childNodes[id || 0];
@@ -156,10 +125,10 @@ NEO.Timeline = function(css, decal){
     this.maxTop = 145;
     this.decal = decal || 0;
 
-    this.framesize = 10;
+    this.frameSize = 10;
     this.currentframe = 0;
     this.currentLeftFrame = 0;
-    this.viewFrame = Math.round(this.width/this.framesize);
+    this.viewFrame = Math.round(this.width/this.frameSize);
     this.fps = 60;
     this.timerStep = 1000/this.fps;
 
@@ -167,17 +136,12 @@ NEO.Timeline = function(css, decal){
     this.delta = 0;
     this.then = Date.now();
 
-    this.totalFrame = 750; // default flash
-    this.totalSize = this.framesize*this.totalFrame;
-    this.currentPosition = this.currentLeftFrame*this.framesize;
-    this.ratio = this.totalFrame/this.width;
-    this.viewFrame = this.width/this.framesize;
+    this.maxFrame = 750; // default flash
+    this.maxSize = this.frameSize*this.maxFrame;
+    this.currentPosition = this.currentLeftFrame*this.frameSize;
+    this.ratio = this.maxFrame/this.width;
+    this.viewFrame = this.width/this.frameSize;
     this.posX = 0;
-
-    //this.isTimeOut = false;
-    //this.timer = null;
-    
-    
 
     this.timerdown = false;
     this.scrolldown = false;
@@ -199,7 +163,7 @@ NEO.Timeline = function(css, decal){
     this.topmenu.appendChild(this.liner(1));
 
     var callbackSize = function(v){ this.scaletime(v); }.bind(this);
-    var callbackFps = function(v){ this.fps = v; this.timerStep = 1000/this.fps; this.updateTime(); }.bind(this);
+    var callbackFps = function(v){ this.setFps(v); }.bind(this);
     var callbackList = function(v){ this.add(v); this.addList.text('ADD'); }.bind(this);
     var callbackPlay = function(v){ this.play(); }.bind(this);
 
@@ -300,7 +264,6 @@ NEO.Timeline = function(css, decal){
 
         if(this.timerdown){
             this.currentframe = this.getFrameClick(x);
-            //this.currentframe = Math.floor(x/this.framesize)+this.currentLeftFrame;
             this.updateTime();
         }
         if(this.scrolldown){
@@ -330,6 +293,8 @@ NEO.Timeline = function(css, decal){
     this.resize();
 
     this.scaletime(0.8);//default FLASH
+
+    //this.scaletime(0.1);
     //this.scaletime(1);
 
     NEO.main = this;
@@ -348,7 +313,7 @@ NEO.Timeline.prototype = {
         }else{
             this.inPlay = true;
             this.playButton.icon(this.pauseIcon);
-            if(this.currentframe === this.totalFrame){
+            if(this.currentframe === this.maxFrame){
                 this.currentframe=0;
                 this.move(this.mid);
             }
@@ -376,7 +341,7 @@ NEO.Timeline.prototype = {
             this.then = this.now - (this.delta % this.timerStep);
 
 
-            if(this.currentframe === this.totalFrame){ this.stop();}
+            if(this.currentframe === this.maxFrame){ this.stop();}
 
         }
 
@@ -395,10 +360,18 @@ NEO.Timeline.prototype = {
     },
     move:function(x){
         x = x || this.posX;
+
+       
         this.mid = this.miniScaleView*0.5;
-        this.currentScrollPosition = Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ).toFixed(0)*1;
-        this.currentLeftFrame = Math.round(this.currentScrollPosition*this.ratio);
-        this.currentPosition = this.currentLeftFrame*this.framesize;
+        this.currentScrollPosition = Math.floor(Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ) );
+        this.currentLeftFrame = Math.floor(this.currentScrollPosition*this.ratio);
+        this.currentPosition =  Math.floor(this.currentLeftFrame*this.frameSize);
+
+        if(this.currentPosition<0){ 
+            this.currentPosition = 0;
+            this.currentLeftFrame = 0;
+        }
+        
         this.scaler.style.left = this.currentScrollPosition+'px';
         this.timeBar.style.left = -this.currentPosition+'px';
         this.moveMarker();
@@ -407,62 +380,67 @@ NEO.Timeline.prototype = {
         while(i--) this.neo[i].move();
     },
     moveMarker:function(){
-        this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
-        this.miniFramePos.style.left = ((this.currentframe*(this.width/this.totalFrame)))+'px';
+        this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.frameSize)+'px';
+        this.miniFramePos.style.left = ((this.currentframe*(this.width/this.maxFrame)))+'px';
     },
     getFrameClick:function(x){
-        return Math.floor(x/this.framesize)+this.currentLeftFrame;
+        var f = Math.floor(x/this.frameSize)+this.currentLeftFrame;
+        if(f>this.maxFrame) f = this.maxFrame;
+        return f;
     },
     scaletime:function(s){
 
-        var w = 100 * (100/(100*s));
-
-        this.framesize = Math.floor(s*10);
-
-        var ld = (this.framesize*0.5)+0.5;
-
-        NEO.setSVG(this.pattern, 'width', 100+'%', 1);
+        this.frameSize = Math.floor(s*10);
+        this.maxSize = (this.maxFrame+1)*this.frameSize;
 
         var n = [
-            Math.round(this.framesize)+0.5,
-            Math.round(this.framesize*2)+0.5,
-            Math.round(this.framesize*3)+0.5,
-            Math.round(this.framesize*4)+0.5,
-            Math.round(this.framesize*5)+0.5,
+            Math.round(this.frameSize)+0.5,
+            Math.round(this.frameSize*2)+0.5,
+            Math.round(this.frameSize*3)+0.5,
+            Math.round(this.frameSize*4)+0.5,
+            Math.round(this.frameSize*5)+0.5,
         ];
 
+        // timeline pattern
         var path = 'M0.5 10 L0.5 18' + 'M'+n[0]+' 15 L'+n[0]+' 18' + 'M'+n[1]+' 15 L'+n[1]+' 18' + 'M'+n[2]+' 15 L'+n[2]+' 18' + 'M'+n[3]+' 15 L'+n[3]+' 18' + 'M-0.5 20 L'+n[4]+' 20';
         NEO.setSVG(this.patternLine, 'd', path, 0);
-        NEO.setSVG(this.pattern.childNodes[0], 'width', this.framesize*5, 0);
+        NEO.setSVG(this.pattern.childNodes[0], 'width', this.frameSize*5, 0);
 
-        this.totalSize = this.framesize*this.totalFrame;
-        //this.currentPosition = this.currentLeftFrame*this.framesize;
-
-        //this.pattern.style.width = this.totalSize + 'px';
-        this.timeBar.style.width = this.totalSize + 'px';
-        //this.timeBar.style.left = this.currentPosition + 'px';
-        //this.pattern.style.left = this.currentPosition +'px';
+      
+        this.timeBar.style.width = this.maxSize + 'px';
 
         var i = this.neo.length;
         while(i--) this.neo[i].setSize();
 
-        NEO.setSVG(this.marker, 'width',this.framesize);
-        NEO.setSVG(this.marker, 'x1',ld, 1);
-        NEO.setSVG(this.marker, 'x2',ld, 1);
+        var middle = (this.frameSize*0.5)+0.5;
+        NEO.setSVG(this.marker, 'width',this.frameSize);
+        NEO.setSVG(this.marker, 'x1',middle, 1);
+        NEO.setSVG(this.marker, 'x2',middle, 1);
 
-        //this.marker.style.left = ((this.currentframe*this.framesize)-this.currentPosition)+'px';
 
         this.setScaler();
         this.move();
 
     },
     setScaler:function(){
-        this.ratio = this.totalFrame/this.width;
-        this.viewFrame = Math.round(this.width/this.framesize);
-        this.miniScaleView = (this.width/this.totalFrame) * this.viewFrame;
-        this.scaler.style.width = this.miniScaleView+'px';
-        NEO.setSVG(this.scaler, 'width',this.miniScaleView);
+        this.ratio = this.maxFrame/this.width;
+        this.viewFrame = Math.floor(this.width/this.frameSize);
+        this.miniScaleView = Math.floor((this.width/this.maxFrame) * this.viewFrame);
+
+        if(this.maxSize<this.width){
+            this.scaler.style.display = 'none';
+        }else{
+            this.scaler.style.display = 'block';
+            this.scaler.style.width = this.miniScaleView+'px';
+            NEO.setSVG(this.scaler, 'width',this.miniScaleView);
+        }
     },
+    setFps:function(fps){
+        this.fps = fps;
+        this.timerStep = 1000/this.fps; 
+        this.updateTime();
+    },
+    
     add:function(type, obj){
         obj = obj || {};
         var n;
@@ -479,8 +457,6 @@ NEO.Timeline.prototype = {
         n.id = this.neo.length;
         this.neo.push(n);
         this.calc();
-
-        //console.log(type);
         return n;
     },
     remove:function(id){
@@ -504,14 +480,6 @@ NEO.Timeline.prototype = {
         this.move();
 
         this.topLimite = this.viewHeight-(this.height-10);
-
-        //console.log(this.viewFrame);
-
-
-        //this.sizer.setDom(0,'left', this.width-140 );
-        //this.zone = this.height-40;
-        //this.calc();
-        //this.f[5](0);
     },
     updateTime:function () {
         this.time = this.currentframe/this.fps;
@@ -559,9 +527,9 @@ NEO.Timeline.prototype = {
         return NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
     },
     keybox:function(k){
-        var l = k*this.framesize;
-        var w = this.framesize;
-         return NEO.DOM('NEO', 'rect','width:'+w+'px; height:60px; left:'+l+'px; top:0;',{ width:w, height:60, fill:'#56afb2' } );
+        var l = k*this.frameSize;
+        var w = this.frameSize;
+        return NEO.DOM('NEO', 'rect','width:'+w+'px; height:60px; left:'+l+'px; top:0;',{ width:'100%', height:60, fill:'#56afb2' } );
     },
     dels:function(){
         return NEO.DOM('NEO', 'path','width:16px; height:20px; right:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 12 L 8 8 4 12 M 4 4 L 8 8 12 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );

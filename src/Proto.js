@@ -76,7 +76,7 @@ NEO.Proto.prototype = {
     },
 
     setSize:function(){
-        this.c[5].style.width = NEO.main.totalSize+'px';
+        this.c[5].style.width = NEO.main.maxSize+'px';
     },
 
     move:function(){
