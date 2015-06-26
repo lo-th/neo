@@ -9,6 +9,7 @@
 
 // need uil http://lo-th.github.io/uil/build/uil.min.js
 var UIL;
+var loop;
 
 var NEO = NEO || ( function () {
     return {
@@ -154,13 +155,23 @@ NEO.Timeline = function(css, decal){
     this.framesize = 10;
     this.currentframe = 0;
     this.currentLeftFrame = 0;
+    this.viewFrame = Math.round(this.width/this.framesize);
     this.fps = 60;
+    this.timerStep = 1000/this.fps;
+
+    this.now = 0;
+    this.delta = 0;
+    this.then = Date.now();
+
     this.totalFrame = 750; // default flash
     this.totalSize = this.framesize*this.totalFrame;
     this.currentPosition = this.currentLeftFrame*this.framesize;
     this.ratio = this.totalFrame/this.width;
     this.viewFrame = this.width/this.framesize;
     this.posX = 0;
+
+    //this.isTimeOut = false;
+    //this.timer = null;
     
     
 
@@ -184,7 +195,7 @@ NEO.Timeline = function(css, decal){
     this.topmenu.appendChild(this.liner(1));
 
     var callbackSize = function(v){ this.scaletime(v); }.bind(this);
-    var callbackFps = function(v){ this.fps = v; this.updateTime(); }.bind(this);
+    var callbackFps = function(v){ this.fps = v; this.timerStep = 1000/this.fps; this.updateTime(); }.bind(this);
     var callbackList = function(v){ this.add(v); this.addList.text('ADD'); }.bind(this);
     var callbackPlay = function(v){ this.play(); }.bind(this);
 
@@ -322,14 +333,44 @@ NEO.Timeline = function(css, decal){
 
 NEO.Timeline.prototype = {
     constructor: NEO.Timeline,
+    stop:function(){
+        this.inPlay = false;
+        this.playButton.icon(this.playIcon);
+    },
     play:function(){
         if(this.inPlay){
-            this.inPlay = false;
-            this.playButton.icon(this.playIcon);
+            this.stop();
         }else{
             this.inPlay = true;
             this.playButton.icon(this.pauseIcon);
+            if(this.currentframe === this.totalFrame){
+                this.currentframe=0;
+                this.move(this.mid);
+            }
+
+            loop();
+
         }
+    },
+    update:function(){
+
+        this.now = Date.now();
+        this.delta = this.now - this.then;
+
+        if (this.delta > this.timerStep) {
+
+            this.currentframe ++;
+
+            this.autoScroll();
+            this.updateTime();
+
+            this.then = this.now - (this.delta % this.timerStep);
+
+
+            if(this.currentframe === this.totalFrame){ this.stop();}
+
+        }
+        
     },
     show:function(){
         this.content.style.display = 'block';
@@ -337,17 +378,27 @@ NEO.Timeline.prototype = {
     hide:function(){
         this.content.style.display = 'none';
     },
-    move:function(){
-        var x = this.posX;
+    autoScroll:function(){
+        var right = this.currentLeftFrame+this.viewFrame;
+        if(this.currentframe>right) {
+            this.move(this.currentScrollPosition+this.miniScaleView+this.mid);
+        }
+    },
+    move:function(x){
+        x = x || this.posX;
         this.mid = this.miniScaleView*0.5;
         this.currentScrollPosition = Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ).toFixed(0)*1;
         this.currentLeftFrame = Math.round(this.currentScrollPosition*this.ratio);
         this.currentPosition = this.currentLeftFrame*this.framesize;
         this.scaler.style.left = this.currentScrollPosition+'px';
         this.timeBar.style.left = -this.currentPosition+'px';
+        this.moveMarker();
+    },
+    moveMarker:function(){
         this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
         this.miniFramePos.style.left = ((this.currentframe*(this.width/this.totalFrame)))+'px';
     },
+
     scaletime:function(s){
 
         var w = 100 * (100/(100*s));
@@ -382,7 +433,7 @@ NEO.Timeline.prototype = {
         NEO.setSVG(this.marker, 'x1',ld, 1);
         NEO.setSVG(this.marker, 'x2',ld, 1);
 
-        this.marker.style.left = ((this.currentframe*this.framesize)-this.currentPosition)+'px';
+        //this.marker.style.left = ((this.currentframe*this.framesize)-this.currentPosition)+'px';
 
         this.setScaler();
         this.move();
@@ -454,8 +505,7 @@ NEO.Timeline.prototype = {
         this.title.text2(this.currentframe);
         this.title.text( minutes + ':' + padding + seconds.toFixed( 2 ) );
 
-        this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
-        this.miniFramePos.style.left = ((this.currentframe*(this.width/this.totalFrame)))+'px';
+        this.moveMarker();
     },
     calc:function(){
         var total = 0;

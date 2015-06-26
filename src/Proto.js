@@ -14,8 +14,6 @@ NEO.Proto = function(obj){
     if(obj.color) NEO.COLOR = obj.color;
     this.color = NEO.COLOR;
     
-
-    //this.txt = obj.name || 'Proto';
     this.target = obj.target || null;
     this.callback = obj.callback || function(){};
 
@@ -64,7 +62,7 @@ NEO.Proto.prototype = {
         this.c[0].style.height = this.h+'px';
         if(NEO.main)NEO.main.calc();
     },
-    
+
     move:function(){
 
     },

@@ -33,6 +33,13 @@ var debug = document.getElementById('debug');
 
 var neo = new NEO.Timeline();
 
+var loop = function () {
+    if(neo.inPlay){ 
+        requestAnimationFrame( loop );
+        neo.update();
+    }
+};
+
 </script>
 </body>
 </html>
