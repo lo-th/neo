@@ -48,7 +48,8 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.inner', 'width:100%; top:40px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
-            NEO.CC('NEO.top', 'position:absolute; height:20px; width:100%; overflow:hidden;');
+            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; background:-webkit-linear-gradient( 0deg, #111 0%, #F11 100%); ');
+            //NEO.CC('NEO.top', 'position:absolute; height:20px; width:100%; overflow:hidden;');
             NEO.CC('NEO.text', NEO.txt1);
 
             /*NEO.CC('NEO.mask', 'width:400px; height:100%; margin-left:-50px; pointer-events:auto; cursor:col-resize; background:none; display:none;');
@@ -349,6 +350,7 @@ NEO.Timeline.prototype = {
             }
 
             loop();
+            //this.update();
 
         }
     },
@@ -370,7 +372,7 @@ NEO.Timeline.prototype = {
             if(this.currentframe === this.totalFrame){ this.stop();}
 
         }
-        
+
     },
     show:function(){
         this.content.style.display = 'block';
@@ -393,6 +395,9 @@ NEO.Timeline.prototype = {
         this.scaler.style.left = this.currentScrollPosition+'px';
         this.timeBar.style.left = -this.currentPosition+'px';
         this.moveMarker();
+
+        var i = this.neo.length;
+        while(i--) this.neo[i].move();
     },
     moveMarker:function(){
         this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
@@ -422,12 +427,15 @@ NEO.Timeline.prototype = {
         NEO.setSVG(this.pattern.childNodes[0], 'width', this.framesize*5, 0);
 
         this.totalSize = this.framesize*this.totalFrame;
-        this.currentPosition = this.currentLeftFrame*this.framesize;
+        //this.currentPosition = this.currentLeftFrame*this.framesize;
 
         //this.pattern.style.width = this.totalSize + 'px';
         this.timeBar.style.width = this.totalSize + 'px';
-        this.timeBar.style.left = this.currentPosition + 'px';
+        //this.timeBar.style.left = this.currentPosition + 'px';
         //this.pattern.style.left = this.currentPosition +'px';
+
+        var i = this.neo.length;
+        while(i--) this.neo[i].setSize();
 
         NEO.setSVG(this.marker, 'width',this.framesize);
         NEO.setSVG(this.marker, 'x1',ld, 1);

@@ -346,7 +346,8 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.inner', 'width:100%; top:40px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
-            NEO.CC('NEO.top', 'position:absolute; height:20px; width:100%; overflow:hidden;');
+            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; background:-webkit-linear-gradient( 0deg, #111 0%, #F11 100%); ');
+            //NEO.CC('NEO.top', 'position:absolute; height:20px; width:100%; overflow:hidden;');
             NEO.CC('NEO.text', NEO.txt1);
 
             /*NEO.CC('NEO.mask', 'width:400px; height:100%; margin-left:-50px; pointer-events:auto; cursor:col-resize; background:none; display:none;');
@@ -647,6 +648,7 @@ NEO.Timeline.prototype = {
             }
 
             loop();
+            //this.update();
 
         }
     },
@@ -668,7 +670,7 @@ NEO.Timeline.prototype = {
             if(this.currentframe === this.totalFrame){ this.stop();}
 
         }
-        
+
     },
     show:function(){
         this.content.style.display = 'block';
@@ -691,6 +693,9 @@ NEO.Timeline.prototype = {
         this.scaler.style.left = this.currentScrollPosition+'px';
         this.timeBar.style.left = -this.currentPosition+'px';
         this.moveMarker();
+
+        var i = this.neo.length;
+        while(i--) this.neo[i].move();
     },
     moveMarker:function(){
         this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
@@ -720,12 +725,15 @@ NEO.Timeline.prototype = {
         NEO.setSVG(this.pattern.childNodes[0], 'width', this.framesize*5, 0);
 
         this.totalSize = this.framesize*this.totalFrame;
-        this.currentPosition = this.currentLeftFrame*this.framesize;
+        //this.currentPosition = this.currentLeftFrame*this.framesize;
 
         //this.pattern.style.width = this.totalSize + 'px';
         this.timeBar.style.width = this.totalSize + 'px';
-        this.timeBar.style.left = this.currentPosition + 'px';
+        //this.timeBar.style.left = this.currentPosition + 'px';
         //this.pattern.style.left = this.currentPosition +'px';
+
+        var i = this.neo.length;
+        while(i--) this.neo[i].setSize();
 
         NEO.setSVG(this.marker, 'width',this.framesize);
         NEO.setSVG(this.marker, 'x1',ld, 1);
@@ -890,9 +898,15 @@ NEO.Proto = function(obj){
     this.c[0] = NEO.DOM('NEO base');
     this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
     this.c[2] = NEO.main.liner(20);
-    this.c[3] = NEO.main.linerBottom();
-    this.c[4] = NEO.main.pins();
-    this.c[5] = NEO.main.dels();
+    
+    this.c[3] = NEO.main.pins();
+    this.c[4] = NEO.main.dels();
+
+    this.c[5] = NEO.DOM('NEO track');
+
+    this.c[6] = NEO.main.linerBottom();
+
+
 
     this.c[1].textContent = this.type;
 
@@ -905,22 +919,25 @@ NEO.Proto = function(obj){
         this.clear(true);
     }.bind(this);
 
-    this.c[4].onclick = this.f[0];
-    this.c[5].onclick = this.f[1];
+    this.c[3].onclick = this.f[0];
+    this.c[4].onclick = this.f[1];
+
+
+    this.setSize();
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
     open:function(){
         this.show = true;
-        this.setSvg(4, 'd','M 12 6 L 8 10 4 6');
+        this.setSvg(3, 'd','M 12 6 L 8 10 4 6');
         this.h = 80;
         this.c[2].style.display = 'block';
         this.applyHeight();
     },
     close:function(){
         this.show = false;
-        this.setSvg(4, 'd','M 6 4 L 10 8 6 12');
+        this.setSvg(3, 'd','M 6 4 L 10 8 6 12');
         this.h = 20;
         this.c[2].style.display = 'none';
         this.applyHeight();
@@ -930,8 +947,12 @@ NEO.Proto.prototype = {
         if(NEO.main)NEO.main.calc();
     },
 
-    move:function(){
+    setSize:function(){
+        this.c[5].style.width = NEO.main.totalSize+'px';
+    },
 
+    move:function(){
+        this.c[5].style.left = -NEO.main.currentPosition+'px';
     },
 
     init:function(){

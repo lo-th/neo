@@ -23,9 +23,15 @@ NEO.Proto = function(obj){
     this.c[0] = NEO.DOM('NEO base');
     this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
     this.c[2] = NEO.main.liner(20);
-    this.c[3] = NEO.main.linerBottom();
-    this.c[4] = NEO.main.pins();
-    this.c[5] = NEO.main.dels();
+    
+    this.c[3] = NEO.main.pins();
+    this.c[4] = NEO.main.dels();
+
+    this.c[5] = NEO.DOM('NEO track');
+
+    this.c[6] = NEO.main.linerBottom();
+
+
 
     this.c[1].textContent = this.type;
 
@@ -38,22 +44,25 @@ NEO.Proto = function(obj){
         this.clear(true);
     }.bind(this);
 
-    this.c[4].onclick = this.f[0];
-    this.c[5].onclick = this.f[1];
+    this.c[3].onclick = this.f[0];
+    this.c[4].onclick = this.f[1];
+
+
+    this.setSize();
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
     open:function(){
         this.show = true;
-        this.setSvg(4, 'd','M 12 6 L 8 10 4 6');
+        this.setSvg(3, 'd','M 12 6 L 8 10 4 6');
         this.h = 80;
         this.c[2].style.display = 'block';
         this.applyHeight();
     },
     close:function(){
         this.show = false;
-        this.setSvg(4, 'd','M 6 4 L 10 8 6 12');
+        this.setSvg(3, 'd','M 6 4 L 10 8 6 12');
         this.h = 20;
         this.c[2].style.display = 'none';
         this.applyHeight();
@@ -63,8 +72,12 @@ NEO.Proto.prototype = {
         if(NEO.main)NEO.main.calc();
     },
 
-    move:function(){
+    setSize:function(){
+        this.c[5].style.width = NEO.main.totalSize+'px';
+    },
 
+    move:function(){
+        this.c[5].style.left = -NEO.main.currentPosition+'px';
     },
 
     init:function(){
