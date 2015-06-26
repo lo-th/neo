@@ -764,49 +764,68 @@ NEO.Proto.prototype = {
 NEO.Bang = function(obj){
 
     obj = obj || {};
-    
     this.type = 'bang';
-
-    this.bangs = [];
-
     NEO.Proto.call( this, obj );
 
-    this.f[2] = function(e){
-        this.addBangs(e);
-    }.bind(this);
+    this.keys = [];
+    this.list = [];
 
+    this.f[2] = function(e){
+        this.add(e);
+    }.bind(this);
 
     this.c[6].onclick = this.f[2];
 
     this.init();
+    
 }
 
 NEO.Bang.prototype = Object.create( NEO.Proto.prototype );
 NEO.Bang.prototype.constructor = NEO.Bang;
 
-//NEO.Bang.prototype.rSize = function(){
-    //NEO.Proto.prototype.rSize.call( this );
-    //this.setDom(2, 'left', this.sa);
-    //this.setDom(3, 'left', this.sa);
-//};
+NEO.Bang.prototype.add = function(e){
 
-NEO.Bang.prototype.addBangs = function(e){
-    var k = NEO.main.getFrameClick(e.clientX);
-    var key = NEO.main.keybox(k);
-    key.name = k;
+    var f = NEO.main.getFrameClick(e.clientX);
+
+    if (this.list.indexOf(f) > -1) {
+        this.remove(this.list.indexOf(f));
+        return;
+    }
+
+    var key = NEO.main.keybox(f);
+    key.name = f;
 
     this.c[5].appendChild(key);
-    
-    this.bangs.push(key);
+    this.keys.push(key);
+    this.sort();
+
+}
+
+NEO.Bang.prototype.remove = function(i){
+
+    this.c[5].removeChild( this.keys[i]);
+    this.keys.splice( i, 1 );
+    this.sort();
+
+}
+
+NEO.Bang.prototype.sort = function(){
+
+    this.keys.sort( function ( a, b ) { return a.name - b.name; } );
+    this.list = [];
+    var i = this.keys.length;
+    while(i--) this.list.unshift(this.keys[i].name);
+
 }
 
 NEO.Bang.prototype.update = function(f){
+
     var active = false;
-    var i = this.bangs.length;
-    while(i--){ if(this.bangs[i].name===f) active=true; }
+    if (this.list.indexOf(f) > -1) active = true;
 
     if(active) this.c[5].style.background = 'rgba(86,175,178,0.3)';
     else this.c[5].style.background = 'none';
+
 }
 NEO.Color = function(obj){
 
