@@ -45,10 +45,11 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 <script>
 document.getElementById('version').innerHTML = 'eo '+NEO.REVISION;
 var debug = document.getElementById('debug');
+var callback = function(v){ debug.innerHTML = v; }
 
 var neo = new NEO.Timeline();
 
-neo.add('bang');
+neo.add('bang', { callback:callback });
 
 var loop = function () {
     if(neo.inPlay){ 

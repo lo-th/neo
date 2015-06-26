@@ -1,18 +1,13 @@
 NEO.Bang = function(obj){
 
+    this.type = 'bang';
     this.keys = [];
     this.list = [];
-
-    obj = obj || {};
-    this.type = 'bang';
+    
     NEO.Proto.call( this, obj );
 
-    
-
-    this.f[2] = function(e){
-        this.add(e);
-    }.bind(this);
-
+    // click
+    this.f[2] = function(e){ this.add(e); }.bind(this);
     this.c[6].onclick = this.f[2];
 
     this.init();
@@ -64,6 +59,8 @@ NEO.Bang.prototype.update = function(f){
 
     if(active) this.c[5].style.background = 'rgba(86,175,178,0.3)';
     else this.c[5].style.background = 'none';
+
+    this.callback(active);
 
 };
 
