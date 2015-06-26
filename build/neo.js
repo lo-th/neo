@@ -345,6 +345,7 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.inner', 'width:100%; top:40px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
+            NEO.CC('NEO.top', 'position:absolute; height:20px; width:100%; overflow:hidden;');
             NEO.CC('NEO.text', NEO.txt1);
 
             /*NEO.CC('NEO.mask', 'width:400px; height:100%; margin-left:-50px; pointer-events:auto; cursor:col-resize; background:none; display:none;');
@@ -487,12 +488,12 @@ NEO.Timeline = function(css, decal){
 
    
     this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0', top:'2px' }});
-    this.setFps = new UIL.Number({target:this.topmenu, callback:callbackFps, name:'fps', min:12, max:60, value:60, step:1, color:'no', size:82, solo:true, pos:{left:'auto', right:'130px', top:'2px' }});
+    this.setFps = new UIL.Number({target:this.topmenu, callback:callbackFps, name:'fps', min:12, max:60, value:60, step:1, color:'no', size:82, pos:{left:'auto', right:'130px', top:'2px' }});
     this.title = new UIL.Title({target:this.topmenu, name:'0:00:00', color:'no', size:120, height:20, pos:{top:'2px' } });
-    this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:150, pos:{left:'60px', top:'2px' } });
+    this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:80, pos:{left:'100px', top:'2px' }, simple:true });
     this.addList.text('ADD');
 
-    this.playButton = new UIL.Button({target:this.topmenu, callback:callbackPlay, name:'X', color:'no', size:41, pos:{left:'200px', top:'2px' } });
+    this.playButton = new UIL.Button({target:this.topmenu, callback:callbackPlay, name:'X', color:'no', size:18, pos:{left:'190px', top:'2px' }, simple:true });
     this.playIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='16px' height='16px'><path fill='#CCC' d='M 12 9 L 12 7 5 3 4 4 4 12 5 13 12 9 Z'/></svg>";
     this.pauseIcon = "<svg xmlns='http://www.w3.org/2000/svg' width='16px' height='16px'><path fill='#CCC' d='M 12 3 L 9 3 9 13 12 13 12 3 M 7 3 L 4 3 4 13 7 13 7 3 Z'/></svg>";
     this.playButton.icon(this.playIcon);
@@ -704,11 +705,19 @@ NEO.Timeline.prototype = {
             case 'audio':   n = new NEO.Audio(obj);   break;
             case 'video':   n = new NEO.Video(obj);   break;
         }
+        n.id = this.neo.length;
         this.neo.push(n);
         this.calc();
 
         //console.log(type);
         return n;
+    },
+    remove:function(id){
+        this.neo.splice(id, 1);
+        for(var i = 0; i< this.neo.length; i++){
+            this.neo[i].id = i;
+        }
+        this.calc();
     },
     resize:function(e){
         this.viewWidth = window.innerWidth;
@@ -764,16 +773,24 @@ NEO.Timeline.prototype = {
 
 
 
-    liner:function(top){
-        var l = NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:'#888', 'stroke-width':1} );
+    liner:function(top, color){
+        var l = NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+        return l;
+    },
+    linerBottom:function(color){
+        var l = NEO.DOM('NEO', 'line', 'width:100%; height:1px; bottom:0', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
         return l;
     },
     vliner:function(top, color){
-        var l = NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888', 'stroke-width':1} );
+        var l = NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
         return l;
     },
     pins:function(){
         var p = NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
+        return p;
+    },
+    dels:function(){
+        var p = NEO.DOM('NEO', 'path','width:16px; height:20px; right:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 12 L 8 8 4 12 M 4 4 L 8 8 12 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
         return p;
     }
 }
@@ -805,6 +822,8 @@ NEO.Proto = function(obj){
     this.h = 80;
     this.show = true;
 
+    this.id = 0;
+
     // define obj size
     /*this.setSize(obj.size);
     
@@ -823,18 +842,23 @@ NEO.Proto = function(obj){
     this.c[0] = NEO.DOM('NEO base');
     this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
     this.c[2] = NEO.main.liner(20);
-    this.c[3] = NEO.main.liner(80);
+    this.c[3] = NEO.main.linerBottom();
     this.c[4] = NEO.main.pins();
+    this.c[5] = NEO.main.dels();
 
     this.c[1].textContent = this.type;
 
-    this.f[0] = function(e){
+    this.f[0] = function(){
         if(this.show) this.close();
         else this.open();
     }.bind(this);
 
-    this.c[4].onclick = this.f[0];
+    this.f[1] = function(){
+        this.clear(true);
+    }.bind(this);
 
+    this.c[4].onclick = this.f[0];
+    this.c[5].onclick = this.f[1];
 }
 
 NEO.Proto.prototype = {
@@ -843,18 +867,21 @@ NEO.Proto.prototype = {
         this.show = true;
         this.setSvg(4, 'd','M 12 6 L 8 10 4 6');
         this.h = 80;
+        this.c[2].style.display = 'block';
         this.applyHeight();
     },
     close:function(){
         this.show = false;
         this.setSvg(4, 'd','M 6 4 L 10 8 6 12');
         this.h = 20;
+        this.c[2].style.display = 'none';
         this.applyHeight();
     },
     applyHeight:function(){
         this.c[0].style.height = this.h+'px';
         if(NEO.main)NEO.main.calc();
     },
+    
     move:function(){
 
     },
@@ -880,15 +907,15 @@ NEO.Proto.prototype = {
     },
     setDom:function(id, type, value){
         this.c[id].style[type] = value+'px';
-    },
+    },*/
     
-    clear:function(){
-        var ev = UIL.events;
+    clear:function(selfClear){
+        var ev = NEO.events;
         var i = this.c.length, j;
         while(i--){
             if(i==0){ 
                 if(this.target!==null) this.target.removeChild(this.c[0]);
-                else UIL.main.inner.removeChild(this.c[0]);
+                else NEO.main.inner.removeChild(this.c[0]);
             } else {
                 j = ev.length;
                 while(j--){ if(this.c[i][ev[j]]!==null) this.c[i][ev[j]] = null; }
@@ -905,7 +932,11 @@ NEO.Proto.prototype = {
             this.f = null
         }
         if(this.callback)this.callback = null;
-        if(this.value)this.value = null;
+        if(this.value) this.value = null;
+
+        if(selfClear){
+            if(NEO.main)NEO.main.remove(this.id);
+        }
     },
     clearDOM:function(dom){
         while ( dom.children.length ){
@@ -913,7 +944,7 @@ NEO.Proto.prototype = {
             dom.removeChild( dom.lastChild );
         }
     },
-    setTypeNumber:function( obj ){
+    /*setTypeNumber:function( obj ){
 
         this.min = -Infinity;
         this.max = Infinity;
