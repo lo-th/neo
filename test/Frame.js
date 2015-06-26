@@ -2,7 +2,7 @@ var FRAME = ( function () {
 
 	return {
 
-		VERSION: 2,
+		VERSION: 3,
 
 		/*Curves: {
 			
@@ -237,8 +237,8 @@ var FRAME = ( function () {
 					// render
 
 					active.sort( function ( a, b ) { return a.layer - b.layer; } );
-					var l = active.length;
-					for ( i = 0; i < l; i ++ ) {
+
+					for ( var i = 0, l = active.length; i < l; i ++ ) {
 
 						var element = active[ i ];
 						element.module.update( ( time - element.start ) / ( element.end - element.start ) );

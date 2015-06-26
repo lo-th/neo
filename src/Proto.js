@@ -23,13 +23,13 @@ NEO.Proto = function(obj){
     this.c[0] = NEO.DOM('NEO base');
     this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
     this.c[2] = NEO.main.liner(20);
-    
     this.c[3] = NEO.main.pins();
     this.c[4] = NEO.main.dels();
 
     this.c[5] = NEO.DOM('NEO track');
+    this.c[6] = NEO.DOM('NEO trackTop');
 
-    this.c[6] = NEO.main.linerBottom();
+    this.c[7] = NEO.main.linerBottom();
 
 
 
@@ -47,12 +47,15 @@ NEO.Proto = function(obj){
     this.c[3].onclick = this.f[0];
     this.c[4].onclick = this.f[1];
 
-
     this.setSize();
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
+    update:function(f){
+
+
+    },
     open:function(){
         this.show = true;
         this.setSvg(3, 'd','M 12 6 L 8 10 4 6');
@@ -94,14 +97,11 @@ NEO.Proto.prototype = {
     setSvg:function(domId, type, value, id){
         this.c[domId].childNodes[id || 0].setAttributeNS(null, type, value );
     },
-    /*setSize:function(sx){
-        this.size = sx || UIL.WIDTH;
-        this.sa = (this.size/3).toFixed(0)*1;
-        this.sb = ((this.sa*2)-10).toFixed(0)*1;
-    },
+  
+
     setDom:function(id, type, value){
         this.c[id].style[type] = value+'px';
-    },*/
+    },
     
     clear:function(selfClear){
         var ev = NEO.events;

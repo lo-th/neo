@@ -4,29 +4,16 @@ NEO.Bang = function(obj){
     
     this.type = 'bang';
 
+    this.bangs = [];
+
     NEO.Proto.call( this, obj );
 
-    this.value = obj.value || false;
-
-    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
-    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
-
-    if(!this.value) this.c[3].style.display = 'none';
-
-    this.f[0] = function(e){
-        if(this.value){
-            this.value = false;
-            this.c[3].style.display = 'none';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
-        } else {
-            this.value = true;
-            this.c[3].style.display = 'block';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
-        }
-        this.callback( this.value );
+    this.f[2] = function(e){
+        this.addBangs(e);
     }.bind(this);
 
-    this.c[2].onclick = this.f[0];*/
+
+    this.c[6].onclick = this.f[2];
 
     this.init();
 }
@@ -34,8 +21,27 @@ NEO.Bang = function(obj){
 NEO.Bang.prototype = Object.create( NEO.Proto.prototype );
 NEO.Bang.prototype.constructor = NEO.Bang;
 
-NEO.Bang.prototype.rSize = function(){
+//NEO.Bang.prototype.rSize = function(){
     //NEO.Proto.prototype.rSize.call( this );
     //this.setDom(2, 'left', this.sa);
     //this.setDom(3, 'left', this.sa);
-};
+//};
+
+NEO.Bang.prototype.addBangs = function(e){
+    var k = NEO.main.getFrameClick(e.clientX);
+    var key = NEO.main.keybox(k);
+    key.name = k;
+
+    this.c[5].appendChild(key);
+    
+    this.bangs.push(key);
+}
+
+NEO.Bang.prototype.update = function(f){
+    var active = false;
+    var i = this.bangs.length;
+    while(i--){ if(this.bangs[i].name===f) active=true; }
+
+    if(active) this.c[5].style.background = 'rgba(86,175,178,0.3)';
+    else this.c[5].style.background = 'none';
+}

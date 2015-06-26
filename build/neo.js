@@ -1,301 +1,6 @@
 var performance, define, exports, module;
 // tween.js v.0.15.0 https://github.com/sole/tween.js
 void 0===Date.now&&(Date.now=function(){return(new Date).valueOf()});var TWEEN=TWEEN||function(){var n=[];return{REVISION:"14",getAll:function(){return n},removeAll:function(){n=[]},add:function(t){n.push(t)},remove:function(t){var r=n.indexOf(t);-1!==r&&n.splice(r,1)},update:function(t){if(0===n.length)return!1;var r=0;for(t=void 0!==t?t:"undefined"!=typeof window&&void 0!==window.performance&&void 0!==window.performance.now?window.performance.now():Date.now();r<n.length;)n[r].update(t)?r++:n.splice(r,1);return!0}}}();TWEEN.Tween=function(n){var t=n,r={},i={},u={},o=1e3,e=0,a=!1,f=!1,c=!1,s=0,h=null,l=TWEEN.Easing.Linear.None,p=TWEEN.Interpolation.Linear,E=[],d=null,v=!1,I=null,w=null,M=null;for(var O in n)r[O]=parseFloat(n[O],10);this.to=function(n,t){return void 0!==t&&(o=t),i=n,this},this.start=function(n){TWEEN.add(this),f=!0,v=!1,h=void 0!==n?n:"undefined"!=typeof window&&void 0!==window.performance&&void 0!==window.performance.now?window.performance.now():Date.now(),h+=s;for(var o in i){if(i[o]instanceof Array){if(0===i[o].length)continue;i[o]=[t[o]].concat(i[o])}r[o]=t[o],r[o]instanceof Array==!1&&(r[o]*=1),u[o]=r[o]||0}return this},this.stop=function(){return f?(TWEEN.remove(this),f=!1,null!==M&&M.call(t),this.stopChainedTweens(),this):this},this.stopChainedTweens=function(){for(var n=0,t=E.length;t>n;n++)E[n].stop()},this.delay=function(n){return s=n,this},this.repeat=function(n){return e=n,this},this.yoyo=function(n){return a=n,this},this.easing=function(n){return l=n,this},this.interpolation=function(n){return p=n,this},this.chain=function(){return E=arguments,this},this.onStart=function(n){return d=n,this},this.onUpdate=function(n){return I=n,this},this.onComplete=function(n){return w=n,this},this.onStop=function(n){return M=n,this},this.update=function(n){var f;if(h>n)return!0;v===!1&&(null!==d&&d.call(t),v=!0);var M=(n-h)/o;M=M>1?1:M;var O=l(M);for(f in i){var m=r[f]||0,N=i[f];N instanceof Array?t[f]=p(N,O):("string"==typeof N&&(N=m+parseFloat(N,10)),"number"==typeof N&&(t[f]=m+(N-m)*O))}if(null!==I&&I.call(t,O),1==M){if(e>0){isFinite(e)&&e--;for(f in u){if("string"==typeof i[f]&&(u[f]=u[f]+parseFloat(i[f],10)),a){var T=u[f];u[f]=i[f],i[f]=T}r[f]=u[f]}return a&&(c=!c),h=n+s,!0}null!==w&&w.call(t);for(var g=0,W=E.length;W>g;g++)E[g].start(n);return!1}return!0}},TWEEN.Easing={Linear:{None:function(n){return n}},Quadratic:{In:function(n){return n*n},Out:function(n){return n*(2-n)},InOut:function(n){return(n*=2)<1?.5*n*n:-.5*(--n*(n-2)-1)}},Cubic:{In:function(n){return n*n*n},Out:function(n){return--n*n*n+1},InOut:function(n){return(n*=2)<1?.5*n*n*n:.5*((n-=2)*n*n+2)}},Quartic:{In:function(n){return n*n*n*n},Out:function(n){return 1- --n*n*n*n},InOut:function(n){return(n*=2)<1?.5*n*n*n*n:-.5*((n-=2)*n*n*n-2)}},Quintic:{In:function(n){return n*n*n*n*n},Out:function(n){return--n*n*n*n*n+1},InOut:function(n){return(n*=2)<1?.5*n*n*n*n*n:.5*((n-=2)*n*n*n*n+2)}},Sinusoidal:{In:function(n){return 1-Math.cos(n*Math.PI/2)},Out:function(n){return Math.sin(n*Math.PI/2)},InOut:function(n){return.5*(1-Math.cos(Math.PI*n))}},Exponential:{In:function(n){return 0===n?0:Math.pow(1024,n-1)},Out:function(n){return 1===n?1:1-Math.pow(2,-10*n)},InOut:function(n){return 0===n?0:1===n?1:(n*=2)<1?.5*Math.pow(1024,n-1):.5*(-Math.pow(2,-10*(n-1))+2)}},Circular:{In:function(n){return 1-Math.sqrt(1-n*n)},Out:function(n){return Math.sqrt(1- --n*n)},InOut:function(n){return(n*=2)<1?-.5*(Math.sqrt(1-n*n)-1):.5*(Math.sqrt(1-(n-=2)*n)+1)}},Elastic:{In:function(n){var t,r=.1,i=.4;return 0===n?0:1===n?1:(!r||1>r?(r=1,t=i/4):t=i*Math.asin(1/r)/(2*Math.PI),-(r*Math.pow(2,10*(n-=1))*Math.sin(2*(n-t)*Math.PI/i)))},Out:function(n){var t,r=.1,i=.4;return 0===n?0:1===n?1:(!r||1>r?(r=1,t=i/4):t=i*Math.asin(1/r)/(2*Math.PI),r*Math.pow(2,-10*n)*Math.sin(2*(n-t)*Math.PI/i)+1)},InOut:function(n){var t,r=.1,i=.4;return 0===n?0:1===n?1:(!r||1>r?(r=1,t=i/4):t=i*Math.asin(1/r)/(2*Math.PI),(n*=2)<1?-.5*r*Math.pow(2,10*(n-=1))*Math.sin(2*(n-t)*Math.PI/i):r*Math.pow(2,-10*(n-=1))*Math.sin(2*(n-t)*Math.PI/i)*.5+1)}},Back:{In:function(n){var t=1.70158;return n*n*((t+1)*n-t)},Out:function(n){var t=1.70158;return--n*n*((t+1)*n+t)+1},InOut:function(n){var t=2.5949095;return(n*=2)<1?.5*n*n*((t+1)*n-t):.5*((n-=2)*n*((t+1)*n+t)+2)}},Bounce:{In:function(n){return 1-TWEEN.Easing.Bounce.Out(1-n)},Out:function(n){return 1/2.75>n?7.5625*n*n:2/2.75>n?7.5625*(n-=1.5/2.75)*n+.75:2.5/2.75>n?7.5625*(n-=2.25/2.75)*n+.9375:7.5625*(n-=2.625/2.75)*n+.984375},InOut:function(n){return.5>n?.5*TWEEN.Easing.Bounce.In(2*n):.5*TWEEN.Easing.Bounce.Out(2*n-1)+.5}}},TWEEN.Interpolation={Linear:function(n,t){var r=n.length-1,i=r*t,u=Math.floor(i),o=TWEEN.Interpolation.Utils.Linear;return 0>t?o(n[0],n[1],i):t>1?o(n[r],n[r-1],r-i):o(n[u],n[u+1>r?r:u+1],i-u)},Bezier:function(n,t){var r,i=0,u=n.length-1,o=Math.pow,e=TWEEN.Interpolation.Utils.Bernstein;for(r=0;u>=r;r++)i+=o(1-t,u-r)*o(t,r)*n[r]*e(u,r);return i},CatmullRom:function(n,t){var r=n.length-1,i=r*t,u=Math.floor(i),o=TWEEN.Interpolation.Utils.CatmullRom;return n[0]===n[r]?(0>t&&(u=Math.floor(i=r*(1+t))),o(n[(u-1+r)%r],n[u],n[(u+1)%r],n[(u+2)%r],i-u)):0>t?n[0]-(o(n[0],n[0],n[1],n[1],-i)-n[0]):t>1?n[r]-(o(n[r],n[r],n[r-1],n[r-1],i-r)-n[r]):o(n[u?u-1:0],n[u],n[u+1>r?r:u+1],n[u+2>r?r:u+2],i-u)},Utils:{Linear:function(n,t,r){return(t-n)*r+n},Bernstein:function(n,t){var r=TWEEN.Interpolation.Utils.Factorial;return r(n)/r(t)/r(n-t)},Factorial:function(){var n=[1];return function(t){var r,i=1;if(n[t])return n[t];for(r=t;r>1;r--)i*=r;return n[t]=i}}(),CatmullRom:function(n,t,r,i,u){var o=.5*(r-n),e=.5*(i-t),a=u*u,f=u*a;return(2*t-2*r+o+e)*f+(-3*t+3*r-2*o-e)*a+o*u+t}}},"undefined"!=typeof module&&module.exports&&(module.exports=TWEEN);
-var FRAME = ( function () {
-
-	return {
-
-		VERSION: 2,
-
-		/*Curves: {
-			
-			Linear: function ( points ) {
-
-				var linear = function ( p0, p1, t0, t1, t ) {
-
-                        return ( p1 - p0 ) * ( ( t - t0 ) / ( t1 - t0 ) ) + p0;
-
-                };
-
-                this.points = points;
-				this.value = 0;
-
-				this.update = function ( time ) {
-
-					if ( time <= points[ 0 ] ) {
-
-						this.value = points[ 1 ];
-
-					} else if ( time >= points[ points.length - 2 ] ) {
-
-						this.value = points[ points.length - 1 ];
-
-					} else {
-
-						for ( var i = 0, l = points.length; i < l; i += 2 ) {
-
-							if ( time < points[ i + 2 ] ) {
-
-								this.value = linear( points[ i + 1 ], points[ i + 3 ], points[ i ], points[ i + 2 ], time );
-								break;
-
-							}
-
-						}
-
-					}
-
-				};
-
-			},
-
-			Sin: function () {
-
-				var frequency = 10;
-
-				this.value = 0;
-
-				this.update = function ( time ) {
-
-					this.value = Math.sin( time * frequency );
-
-				};
-
-			},
-
-			Saw: function ( frequency, offset, min, max ) {
-
-				var delta = max - min;
-
-				this.frequency = frequency;
-				this.offset = offset;
-				this.min = min;
-				this.max = max;
-				this.value = 0;
-
-				this.update = function ( time ) {
-
-					this.value = ( ( ( time - offset ) % frequency ) / frequency ) * delta + min;
-
-				};
-
-			}
-
-		},*/
-
-		Module: function ( data ) {
-
-			if ( data === undefined ) data = {};
-
-			this.name = '';
-			this.parameters = data.parameters !== undefined ? data.parameters : {};
-
-			this.init = data.init !== undefined ? data.init : function () {};
-			this.start = data.start !== undefined ? data.start : function () {};
-			this.update = data.update !== undefined ? data.update : function () {};
-			this.complete = data.complete !== undefined ? data.complete : function () {};
-
-		},
-
-		Parameter: {
-
-			Boolean: function ( name, value ) {
-				this.name = name;
-				this.value = value || true;
-			},
-
-			Color: function ( name, value ) {
-				this.name = name;
-				this.value = value || 0xffffff;
-			},
-
-			Float: function ( name, value, min, max ) {
-				this.name = name;
-				this.value = value || 0.0;
-				this.min = min !== undefined ? min : - Infinity;
-				this.max = max !== undefined ? max : Infinity;
-			},
-
-			Integer: function ( name, value, min, max ) {
-				this.name = name;
-				this.value = value || 0;
-				this.min = min !== undefined ? min : - Infinity;
-				this.max = max !== undefined ? max : Infinity;
-			},
-
-			String: function ( name, value ) {
-				this.name = name;
-				this.value = value || '';
-			},
-
-			Vector2: function ( name, value ) {
-				this.name = name
-				this.value = value !== undefined ? value : [ 0, 0 ];
-			},
-
-			Vector3: function ( name, value ) {
-				this.name = name;
-				this.value = value !== undefined ? value : [ 0, 0, 0 ];
-			}
-
-		},
-
-		Timeline: function () {
-
-			//var curves = [];
-			var elements = [];
-			var active = [];
-
-			var next = 0, prevtime = 0;
-
-			return {
-
-				//curves: curves,
-				elements: elements,
-
-				add: function ( element ) {
-
-					elements.push( element );
-					this.sort();
-
-				},
-
-				remove: function ( element ) {
-
-					var i = elements.indexOf( element );
-
-					if ( i !== -1 ) {
-
-						elements.splice( i, 1 );
-
-					}
-
-				},
-
-				sort: function () {
-
-					elements.sort( function ( a, b ) { return a.start - b.start; } );
-
-				},
-				
-				update: function ( time ) {
-
-					if ( time < prevtime ) {
-
-						this.reset();
-
-					}
-
-					// add to active
-
-					while ( elements[ next ] ) {
-
-						var element = elements[ next ];
-
-						if ( element.start > time ) {
-
-							break;
-
-						}
-
-						if ( element.end > time ) {
-
-							active.push( element );
-							element.module.start();
-
-						}
-
-						next ++;
-
-					}
-
-					// remove from active
-
-					var i = 0;
-
-					while ( active[ i ] ) {
-
-						var element = active[ i ];
-
-						if ( element.end < time ) {
-
-							element.module.complete();
-							active.splice( i, 1 );
-							continue;
-
-						}
-
-						i ++;
-
-					}
-
-					// update curves
-
-					/*for ( var i = 0, l = curves.length; i < l; i ++ ) {
-
-						curves[ i ].update( time );
-
-					}*/
-
-					// render
-
-					active.sort( function ( a, b ) { return a.layer - b.layer; } );
-					var l = active.length;
-					for ( i = 0; i < l; i ++ ) {
-
-						var element = active[ i ];
-						element.module.update( ( time - element.start ) / ( element.end - element.start ) );
-
-					}
-
-					prevtime = time;
-
-				},
-
-				clear: function() {
-
-					while ( active.length ) active.pop();
-					active = [];
-					next = 0;
-
-					while(elements.length) elements.pop();
-					elements = [];
-
-				},
-
-				reset: function () {
-
-					while ( active.length ) active.pop();
-					next = 0;
-
-				}
-
-			}
-
-		},
-
-		TimelineElement: function () {
-			
-			var id = 0;
-			
-			return function ( module, layer, start, end ) {
-
-				this.id = id ++;
-				this.module = module;
-				this.layer = layer;
-				this.start = start;
-				this.end = end;
-
-				this.module.init();
-				
-			};
-
-		}()
-
-	}
-
-} )();
-
 /**   _   _____ _   _   
 *    | | |_   _| |_| |
 *    | |_ _| | |  _  |
@@ -346,7 +51,10 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.inner', 'width:100%; top:40px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
-            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; background:-webkit-linear-gradient( 0deg, #111 0%, #F11 100%); ');
+
+            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:none; background:none; ');
+            NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:auto; background:none; ');
+            //NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; background:-webkit-linear-gradient( 0deg, #111 0%, #F11 100%); ');
             //NEO.CC('NEO.top', 'position:absolute; height:20px; width:100%; overflow:hidden;');
             NEO.CC('NEO.text', NEO.txt1);
 
@@ -594,7 +302,8 @@ NEO.Timeline = function(css, decal){
         if(y<this.topLimite)this.f[2]();
 
         if(this.timerdown){
-            this.currentframe = Math.floor(x/this.framesize)+this.currentLeftFrame;
+            this.currentframe = this.getFrameClick(x);
+            //this.currentframe = Math.floor(x/this.framesize)+this.currentLeftFrame;
             this.updateTime();
         }
         if(this.scrolldown){
@@ -664,6 +373,9 @@ NEO.Timeline.prototype = {
             this.autoScroll();
             this.updateTime();
 
+            //var i = this.neo.length;
+            //while(i--) this.neo[i].update(this.currentframe);
+
             this.then = this.now - (this.delta % this.timerStep);
 
 
@@ -701,7 +413,9 @@ NEO.Timeline.prototype = {
         this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.framesize)+'px';
         this.miniFramePos.style.left = ((this.currentframe*(this.width/this.totalFrame)))+'px';
     },
-
+    getFrameClick:function(x){
+        return Math.floor(x/this.framesize)+this.currentLeftFrame;
+    },
     scaletime:function(s){
 
         var w = 100 * (100/(100*s));
@@ -753,6 +467,7 @@ NEO.Timeline.prototype = {
         NEO.setSVG(this.scaler, 'width',this.miniScaleView);
     },
     add:function(type, obj){
+        obj = obj || {};
         var n;
         switch(type){
             case 'bang':  n = new NEO.Bang(obj); break;
@@ -812,6 +527,9 @@ NEO.Timeline.prototype = {
         this.title.text( minutes + ':' + padding + seconds.toFixed( 2 ) );
 
         this.moveMarker();
+
+        var i = this.neo.length;
+        while(i--) this.neo[i].update(this.currentframe);
     },
     calc:function(){
         var total = 0;
@@ -832,24 +550,24 @@ NEO.Timeline.prototype = {
 
 
     liner:function(top, color){
-        var l = NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
-        return l;
+        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
     },
     linerBottom:function(color){
-        var l = NEO.DOM('NEO', 'line', 'width:100%; height:1px; bottom:0', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
-        return l;
+        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; bottom:0', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
     },
     vliner:function(top, color){
-        var l = NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
-        return l;
+        return NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
     },
     pins:function(){
-        var p = NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
-        return p;
+        return NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
+    },
+    keybox:function(k){
+        var l = k*this.framesize;
+        var w = this.framesize;
+         return NEO.DOM('NEO', 'rect','width:'+w+'px; height:60px; left:'+l+'px; top:0;',{ width:w, height:60, fill:'#56afb2' } );
     },
     dels:function(){
-        var p = NEO.DOM('NEO', 'path','width:16px; height:20px; right:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 12 L 8 8 4 12 M 4 4 L 8 8 12 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
-        return p;
+        return NEO.DOM('NEO', 'path','width:16px; height:20px; right:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 12 L 8 8 4 12 M 4 4 L 8 8 12 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
     }
 }
 
@@ -898,13 +616,13 @@ NEO.Proto = function(obj){
     this.c[0] = NEO.DOM('NEO base');
     this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
     this.c[2] = NEO.main.liner(20);
-    
     this.c[3] = NEO.main.pins();
     this.c[4] = NEO.main.dels();
 
     this.c[5] = NEO.DOM('NEO track');
+    this.c[6] = NEO.DOM('NEO trackTop');
 
-    this.c[6] = NEO.main.linerBottom();
+    this.c[7] = NEO.main.linerBottom();
 
 
 
@@ -922,12 +640,15 @@ NEO.Proto = function(obj){
     this.c[3].onclick = this.f[0];
     this.c[4].onclick = this.f[1];
 
-
     this.setSize();
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
+    update:function(f){
+
+
+    },
     open:function(){
         this.show = true;
         this.setSvg(3, 'd','M 12 6 L 8 10 4 6');
@@ -969,14 +690,11 @@ NEO.Proto.prototype = {
     setSvg:function(domId, type, value, id){
         this.c[domId].childNodes[id || 0].setAttributeNS(null, type, value );
     },
-    /*setSize:function(sx){
-        this.size = sx || UIL.WIDTH;
-        this.sa = (this.size/3).toFixed(0)*1;
-        this.sb = ((this.sa*2)-10).toFixed(0)*1;
-    },
+  
+
     setDom:function(id, type, value){
         this.c[id].style[type] = value+'px';
-    },*/
+    },
     
     clear:function(selfClear){
         var ev = NEO.events;
@@ -1049,29 +767,16 @@ NEO.Bang = function(obj){
     
     this.type = 'bang';
 
+    this.bangs = [];
+
     NEO.Proto.call( this, obj );
 
-    this.value = obj.value || false;
-
-    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
-    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
-
-    if(!this.value) this.c[3].style.display = 'none';
-
-    this.f[0] = function(e){
-        if(this.value){
-            this.value = false;
-            this.c[3].style.display = 'none';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
-        } else {
-            this.value = true;
-            this.c[3].style.display = 'block';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
-        }
-        this.callback( this.value );
+    this.f[2] = function(e){
+        this.addBangs(e);
     }.bind(this);
 
-    this.c[2].onclick = this.f[0];*/
+
+    this.c[6].onclick = this.f[2];
 
     this.init();
 }
@@ -1079,11 +784,30 @@ NEO.Bang = function(obj){
 NEO.Bang.prototype = Object.create( NEO.Proto.prototype );
 NEO.Bang.prototype.constructor = NEO.Bang;
 
-NEO.Bang.prototype.rSize = function(){
+//NEO.Bang.prototype.rSize = function(){
     //NEO.Proto.prototype.rSize.call( this );
     //this.setDom(2, 'left', this.sa);
     //this.setDom(3, 'left', this.sa);
-};
+//};
+
+NEO.Bang.prototype.addBangs = function(e){
+    var k = NEO.main.getFrameClick(e.clientX);
+    var key = NEO.main.keybox(k);
+    key.name = k;
+
+    this.c[5].appendChild(key);
+    
+    this.bangs.push(key);
+}
+
+NEO.Bang.prototype.update = function(f){
+    var active = false;
+    var i = this.bangs.length;
+    while(i--){ if(this.bangs[i].name===f) active=true; }
+
+    if(active) this.c[5].style.background = 'rgba(86,175,178,0.3)';
+    else this.c[5].style.background = 'none';
+}
 NEO.Color = function(obj){
 
     obj = obj || {};
