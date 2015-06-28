@@ -6,11 +6,9 @@ NEO.Proto = function(obj){
     this.show = true;
 
     this.id = 0;
+    this.items = [];
+    this.keys = obj.keys || [];
 
-    // define obj size
-    /*this.setSize(obj.size);
-    
-    */
     if(obj.color) NEO.COLOR = obj.color;
     this.color = NEO.COLOR;
     
@@ -31,9 +29,7 @@ NEO.Proto = function(obj){
 
     this.c[7] = NEO.main.linerBottom();
 
-
-
-    this.c[1].textContent = this.type;
+    // -- function --
 
     this.f[0] = function(){
         if(this.show) this.close();
@@ -46,6 +42,8 @@ NEO.Proto = function(obj){
 
     this.c[3].onclick = this.f[0];
     this.c[4].onclick = this.f[1];
+
+    this.c[1].textContent = this.type;
 
     this.setSize();
 }
@@ -72,12 +70,10 @@ NEO.Proto.prototype = {
     },
     applyHeight:function(){
         this.c[0].style.height = this.h+'px';
-        if(NEO.main)NEO.main.calc();
+        if(NEO.main) NEO.main.calc();
     },
 
-    setSize:function(){
-        this.c[5].style.width = NEO.main.maxSize+'px';
-    },
+
 
     move:function(){
         this.c[5].style.left = -NEO.main.currentPosition+'px';
@@ -93,6 +89,8 @@ NEO.Proto.prototype = {
             else this.c[0].appendChild(this.c[i]);
         }
         //this.rSize();
+
+        if(this.keys.length) this.addKeys();
     },
     setSvg:function(domId, type, value, id){
         this.c[domId].childNodes[id || 0].setAttributeNS(null, type, value );
@@ -138,33 +136,72 @@ NEO.Proto.prototype = {
             dom.removeChild( dom.lastChild );
         }
     },
-    /*setTypeNumber:function( obj ){
 
-        this.min = -Infinity;
-        this.max = Infinity;
+    // KEY SIDE
 
-        this.precision = 2;
-        if(obj.precision !== undefined ) this.precision = obj.precision;
-        //this.prev = null;
-        this.step = 0.01;
-        switch(this.precision){
-            case 0:  this.step = 1; break;
-            case 1:  this.step = 0.1; break;
-            case 2:  this.step = 0.01; break;
-            case 3:  this.step = 0.001; break;
-            case 4:  this.step = 0.0001; break;
+    setSize:function(){
+        this.c[5].style.width = NEO.main.maxSize+'px';
+
+        var w = NEO.main.frameSize;
+        var i = this.items.length, item;
+        while(i--){
+            item = this.items[i];
+            item.reSize(w);
+            //item.style.width = w + 'px';
+            //item.style.left = (item.id*w) + 'px';
+        }
+    },
+
+    addKeys:function(){
+        var i = this.keys.length, k;
+        while(i--){
+            k = this.keys[i];
+            this.add(k);
+        }
+        this.sort();
+    },
+
+    add:function(f){
+        var item, name;// = NEO.main[this.itemType](f);
+        switch(this.type){
+            case 'bang' :// item = NEO.main.keyBang(f); 
+            item = new NEO.KeyBang(f);
+            break;
+            case 'flag' :
+            item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] || 'new');
+            break;
+        }
+        this.c[5].appendChild(item.content);
+        this.items.push(item);
+        item.id = f;
+        //if(name !== null) item.name = name;
+    },
+
+    remove:function(f){
+        var id = this.keys.indexOf(f);
+        this.c[5].removeChild(this.items[id].content);
+        this.items[id].clear();
+        this.items.splice( id, 1 );
+        this.sort();
+    },
+
+    sort:function(){
+        var i, py = 0;
+        this.items.sort( function ( a, b ) { return a.id - b.id; } );
+
+        if(this.names){
+            for(i=0; i<this.items.length; i++){
+                this.names[i] = this.items[i].name;
+                this.items[i].setPy(py);
+                if(py<2) py++;
+                else py = 0;
+            }
         }
 
-        if(obj.min !== undefined ) this.min = obj.min;
-        if(obj.max !== undefined ) this.max = obj.max;
-        if(obj.step !== undefined ) this.step = obj.step;
+        this.keys = [];
+        i = this.items.length;
+        while(i--) this.keys.unshift(this.items[i].id*1);
         
     },
-    numValue:function(n){
-        return Math.min( this.max, Math.max( this.min, n ) ).toFixed( this.precision )*1;
-    },
-    rSize:function(){
-        this.c[0].style.width = this.size+'px';
-        this.c[1].style.width = this.sa+'px';
-    }*/
+
 }

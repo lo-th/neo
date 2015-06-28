@@ -1,61 +1,22 @@
 NEO.Bang = function(obj){
 
     this.type = 'bang';
-    this.items = [];
-    this.keys = obj.keys || [];
     
     NEO.Proto.call( this, obj );
 
     // click
-    this.f[2] = function(e){ this.addMouse(e); }.bind(this);
+    this.f[2] = function(e){ this.addOnMouse(e); }.bind(this);
     this.c[6].onclick = this.f[2];
 
     this.init();
 
-    if(this.keys.length) this.addKeys();
+    //if(this.keys.length) this.addKeys();
 }
 
 NEO.Bang.prototype = Object.create( NEO.Proto.prototype );
 NEO.Bang.prototype.constructor = NEO.Bang;
 
-NEO.Bang.prototype.addKeys = function(){
-    var i = this.keys.length, k, f;
-    while(i--){
-        f = this.keys[i];
-        this.add(f);
-    }
-    this.sort();
-}
 
-NEO.Bang.prototype.addMouse = function(e){
-    var f = NEO.main.getFrameClick(e.clientX);
-    if (this.keys.indexOf(f) > -1) {
-        this.remove(this.keys.indexOf(f));
-    } else {
-        this.add(f);
-        this.sort();
-    }
-};
-
-NEO.Bang.prototype.add = function(f){
-    var k = NEO.main.keybox(f);
-    this.c[5].appendChild(k);
-    k.name = f;
-    this.items.push(k);
-};
-
-NEO.Bang.prototype.remove = function(i){
-    this.c[5].removeChild( this.items[i]);
-    this.items.splice( i, 1 );
-    this.sort();
-};
-
-NEO.Bang.prototype.sort = function(){
-    this.items.sort( function ( a, b ) { return a.name - b.name; } );
-    this.keys = [];
-    var i = this.items.length;
-    while(i--) this.keys.unshift(this.items[i].name);
-};
 
 NEO.Bang.prototype.update = function(f){
     var active = false;
@@ -67,14 +28,35 @@ NEO.Bang.prototype.update = function(f){
     this.callback(active);
 };
 
-NEO.Bang.prototype.setSize = function(){
-    this.c[5].style.width = NEO.main.maxSize+'px';
-    var w = NEO.main.frameSize;
-    var i = this.items.length, k;
-    while(i--){
-        k = this.items[i];
-        k.style.width = w + 'px';
-        k.style.left = (k.name*w) + 'px';
+NEO.Bang.prototype.addOnMouse = function(e){
+    var f = NEO.main.getFrameClick(e.clientX);
 
+    if (this.keys.indexOf(f) > -1) {
+        this.remove(f);
+    } else {
+        this.add(f);
+        this.sort();
     }
 };
+
+
+// ------------------------------------------
+
+NEO.KeyBang = function(k){
+    this.id = 0;
+    var frameSize = NEO.main.frameSize;
+    var l = k*frameSize;
+    var w = frameSize;
+    this.content = NEO.DOM('NEO', 'div','width:'+w+'px; height:60px; left:'+l+'px; top:0; ');
+    this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:'#56afb2' } ));
+}
+NEO.KeyBang.prototype = {
+    constructor: NEO.KeyBang,
+    clear:function(){
+        
+    },
+    reSize:function(w){
+        this.content.style.width = w + 'px';
+        this.content.style.left = (this.id*w) + 'px';
+    }
+}

@@ -1,41 +1,86 @@
 NEO.Flag = function(obj){
 
-    obj = obj || {};
-    
-    this.type = 'flag';
+    this.names = obj.names || [];
+    this.currentName = '';
 
+    this.type = 'flag';
+    
     NEO.Proto.call( this, obj );
 
-    this.value = obj.value || false;
+    // click
+    this.f[2] = function(e){ this.addOnMouse(e); }.bind(this);
+    //this.c[6].onclick = this.f[2];
 
-    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
-    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
+    this.c[6].style.pointerEvents = 'none';
+    this.c[5].style.pointerEvents = 'auto';
 
-    if(!this.value) this.c[3].style.display = 'none';
-
-    this.f[0] = function(e){
-        if(this.value){
-            this.value = false;
-            this.c[3].style.display = 'none';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
-        } else {
-            this.value = true;
-            this.c[3].style.display = 'block';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
-        }
-        this.callback( this.value );
-    }.bind(this);
-
-    this.c[2].onclick = this.f[0];*/
+    this.c[5].onclick = this.f[2];
 
     this.init();
+
+    //if(this.keys.length) this.addKeys();
 }
 
 NEO.Flag.prototype = Object.create( NEO.Proto.prototype );
 NEO.Flag.prototype.constructor = NEO.Flag;
 
-NEO.Flag.prototype.rSize = function(){
-    //NEO.Proto.prototype.rSize.call( this );
-    //this.setDom(2, 'left', this.sa);
-    //this.setDom(3, 'left', this.sa);
+
+
+NEO.Flag.prototype.update = function(f){
+    if(f==0) this.currentName = '';
+    var active = false;
+    if (this.keys.indexOf(f) > -1) active = true;
+
+    if(active){ 
+        this.c[5].style.background = 'rgba(86,175,178,0.3)';
+        this.currentName = this.items[this.keys.indexOf(f)].name;
+    }
+    else{ 
+        this.c[5].style.background = 'none';
+    }
+
+    this.callback(this.currentName);
+    
 };
+
+NEO.Flag.prototype.addOnMouse = function(e){
+    //console.log(e.target.name);
+    if(e.target.name) return;
+
+    var f = NEO.main.getFrameClick(e.clientX);
+    if (this.keys.indexOf(f) > -1) {
+        this.remove(f);
+    } else {
+        this.add(f);
+        this.sort();
+    }
+};
+
+
+// ------------------------------------------
+
+NEO.KeyFlag = function(k, name){
+    this.id = 0;
+    this.name = name;
+    var frameSize = NEO.main.frameSize;
+    var l = k*frameSize;
+    var w = frameSize;
+    this.content = NEO.DOM('NEO', 'div','width:'+w+'px; height:60px; left:'+l+'px; top:0; ');
+    this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:'#56afb2' } ));
+    this.flagName = new UIL.String({target:this.content, callback:function(v){this.name = v;}.bind(this), value:this.name, color:'no', size:80, simple:true, allway:true, pos:{left:w+'px', top:'0px' } });
+
+}
+NEO.KeyFlag.prototype = {
+    constructor: NEO.KeyFlag,
+    clear:function(){
+        
+    },
+    reSize:function(w){
+        this.content.style.width = w + 'px';
+        this.content.style.left = (this.id*w) + 'px';
+        this.flagName.c[0].style.left = w+'px';
+    },
+    setPy:function(y){
+        this.flagName.c[0].style.top = (y*20)+'px';
+    }
+}

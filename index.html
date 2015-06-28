@@ -34,7 +34,8 @@ var callback = function(v){ debug.innerHTML = v; }
 
 var neo = new NEO.Timeline();
 
-neo.add('bang', { callback:callback });
+neo.add('bang', {  keys:[20, 40] });
+neo.add('flag', { callback:callback, keys:[10, 30, 50, 70, 90, 110], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline'] });
 
 var loop = function () {
     if(neo.inPlay){ 

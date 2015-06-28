@@ -51,7 +51,7 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:none; background:none; ');
             NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:auto; background:none; ');
-    ;
+
             NEO.CC('NEO.text', NEO.txt1);
 
             NEO.DEF = true;
@@ -80,7 +80,7 @@ var NEO = NEO || ( function () {
         },
         DOM:function(cc, type, css, obj, dom, id){
             type = type || 'div';
-            if(type=='rect' || type=='path' || type=='polygon' || type=='text' || type=='pattern' || type=='defs' || type=='g' || type=='line' ){
+            if(type=='rect' || type=='path' || type=='polygon' || type=='text' || type=='pattern' || type=='defs' || type=='g' || type=='line' || type=='foreignObject' ){
                 if(dom==undefined) dom = document.createElementNS( this.svgns, 'svg' );
                 var g = document.createElementNS( this.svgns, type );
 
@@ -522,10 +522,6 @@ NEO.Timeline.prototype = {
     },
 
 
-
-
-
-
     liner:function(top, color){
         return NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
     },
@@ -538,16 +534,10 @@ NEO.Timeline.prototype = {
     pins:function(){
         return NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
     },
-    keybox:function(k){
-        var l = k*this.frameSize;
-        var w = this.frameSize;
-        return NEO.DOM('NEO', 'rect','width:'+w+'px; height:60px; left:'+l+'px; top:0;',{ width:'100%', height:60, fill:'#56afb2' } );
-    },
+    
     dels:function(){
         return NEO.DOM('NEO', 'path','width:16px; height:20px; right:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 12 L 8 8 4 12 M 4 4 L 8 8 12 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
     }
 }
-
-
 
 NEO.classDefine();
