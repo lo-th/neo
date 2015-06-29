@@ -43,14 +43,14 @@ var NEO = NEO || ( function () {
 
             
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
-            NEO.CC('NEO.timeBar', 'width:100px; height:20px; top:20px; background:none; pointer-events:auto; cursor:pointer;');
-            NEO.CC('NEO.timescale', 'width:100px; height:20px; background:none; bottom:0; pointer-events:auto; cursor:pointer;');
+            NEO.CC('NEO.timeBar', 'width:100px; height:20px; top:20px; background:none; pointer-events:auto; cursor:e-resize;');
+            NEO.CC('NEO.timescale', 'width:100px; height:20px; background:none; bottom:0; pointer-events:auto; cursor:e-resize;');
             NEO.CC('NEO.inner', 'width:100%; top:40px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
 
-            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:none; background:none; ');
-            NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:auto; background:none; ');
+            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; background:none; ');
+            NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:none; background:none; ');
 
             NEO.CC('NEO.text', NEO.txt1);
 
@@ -246,6 +246,7 @@ NEO.Timeline = function(css, decal){
 
 
 
+
     // FUNCTION
 
     // content.mouseDown
@@ -289,6 +290,7 @@ NEO.Timeline = function(css, decal){
     this.content.onmousemove = this.f[1];
     //this.content.onmouseout = this.f[2];
     this.content.onmouseup = this.f[2];
+    this.content.oncontextmenu = function(e){e.preventDefault()};
 
 
 
@@ -458,11 +460,11 @@ NEO.Timeline.prototype = {
         var n;
         switch(type){
             case 'bang':  n = new NEO.Bang(obj); break;
+            case 'flag':  n = new NEO.Flag(obj);  break;
+            case 'switch':  n = new NEO.Switch(obj);  break;
             case 'color': n = new NEO.Color(obj); break;
             case 'curve': n = new NEO.Curve(obj); break;
-            case 'flag':  n = new NEO.Flag(obj);  break;
             case 'lfo':   n = new NEO.Lfo(obj);  break;
-            case 'switch':  n = new NEO.Switch(obj);  break;
             case 'audio':   n = new NEO.Audio(obj);   break;
             case 'video':   n = new NEO.Video(obj);   break;
         }

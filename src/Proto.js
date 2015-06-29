@@ -4,6 +4,9 @@ NEO.Proto = function(obj){
 
     this.h = 80;
     this.show = true;
+    this.mbutton = 0;
+    this.drag = false;
+    this.current = null;
 
     this.id = 0;
     this.items = [];
@@ -25,6 +28,7 @@ NEO.Proto = function(obj){
     this.c[4] = NEO.main.dels();
 
     this.c[5] = NEO.DOM('NEO track');
+    this.c[5].name = 'track';
     this.c[6] = NEO.DOM('NEO trackTop');
 
     this.c[7] = NEO.main.linerBottom();
@@ -164,12 +168,9 @@ NEO.Proto.prototype = {
     add:function(f){
         var item, name;// = NEO.main[this.itemType](f);
         switch(this.type){
-            case 'bang' :// item = NEO.main.keyBang(f); 
-            item = new NEO.KeyBang(f);
-            break;
-            case 'flag' :
-            item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] || 'new');
-            break;
+            case 'bang' : item = new NEO.KeyBang(f); break;
+            case 'switch' : item = new NEO.KeySwitch(f); break;
+            case 'flag' : item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] || 'new'); break;
         }
         this.c[5].appendChild(item.content);
         this.items.push(item);
