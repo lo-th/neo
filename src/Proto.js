@@ -49,11 +49,33 @@ NEO.Proto = function(obj){
 
     this.c[1].textContent = this.type;
 
+    
+
     this.setSize();
 }
 
 NEO.Proto.prototype = {
     constructor: NEO.Proto,
+
+    init:function(){
+        this.c[0].style.background = NEO.bgcolor(this.color);
+        for(var i = 0; i<this.c.length; i++){
+            if(i==0){ 
+                if(this.target!==null) this.target.appendChild(this.c[0]);
+                else NEO.main.inner.appendChild(this.c[0]);
+            }
+            else this.c[0].appendChild(this.c[i]);
+        }
+        
+        this.c[5].onmouseup = function(e){ this.onUp(e); }.bind(this);
+        this.c[5].onmousedown = function(e){ this.onDown(e); }.bind(this);
+        this.c[5].onmousemove = function(e){ this.onMove(e); }.bind(this);
+        this.c[5].onmouseover = function(e){ this.onOver(e); }.bind(this);
+
+        if(this.keys.length) this.addKeys();
+    },
+
+
     update:function(f){
 
 
@@ -83,19 +105,7 @@ NEO.Proto.prototype = {
         this.c[5].style.left = -NEO.main.currentPosition+'px';
     },
 
-    init:function(){
-        this.c[0].style.background = NEO.bgcolor(this.color);
-        for(var i = 0; i<this.c.length; i++){
-            if(i==0){ 
-                if(this.target!==null) this.target.appendChild(this.c[0]);
-                else NEO.main.inner.appendChild(this.c[0]);
-            }
-            else this.c[0].appendChild(this.c[i]);
-        }
-        //this.rSize();
-
-        if(this.keys.length) this.addKeys();
-    },
+    
     setSvg:function(domId, type, value, id){
         this.c[domId].childNodes[id || 0].setAttributeNS(null, type, value );
     },
@@ -203,6 +213,51 @@ NEO.Proto.prototype = {
         i = this.items.length;
         while(i--) this.keys.unshift(this.items[i].id*1);
         
+    },
+
+    // MOUSE
+
+    onDown:function(e){
+    
+        if(e.target.name) if(e.target.name!=='track') return;
+
+        var f = NEO.main.getFrameClick(e.clientX);
+
+        this.mbutton = e.which;
+
+        if (this.keys.indexOf(f) > -1) {
+            if(this.mbutton == 1){
+                this.drag = true;
+                this.current = this.items[this.keys.indexOf(f)];
+            }
+            if(this.mbutton == 3) this.remove(f);
+        } else {
+            if(this.mbutton == 1){
+                this.add(f);
+                this.sort();
+            }
+        }
+    },
+    onOver:function(e){
+        var f = NEO.main.getFrameClick(e.clientX);
+        if (this.keys.indexOf(f) > -1) this.c[5].style.cursor = 'e-resize';
+    },
+    onUp:function(e){
+        if(this.drag){ 
+            this.c[5].style.cursor = 'pointer';
+            this.drag = false; 
+            this.sort(); 
+        }
+    },
+    onMove:function(e){
+        var f = NEO.main.getFrameClick(e.clientX);
+        if (this.keys.indexOf(f) > -1) this.c[5].style.cursor = 'e-resize';
+        else this.c[5].style.cursor = 'pointer';
+
+        if(this.drag){ 
+            this.current.move(f);
+            this.c[5].style.cursor = 'e-resize';
+        }
     },
 
 }
