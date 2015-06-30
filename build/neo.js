@@ -976,7 +976,7 @@ NEO.Color = function(obj){
     this.degradId = 'degrad'+NEO.DID;
     this.degrad = [];
     this.linear = [];
-    this.degNumber = 5;
+    this.degNumber = 10;
     
     NEO.Proto.call( this, obj );
 
@@ -1075,12 +1075,12 @@ NEO.Color.prototype.createDegrad = function(){
 
     var i;
 
-    if(this.degrad.length){
+    /*if(this.degrad.length){
         i = this.degrad.length;
         while(i--) this.c[5].removeChild(this.degrad[i]);
         this.degrad = [];
         this.linear = [];
-    }
+    }*/
     //var fbygrad = max/this.degNumber;
     //var size = fbygrad*NEO.main.frameSize;
     //var size = (NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize;
@@ -1106,7 +1106,9 @@ NEO.Color.prototype.createDegrad = function(){
 
         NEO.DOM(null, 'rect', '', {width:'100%', height:'60', stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
 
-        this.c[5].insertBefore(degrad, this.c[5].childNodes[0]);
+        //this.c[5].insertBefore(degrad, this.c[5].childNodes[0]);
+
+        this.c[5].appendChild(degrad);
 
         this.degrad[i] = degrad;
         this.linear[i] = linear;
@@ -1148,26 +1150,23 @@ NEO.Color.prototype.createDegrad = function(){
 NEO.Color.prototype.upDegrad = function(){
     var max = NEO.main.maxFrame;
     var fbygrad = max/this.degNumber;
+    var pp = 100/this.degNumber;
 
+    // clear old
     var i = this.linear.length;
-    while(i--){
-        NEO.clearDOM(this.linear[i].childNodes[0]);
-    }
-
-    var lng = this.keys.length, percent, color, gid, offset;
+    while(i--) NEO.clearDOM(this.linear[i].childNodes[0]);
+    
 
     i = this.linear.length;
     while(i--){
         NEO.DOM(null, 'stop', '', { offset:0, 'stop-color':NEO.hexToHtml(this.findColor(fbygrad*i)), 'stop-opacity':1 }, this.linear[i], 0 );
     }
 
+    var lng = this.keys.length, percent, gid;
     for(i=0; i<lng; i++){
-        color = NEO.hexToHtml(this.colors[i]);
-
         percent = ((this.keys[i]*100)/max).toFixed(4);
-        gid = Math.floor( percent/20 );
-        offset = ((percent/20)-gid);
-        NEO.DOM(null, 'stop', '', { offset:offset, 'stop-color':color, 'stop-opacity':1 }, this.linear[gid], 0 );
+        gid = Math.floor( percent/pp );
+        NEO.DOM(null, 'stop', '', { offset:((percent/pp)-gid), 'stop-color':NEO.hexToHtml(this.colors[i]), 'stop-opacity':1 }, this.linear[gid], 0 );
     }
 
     i = this.linear.length;
@@ -1211,8 +1210,11 @@ NEO.KeyColor = function(f, color){
     this.color = color || 0x0000FF;
     var l = f*frameSize;
     this.w = frameSize;
-    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
-    this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:NEO.hexToHtml(this.color), stroke:'#000', 'stroke-width':1 } ));
+    this.content = NEO.DOM('NEO', 'div','width:10px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
+    //this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:NEO.hexToHtml(this.color), stroke:'#000', 'stroke-width':1 } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
     this.content.name = 'color'; 
 }
 NEO.KeyColor.prototype = {
@@ -1222,7 +1224,7 @@ NEO.KeyColor.prototype = {
     },
     reSize:function(w){
         this.w = w;
-        this.content.style.width = this.w + 'px';
+        //this.content.style.width = this.w + 'px';
         this.content.style.left = (this.id*this.w) + 'px';
     },
     move:function(f){
