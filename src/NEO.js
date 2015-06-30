@@ -38,7 +38,7 @@ var NEO = NEO || ( function () {
             //NEO.SVGC = 'rgba(120,120,120,0.6)';
             NEO.txt1 = 'font-family:"Open Sans", sans-serif; font-size:11px; color:#cccccc; outline:0; padding:0px 10px; left:0; top:1px; height:17px; width:100px; overflow:hidden;';
 
-            NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; ');
+            NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; border:none; ');
 
             NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none; pointer-events:auto; transition:height, 0.1s ease-out;');
 

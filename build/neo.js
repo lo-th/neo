@@ -41,7 +41,7 @@ var NEO = NEO || ( function () {
             //NEO.SVGC = 'rgba(120,120,120,0.6)';
             NEO.txt1 = 'font-family:"Open Sans", sans-serif; font-size:11px; color:#cccccc; outline:0; padding:0px 10px; left:0; top:1px; height:17px; width:100px; overflow:hidden;';
 
-            NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; ');
+            NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; border:none; ');
 
             NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none; pointer-events:auto; transition:height, 0.1s ease-out;');
 
@@ -622,7 +622,7 @@ NEO.Proto = function(obj){
 
     
 
-    this.setSize();
+    //this.setSize();
 }
 
 NEO.Proto.prototype = {
@@ -644,6 +644,8 @@ NEO.Proto.prototype = {
         //this.c[5].onmouseover = function(e){ this.onOver(e); }.bind(this);
 
         this.c[5].name = this.type;
+
+        this.setSize();
 
         if(this.keys.length) this.addKeys();
     },
@@ -978,9 +980,11 @@ NEO.Color = function(obj){
     
     NEO.Proto.call( this, obj );
 
+    this.createDegrad();
+
     this.init();
 
-    this.upDegrad();
+    
 
     //console.log(this.findColor(0));
 }
@@ -1034,12 +1038,12 @@ NEO.Color.prototype.findColor = function(f){
         }
     }
 
-    return NEO.numToHex(color);
+    return NEO.numToHex(color || 0x0000FF);
 }
 
-NEO.Color.prototype.upDegrad = function(){
-    var max = NEO.main.maxFrame;
-    var fsize = NEO.main.frameSize;
+NEO.Color.prototype.createDegrad = function(){
+    //var max = NEO.main.maxFrame;
+    //var fsize = NEO.main.frameSize;
 
     // CSS methode
     /*var grd = 'linear-gradient(to right';
@@ -1077,21 +1081,30 @@ NEO.Color.prototype.upDegrad = function(){
         this.degrad = [];
         this.linear = [];
     }
-    var fbygrad = max/this.degNumber;
-    var per = 100/this.degNumber;
-    i = this.degNumber;
+    //var fbygrad = max/this.degNumber;
+    //var size = fbygrad*NEO.main.frameSize;
+    //var size = (NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize;
+    //var per = 100/this.degNumber;
+    
     var degrad, linear;
+    i = this.degNumber;
     while(i--){
-        degrad = NEO.DOM('NEO', 'defs', 'left:'+(per*i)+'%; width:'+per+'%; height:60px;', {} );
+    //for(i=0; i<this.degNumber; i++){
+        degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:100px; width:100px; height:60px;', {} );
+        //degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:'+(size*i)+'px; width:'+size+'px; height:60px;', {} );
+        //degrad = NEO.DOM('NEO', 'defs', ' left:'+(per*i)+'%; width:'+per+'%; height:60px;', {} );
+       // degrad = NEO.DOM('NEO', 'defs', 'position:relative; display:block-inline; width:'+per+'%; height:60px;', {} );
+        //degrad = NEO.DOM('NEO', 'defs', 'position:relative; display:block-inline; left:'+(per*i)+'%; width:'+per+'%; height:60px;', {} );
         //degrad = NEO.DOM('NEO', 'defs', 'left:'+(300*i)+'px; width:'+per+'%; height:60px;', {} );
-        linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%', spreadMethod:"pad", gradientUnits:'userSpaceOnUse'}, degrad, 0 );
+        //linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%', spreadMethod:"pad", gradientUnits:'userSpaceOnUse'}, degrad, 0 );
+        linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%' }, degrad, 0 );
 
         
         //NEO.DOM(null, 'stop', '', { offset: '1', 'stop-color':'#FF0000', 'stop-opacity':1 }, linear, 0 );
-        NEO.DOM(null, 'stop', '', { offset:'0', 'stop-color':'#00FF00', 'stop-opacity':1 }, linear, 0 );
-        NEO.DOM(null, 'stop', '', { offset:'0', 'stop-color':'#00FFFF', 'stop-opacity':1 }, linear, 0 );
+        //NEO.DOM(null, 'stop', '', { offset:0, 'stop-color':'#00FF00', 'stop-opacity':1 }, linear, 0 );
+        //NEO.DOM(null, 'stop', '', { offset:0, 'stop-color':'#00FFFF', 'stop-opacity':1 }, linear, 0 );
 
-        NEO.DOM(null, 'rect', '', {width:'100%', height:'60px', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
+        NEO.DOM(null, 'rect', '', {width:'100%', height:'60', stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
 
         this.c[5].insertBefore(degrad, this.c[5].childNodes[0]);
 
@@ -1099,7 +1112,7 @@ NEO.Color.prototype.upDegrad = function(){
         this.linear[i] = linear;
     }
 
-    this.createDegrad();
+    this.upDegrad();
 
 
     //NEO.DOM(null, 'stop', '', { offset:'0%', 'stop-color':'#00FF00', 'stop-opacity':1 }, this.linear[0], 0 );
@@ -1132,7 +1145,7 @@ NEO.Color.prototype.upDegrad = function(){
 
 };
 
-NEO.Color.prototype.createDegrad = function(){
+NEO.Color.prototype.upDegrad = function(){
     var max = NEO.main.maxFrame;
     var fbygrad = max/this.degNumber;
 
@@ -1154,8 +1167,6 @@ NEO.Color.prototype.createDegrad = function(){
         percent = ((this.keys[i]*100)/max).toFixed(4);
         gid = Math.floor( percent/20 );
         offset = ((percent/20)-gid);
-        console.log(gid);
-
         NEO.DOM(null, 'stop', '', { offset:offset, 'stop-color':color, 'stop-opacity':1 }, this.linear[gid], 0 );
     }
 
@@ -1167,21 +1178,28 @@ NEO.Color.prototype.createDegrad = function(){
 }
 
 NEO.Color.prototype.moveDegrad = function(id, f){
-
     this.keys[id] = f
+    this.upDegrad();
+};
 
-    this.createDegrad();
-    // CSS methode
-    //this.keys[id] = f;
-    //this.upDegrad();
 
-    // SVG methode
-    //var max = NEO.main.maxFrame;
-    //var percent = ((f*100)/max).toFixed(4)/100;// + '%';
-    //NEO.setSVG(this.degradStop, 'offset', percent, id);
+NEO.Color.prototype.setSize = function(){
+    this.c[5].style.width = NEO.main.maxSize+'px';
 
-    //var percent = ((f*100)/max).toFixed(4)/20;// + '%';
-    //NEO.setSVG(this.degradStop, 'offset', percent, id);
+    var w = NEO.main.frameSize;
+    var i = this.items.length, item;
+    while(i--){
+        item = this.items[i];
+        item.reSize(w);
+    }
+
+    var size = (NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize;
+
+    i = this.degrad.length
+    while(i--){
+        this.degrad[i].style.width = size+'px';
+        this.degrad[i].style.left = (size*i)+'px';
+    }
 };
 
 // ------------------------------------------

@@ -53,7 +53,7 @@ NEO.Proto = function(obj){
 
     
 
-    this.setSize();
+    //this.setSize();
 }
 
 NEO.Proto.prototype = {
@@ -75,6 +75,8 @@ NEO.Proto.prototype = {
         //this.c[5].onmouseover = function(e){ this.onOver(e); }.bind(this);
 
         this.c[5].name = this.type;
+
+        this.setSize();
 
         if(this.keys.length) this.addKeys();
     },
