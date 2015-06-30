@@ -8,7 +8,7 @@
 <style>
 *{ margin: 0; padding: 0; border: 0; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; } 
 html{ overflow:hidden; width:100%; height:100%; }
-body { font-family: 'Open Sans', sans-serif; background-color:#111; background-image:url(images/orion.png); font-size:12px; color:#fff;}
+body { font-family: 'Open Sans', sans-serif; background-color:#111;  background-image:url(images/orion.png); font-size:12px; color:#fff;}
 #bg{position:absolute; top:0; left:0; width:100%; height:100%;   
     position:absolute; top:0; left:0; bottom:0; right:0;   
     background: url(images/bg.png) no-repeat center center fixed; 
@@ -35,23 +35,30 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 <script type="text/javascript" src="src/Switch.js"></script>
 <script type="text/javascript" src="src/Audio.js"></script>
 <script type="text/javascript" src="src/Video.js"></script>
+
+
 </head>
 
 <body>
 <div id='bg'></div>
-<img id='logo' src='images/neo.svg'>
+<svg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' id='logo' preserveAspectRatio='none' x='0px' y='0px' width='256px' height='256px' viewBox='0 0 256 256'>
+<path id='logoin' fill='#FFFFFF' stroke='none' d='M 219 52 L 206 52 206 166 Q 206 183.4 193.75 195.65 181.4 208 164 208 146.6 208 134.35 195.65 122 183.4 122 166 L 122 90 Q 122 77.6 113.15 68.85 104.4 60 92 60 79.55 60 70.75 68.85 62 77.6 62 90 L 62 204 75 204 75 90 Q 75 83 79.95 78 84.95 73 92 73 99 73 104 78 109 83 109 90 L 109 166 Q 109 188.8 125.15 204.85 141.2 221 164 221 186.75 221 202.95 204.85 219 188.8 219 166 L 219 52 M 194 52 L 181 52 181 166 Q 181 173 176.05 178 171.05 183 164 183 157 183 152 178 147 173 147 166 L 147 90 Q 147 67.2 130.85 51.15 114.8 35 92 35 69.25 35 53.05 51.15 37 67.2 37 90 L 37 204 50 204 50 90 Q 50 72.6 62.25 60.35 74.6 48 92 48 109.4 48 121.65 60.35 134 72.6 134 90 L 134 166 Q 134 178.4 142.85 187.15 151.6 196 164 196 176.45 196 185.25 187.15 194 178.4 194 166 L 194 52 Z'/>
+</svg>
+
 <div id='version'></div>
 <div id='debug'></div>
 <script>
 document.getElementById('version').innerHTML = 'eo '+NEO.REVISION;
 var debug = document.getElementById('debug');
-var callback = function(v){ debug.innerHTML = v; }
+var callback = function(v){ debug.innerHTML = v; document.getElementById('logoin').setAttributeNS(null, 'fill', NEO.hexToHtml(v)); document.getElementById('version').style.color =  NEO.hexToHtml(v);  }
 
 var neo = new NEO.Timeline();
 
 neo.add('bang', { keys:[20, 40] });
-neo.add('flag', { callback:callback, keys:[10, 30, 50, 70, 90, 110], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline'] });
-neo.add('switch', { keys:[20, 40] });
+neo.add('flag', {  keys:[10, 30, 50, 70, 90, 110], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline'] });
+//neo.add('switch', { keys:[20, 40] , lengths:[10, 5] });
+neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
+neo.add('color', {callback:callback, keys:[10, 40, 90, 350] , colors:[0xFF0000, 0x7f7f00, 0x00FF00, 0xFFFFFF] });
 
 var loop = function () {
     if(neo.inPlay){ 

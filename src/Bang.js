@@ -24,13 +24,14 @@ NEO.Bang.prototype.update = function(f){
 // ------------------------------------------
 
 
-NEO.KeyBang = function(k){
-    this.id = 0;
+NEO.KeyBang = function(f){
+    this.id = f;
     var frameSize = NEO.main.frameSize;
-    var l = k*frameSize;
+    var l = f*frameSize;
     this.w = frameSize;
-    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; ');
+    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
     this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:'#56afb2' } ));
+    this.content.name = 'bang'; 
 }
 NEO.KeyBang.prototype = {
     constructor: NEO.KeyBang,

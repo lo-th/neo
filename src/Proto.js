@@ -6,7 +6,10 @@ NEO.Proto = function(obj){
     this.show = true;
     this.mbutton = 0;
     this.drag = false;
+    this.dragEnd = false;
     this.current = null;
+    this.currentType ='none';
+    this.currentIndex = -1;
 
     this.id = 0;
     this.items = [];
@@ -28,7 +31,6 @@ NEO.Proto = function(obj){
     this.c[4] = NEO.main.dels();
 
     this.c[5] = NEO.DOM('NEO track');
-    this.c[5].name = 'track';
     this.c[6] = NEO.DOM('NEO trackTop');
 
     this.c[7] = NEO.main.linerBottom();
@@ -66,11 +68,13 @@ NEO.Proto.prototype = {
             }
             else this.c[0].appendChild(this.c[i]);
         }
-        
+
         this.c[5].onmouseup = function(e){ this.onUp(e); }.bind(this);
         this.c[5].onmousedown = function(e){ this.onDown(e); }.bind(this);
         this.c[5].onmousemove = function(e){ this.onMove(e); }.bind(this);
-        this.c[5].onmouseover = function(e){ this.onOver(e); }.bind(this);
+        //this.c[5].onmouseover = function(e){ this.onOver(e); }.bind(this);
+
+        this.c[5].name = this.type;
 
         if(this.keys.length) this.addKeys();
     },
@@ -179,12 +183,13 @@ NEO.Proto.prototype = {
         var item, name;// = NEO.main[this.itemType](f);
         switch(this.type){
             case 'bang' : item = new NEO.KeyBang(f); break;
-            case 'switch' : item = new NEO.KeySwitch(f); break;
-            case 'flag' : item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] || 'new'); break;
+            case 'switch' : item = new NEO.KeySwitch(f, this.ends[this.keys.indexOf(f)] ); break;
+            case 'flag' : item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] ); break;
+            case 'color' : item = new NEO.KeyColor(f, this.colors[this.keys.indexOf(f) ] || this.findColor(f)); break;
         }
         this.c[5].appendChild(item.content);
         this.items.push(item);
-        item.id = f;
+       
         //if(name !== null) item.name = name;
     },
 
@@ -209,54 +214,115 @@ NEO.Proto.prototype = {
             }
         }
 
+        if(this.ends){
+            for(i=0; i<this.items.length; i++){
+                this.ends[i] = this.items[i].end;
+            }
+        }
+
+        if(this.colors){
+            for(i=0; i<this.items.length; i++){
+                this.colors[i] = this.items[i].color;
+            }
+        }
+
         this.keys = [];
         i = this.items.length;
         while(i--) this.keys.unshift(this.items[i].id*1);
         
     },
 
-    // MOUSE
+    //----------------------------
+    //
+    //     MOUSE
+    //
+    //----------------------------
 
     onDown:function(e){
-    
-        if(e.target.name) if(e.target.name!=='track') return;
+        var type = e.target.name || 'none';
+        this.currentType = type;
+        
+        if(type=='input') return;
 
         var f = NEO.main.getFrameClick(e.clientX);
 
         this.mbutton = e.which;
 
-        if (this.keys.indexOf(f) > -1) {
-            if(this.mbutton == 1){
-                this.drag = true;
-                this.current = this.items[this.keys.indexOf(f)];
+        if(type == 'switch' || type == 'itemSwitch'){
+            var i = this.items.length, it;
+            while(i--){
+                it = this.items[i];
+                if(f>=it.id && f<=it.end){
+                    if(f==it.id){ this.drag = true; this.current = it; this.dragEnd=false; }
+                    if(f==it.end){ this.drag = true; this.current = it; this.dragEnd=true; }
+                }
             }
-            if(this.mbutton == 3) this.remove(f);
-        } else {
-            if(this.mbutton == 1){
-                this.add(f);
-                this.sort();
+        }else{
+
+            if (this.keys.indexOf(f) > -1) {
+                if(this.mbutton == 1){
+                    this.drag = true;
+                    this.currentIndex = this.keys.indexOf(f);
+                    this.current = this.items[this.keys.indexOf(f)];
+                }
+                if(this.mbutton == 3){ 
+                    this.remove(f);
+                    if(this.currentType=='color')this.upDegrad();
+                }
+            } else {
+                if(this.mbutton == 1){
+                    this.add(f);
+                    this.sort();
+                    if(this.currentType=='color')this.upDegrad();
+                }
             }
+
         }
+
     },
     onOver:function(e){
-        var f = NEO.main.getFrameClick(e.clientX);
-        if (this.keys.indexOf(f) > -1) this.c[5].style.cursor = 'e-resize';
+        //var name = e.target.name || 'no';
+        //var type = e.target.name || 'none';
+        //console.log(name);
+        //if(name.substring(0, 4)=='item')this.c[5].style.cursor = 'e-resize';
+        //else this.c[5].style.cursor = 'pointer';
+        //var f = NEO.main.getFrameClick(e.clientX);
+        //if (this.keys.indexOf(f) > -1) this.c[5].style.cursor = 'e-resize';
+
+        //if(this.drag) this.c[5].style.cursor = 'e-resize';
+        //else this.c[5].style.cursor = 'pointer';
     },
     onUp:function(e){
+        //var type = e.target.name || 'none';
+        //console.log(type);
         if(this.drag){ 
             this.c[5].style.cursor = 'pointer';
             this.drag = false; 
-            this.sort(); 
+            this.dragEnd = false;
+            this.sort();
+
+            if(this.currentType=='color') this.upDegrad();
         }
+        this.currentType = 'none';
     },
     onMove:function(e){
-        var f = NEO.main.getFrameClick(e.clientX);
-        if (this.keys.indexOf(f) > -1) this.c[5].style.cursor = 'e-resize';
-        else this.c[5].style.cursor = 'pointer';
+        if(this.currentType=='none') return;
 
-        if(this.drag){ 
-            this.current.move(f);
+        var f = NEO.main.getFrameClick(e.clientX);
+
+        /*if(this.currentType == 'switch'){
+        }else{
+            if (this.keys.indexOf(f) > -1) this.c[5].style.cursor = 'e-resize';
+            else this.c[5].style.cursor = 'pointer';
+        }*/
+        
+
+        if(this.drag){
             this.c[5].style.cursor = 'e-resize';
+            //console.log(this.currentIndex)
+            this.current.move(f, this.dragEnd);
+            //this.c[5].style.cursor = 'e-resize';
+            if(this.currentType=='color') this.moveDegrad(this.currentIndex, f);
         }
     },
 

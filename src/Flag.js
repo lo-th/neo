@@ -34,16 +34,16 @@ NEO.Flag.prototype.update = function(f){
 // ------------------------------------------
 
 
-NEO.KeyFlag = function(k, name){
-    this.id = 0;
-    this.name = name;
+NEO.KeyFlag = function(f, name){
+    this.id = f;
+    this.name = name || 'new';
     var frameSize = NEO.main.frameSize;
-    var l = k*frameSize;
+    var l = f*frameSize;
     this.w = frameSize;
-    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; ');
+    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
     this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:'#56afb2' } ));
     this.flagName = new UIL.String({target:this.content, callback:function(v){this.name = v;}.bind(this), value:this.name, color:'no', size:80, simple:true, allway:true, pos:{left:this.w+'px', top:'0px' } });
-
+    this.content.name = 'bang';
 }
 NEO.KeyFlag.prototype = {
     constructor: NEO.KeyFlag,

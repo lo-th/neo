@@ -14,8 +14,9 @@ var loop;
 var NEO = NEO || ( function () {
     return {
         main:null,
-        REVISION: '0.1',
+        REVISION: '0.2',
         DEF:false,
+        DID:0,
         events:[ 'onkeyup', 'onkeydown', 'onclick', 'onchange', 'onmouseover', 'onmouseout', 'onmousemove', 'onmousedown', 'onmouseup', 'onmousewheel' ],
         WIDTH:300,
         BW:190,
@@ -39,7 +40,7 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; ');
 
-            NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none;pointer-events:auto; transition:height, 0.1s ease-out;');
+            NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none; pointer-events:auto; transition:height, 0.1s ease-out;');
 
             
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
@@ -49,7 +50,7 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
 
-            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; background:none; ');
+            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; background:none; ');
             NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:none; background:none; ');
 
             NEO.CC('NEO.text', NEO.txt1);
@@ -78,9 +79,12 @@ var NEO = NEO || ( function () {
         setDOM:function(dom, type, value){
             dom.style[type] = value+'px';
         },
+        clearDOM:function(dom){
+            while ( dom.children.length ) dom.removeChild( dom.lastChild );
+        },
         DOM:function(cc, type, css, obj, dom, id){
             type = type || 'div';
-            if(type=='rect' || type=='path' || type=='polygon' || type=='text' || type=='pattern' || type=='defs' || type=='g' || type=='line' || type=='foreignObject' ){
+            if(type=='rect' || type=='path' || type=='polygon' || type=='text' || type=='pattern' || type=='defs' || type=='g' || type=='line' || type=='foreignObject' || type=='linearGradient' || type=='stop' || type=='animate' || type=='radialGradient' ){
                 if(dom==undefined) dom = document.createElementNS( this.svgns, 'svg' );
                 var g = document.createElementNS( this.svgns, type );
 
