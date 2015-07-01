@@ -11,8 +11,7 @@ void 0===Date.now&&(Date.now=function(){return(new Date).valueOf()});var TWEEN=T
 'use strict';
 
 // need uil http://lo-th.github.io/uil/build/uil.min.js
-var UIL;
-var loop;
+var UIL, loop, rootUpdate;
 
 var NEO = NEO || ( function () {
     return {
@@ -127,6 +126,9 @@ var NEO = NEO || ( function () {
 
 NEO.Timeline = function(css, decal){
 
+    this.data = {};
+
+    this.frame = 0;
     this.time = 0;
     this.height = 60;
     this.width = 100;
@@ -134,7 +136,6 @@ NEO.Timeline = function(css, decal){
     this.decal = decal || 0;
 
     this.frameSize = 10;
-    this.currentframe = 0;
     this.currentLeftFrame = 0;
     this.viewFrame = Math.round(this.width/this.frameSize);
     this.fps = 60;
@@ -176,8 +177,8 @@ NEO.Timeline = function(css, decal){
     var callbackFps = function(v){ this.setFps(v); }.bind(this);
     var callbackList = function(v){ this.add(v); this.addList.text('ADD'); }.bind(this);
     var callbackPlay = function(v){ this.play(); }.bind(this);
-    var callbackStart = function(v){ this.goTo(0); }.bind(this);
-    var callbackEnd = function(v){ this.goTo(this.maxFrame); }.bind(this);
+    var callbackStart = function(v){ this.goTo(0, true); }.bind(this);
+    var callbackEnd = function(v){ this.goTo(this.maxFrame, true); }.bind(this);
 
    
     this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0', top:'2px' }});
@@ -285,8 +286,10 @@ NEO.Timeline = function(css, decal){
         if(y<this.topLimite)this.f[2]();
 
         if(this.timerdown){
-            this.currentframe = this.getFrameClick(x);
-            this.updateTime();
+            //this.frame = this.getFrameClick(x);
+            //this.updateTime();
+
+            this.goTo(this.getFrameClick(x));
         }
         if(this.scrolldown){
             this.posX = x;
@@ -310,7 +313,7 @@ NEO.Timeline = function(css, decal){
 
     
 
-    this.title.text2(this.currentframe);
+    this.title.text2(this.frame);
 
     window.addEventListener("resize", function(e){this.resize(e)}.bind(this), false );
     this.resize();
@@ -336,8 +339,8 @@ NEO.Timeline.prototype = {
         }else{
             this.inPlay = true;
             this.playButton.icon(this.pauseIcon);
-            if(this.currentframe === this.maxFrame){
-                this.currentframe=0;
+            if(this.frame === this.maxFrame){
+                this.frame=0;
                 this.move(this.mid);
             }
 
@@ -353,26 +356,46 @@ NEO.Timeline.prototype = {
 
         if (this.delta > this.timerStep) {
 
-            this.currentframe ++;
+            this.frame ++;
 
             this.autoScroll();
             this.updateTime();
 
             //var i = this.neo.length;
-            //while(i--) this.neo[i].update(this.currentframe);
+            //while(i--) this.neo[i].update(this.frame);
+
+            var i = this.neo.length, k;
+            while(i--){
+                k = this.neo[i];
+                k.update(this.frame);
+                this.data[k.name] = k.value;
+            }
 
             this.then = this.now - (this.delta % this.timerStep);
 
 
-            if(this.currentframe === this.maxFrame){ this.stop();}
+            if(this.frame === this.maxFrame){ this.stop();}
 
         }
 
     },
-    goTo:function(f){
-        this.currentframe = f;
+    goTo:function(f, move){
+        this.frame = f;
         this.updateTime();
-        this.move(this.width*(f/this.maxFrame));
+
+        //var i = this.neo.length;
+        //while(i--) this.neo[i].update(this.frame);
+
+        var i = this.neo.length, k;
+        while(i--){
+            k = this.neo[i];
+            k.update(this.frame);
+            this.data[k.name] = k.value;
+        }
+
+        if(rootUpdate) rootUpdate();
+
+        if(move)this.move(this.width*(f/this.maxFrame));
     },
     show:function(){
         this.content.style.display = 'block';
@@ -382,7 +405,7 @@ NEO.Timeline.prototype = {
     },
     autoScroll:function(){
         var right = this.currentLeftFrame+this.viewFrame;
-        if(this.currentframe>right) {
+        if(this.frame>right) {
             this.move(this.currentScrollPosition+this.miniScaleView+this.mid);
         }
     },
@@ -408,8 +431,8 @@ NEO.Timeline.prototype = {
         while(i--) this.neo[i].move();
     },
     moveMarker:function(){
-        this.marker.style.left = ((this.currentframe-this.currentLeftFrame)*this.frameSize)+'px';
-        this.miniFramePos.style.left = ((this.currentframe*(this.width/this.maxFrame)))+'px';
+        this.marker.style.left = ((this.frame-this.currentLeftFrame)*this.frameSize)+'px';
+        this.miniFramePos.style.left = ((this.frame*(this.width/this.maxFrame)))+'px';
     },
     getFrameClick:function(x){
         var f = Math.floor(x/this.frameSize)+this.currentLeftFrame;
@@ -483,8 +506,10 @@ NEO.Timeline.prototype = {
             case 'video':   n = new NEO.Video(obj);   break;
         }
         n.id = this.neo.length;
+        n.rename();
         this.neo.push(n);
         this.calc();
+        this.data = {};
         return n;
     },
     remove:function(id){
@@ -493,6 +518,7 @@ NEO.Timeline.prototype = {
             this.neo[i].id = i;
         }
         this.calc();
+        this.data = {};
     },
     resize:function(e){
         this.viewWidth = window.innerWidth;
@@ -511,19 +537,19 @@ NEO.Timeline.prototype = {
         this.topLimite = this.viewHeight-(this.height-10);
     },
     updateTime:function () {
-        this.time = this.currentframe/this.fps;
+        this.time = this.frame/this.fps;
 
         var minutes = Math.floor( this.time / 60 );
         var seconds = this.time % 60;
         var padding = seconds < 10 ? '0' : '';
 
-        this.title.text2(this.currentframe);
+        this.title.text2(this.frame);
         this.title.text( minutes + ':' + padding + seconds.toFixed( 2 ) );
 
         this.moveMarker();
 
-        var i = this.neo.length;
-        while(i--) this.neo[i].update(this.currentframe);
+        //var i = this.neo.length;
+        //while(i--) this.neo[i].update(this.frame);
     },
     calc:function(){
         var total = 0;
@@ -568,7 +594,7 @@ NEO.Timeline.prototype = {
         //this.colorSelect.callback = null;
         this.colorSelect.hide();
         this.colorSelect.c[0].style.display = 'block';
-        this.colorSelect.c[0].style.left = x+'px';
+        this.colorSelect.c[0].style.left = (x-20)+'px';
         this.colorSelect.c[0].style.top = (y-tt.top+40)+'px';
         
 
@@ -598,6 +624,13 @@ NEO.Proto = function(obj){
 
     obj = obj || {};
 
+    this.autoName = true;
+    if(obj.name) this.autoName = false;
+
+    this.name = obj.name || this.type;
+
+    this.value = null;
+
     this.h = 80;
     this.show = true;
     this.mbutton = 0;
@@ -615,7 +648,7 @@ NEO.Proto = function(obj){
     this.color = NEO.COLOR;
     
     this.target = obj.target || null;
-    this.callback = obj.callback || function(){};
+    //this.callback = obj.callback || function(){};
 
     this.c = [];
     this.f = [];
@@ -645,7 +678,7 @@ NEO.Proto = function(obj){
     this.c[3].onclick = this.f[0];
     this.c[4].onclick = this.f[1];
 
-    this.c[1].textContent = this.type;
+    ;
 
     
 
@@ -670,11 +703,19 @@ NEO.Proto.prototype = {
         this.c[5].onmousemove = function(e){ this.onMove(e); }.bind(this);
         //this.c[5].onmouseover = function(e){ this.onOver(e); }.bind(this);
 
+        this.c[1].textContent = this.name;
         this.c[5].name = this.type;
 
         this.setSize();
 
         if(this.keys.length) this.addKeys();
+    },
+
+    rename:function(){
+        if(this.autoName){
+            this.name = this.id+'-'+this.type;
+            this.c[1].textContent = this.name;
+        }
     },
 
 
@@ -739,8 +780,10 @@ NEO.Proto.prototype = {
             while(i--) this.f[i] = null;
             this.f = null
         }
-        if(this.callback)this.callback = null;
+        //if(this.callback)this.callback = null;
         if(this.value) this.value = null;
+
+        //NEO.main.data[this.name] = false;
 
         if(selfClear){
             if(NEO.main)NEO.main.remove(this.id);
@@ -938,13 +981,13 @@ NEO.Bang.prototype = Object.create( NEO.Proto.prototype );
 NEO.Bang.prototype.constructor = NEO.Bang;
 
 NEO.Bang.prototype.update = function(f){
-    var active = false;
-    if (this.keys.indexOf(f) > -1) active = true;
-
-    if(active) this.c[5].style.background = 'rgba(86,175,178,0.3)';
-    else this.c[5].style.background = 'none';
-
-    this.callback(active);
+    if (this.keys.indexOf(f) > -1){ 
+        this.value = true;
+        this.c[6].style.background = 'rgba(86,175,178,0.3)';
+    }else{ 
+        this.value = false;
+        this.c[6].style.background = 'none';
+    }
 };
 
 
@@ -1003,7 +1046,7 @@ NEO.Color = function(obj){
     this.degradId = 'degrad'+NEO.DID;
     this.degrad = [];
     this.linear = [];
-    this.degNumber = 10;
+    this.degNumber = 5;
     
     NEO.Proto.call( this, obj );
 
@@ -1022,8 +1065,9 @@ NEO.Color.prototype = Object.create( NEO.Proto.prototype );
 NEO.Color.prototype.constructor = NEO.Color;
 
 NEO.Color.prototype.update = function(f){
-    var color = this.findColor(f);
-    this.callback(color);
+
+    this.value = this.findColor(f);
+
 };
 
 /*NEO.Color.prototype.Inter = function(a,b,lerp){
@@ -1062,8 +1106,7 @@ NEO.Color.prototype.findColor = function(f){
         if(!c1) color = c2;
         if(!c2) color = c1;
         if(c1 && c2){
-            color = NEO.lerpColor(c1, c2, ((f-f1))/(f2-f1)   );
-            //color = this.Inter(NEO.numToHex(c1), NEO.numToHex(c2), ((f-f1))/(f2-f1)   );
+            color = NEO.lerpColor(c1, c2, ((f-f1))/(f2-f1) );
         }
     }
 
@@ -1071,108 +1114,21 @@ NEO.Color.prototype.findColor = function(f){
 }
 
 NEO.Color.prototype.createDegrad = function(){
-    //var max = NEO.main.maxFrame;
-    //var fsize = NEO.main.frameSize;
-
-    // CSS methode
-    /*var grd = 'linear-gradient(to right';
-    var lng = this.keys.length, percent;
-    for(var i=0; i<lng; i++){
-        percent = ((this.keys[i]*100)/max).toFixed(4) + '%';
-        grd+=','+this.colors[i] + ' '+ percent;
-    }
-    grd+=')';
-    this.c[5].style.background = grd;
-    */
-
-    // SVG methode
-    
-    /*if(this.degrad)this.c[5].removeChild(this.degrad);
-    this.degrad = NEO.DOM('NEO', 'defs', 'width:100%; height:60px;', {} );
-    var p = NEO.DOM(null, 'linearGradient', '', {id:this.degradId, x1:'0%', y1:'0%', x2:'100%', y2:'0%', gradientUnits:'userSpaceOnUse'}, this.degrad, 0 );
-
-    var lng = this.keys.length, percent;
-    //while(i--){
-    for(var i=0; i<lng; i++){
-        percent = ((this.keys[i]*100)/max).toFixed(4)/100;// + '%'
-        NEO.DOM(null, 'stop', '', { offset: percent, 'stop-color':this.colors[i], 'stop-opacity':1 }, p, 0 );
-    }
-    NEO.DOM(null, 'rect', '', {width:'100%', height:'60px', x:0, fill:'url(#'+this.degradId+')'}, this.degrad );
-
-    this.degradStop = p.childNodes[0];
-    this.c[5].insertBefore(this.degrad, this.c[5].childNodes[0]);*/
 
     var i;
 
-    /*if(this.degrad.length){
-        i = this.degrad.length;
-        while(i--) this.c[5].removeChild(this.degrad[i]);
-        this.degrad = [];
-        this.linear = [];
-    }*/
-    //var fbygrad = max/this.degNumber;
-    //var size = fbygrad*NEO.main.frameSize;
-    //var size = (NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize;
-    //var per = 100/this.degNumber;
-    
     var degrad, linear;
     i = this.degNumber;
     while(i--){
-    //for(i=0; i<this.degNumber; i++){
         degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:100px; width:100px; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:'+(size*i)+'px; width:'+size+'px; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', ' left:'+(per*i)+'%; width:'+per+'%; height:60px;', {} );
-       // degrad = NEO.DOM('NEO', 'defs', 'position:relative; display:block-inline; width:'+per+'%; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', 'position:relative; display:block-inline; left:'+(per*i)+'%; width:'+per+'%; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', 'left:'+(300*i)+'px; width:'+per+'%; height:60px;', {} );
-        //linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%', spreadMethod:"pad", gradientUnits:'userSpaceOnUse'}, degrad, 0 );
         linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%' }, degrad, 0 );
-
-        
-        //NEO.DOM(null, 'stop', '', { offset: '1', 'stop-color':'#FF0000', 'stop-opacity':1 }, linear, 0 );
-        //NEO.DOM(null, 'stop', '', { offset:0, 'stop-color':'#00FF00', 'stop-opacity':1 }, linear, 0 );
-        //NEO.DOM(null, 'stop', '', { offset:0, 'stop-color':'#00FFFF', 'stop-opacity':1 }, linear, 0 );
-
         NEO.DOM(null, 'rect', '', {width:'100%', height:'60', stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
-
-        //this.c[5].insertBefore(degrad, this.c[5].childNodes[0]);
-
         this.c[5].appendChild(degrad);
-
         this.degrad[i] = degrad;
         this.linear[i] = linear;
     }
 
     this.upDegrad();
-
-
-    //NEO.DOM(null, 'stop', '', { offset:'0%', 'stop-color':'#00FF00', 'stop-opacity':1 }, this.linear[0], 0 );
-
-
-
-
-
-
-
-
-
-    /*if(this.degrad)this.c[5].removeChild(this.degrad);
-    this.degrad = NEO.DOM('NEO', 'defs', 'width:20%; height:60px;', {} );
-    var p = NEO.DOM(null, 'linearGradient', '', {id:this.degradId, x1:'0%', y1:'0%', x2:'100%', y2:'0%', spreadMethod:"pad", gradientUnits:'userSpaceOnUse'}, this.degrad, 0 );
-
-    var lng = this.keys.length, percent, color;
-    //while(i--){
-    for(var i=0; i<lng; i++){
-        color = NEO.hexToHtml(this.colors[i]);
-        //console.log(color)
-        percent = ((this.keys[i]*100)/max).toFixed(4)/20;// + '%'
-        NEO.DOM(null, 'stop', '', { offset: percent, 'stop-color':color, 'stop-opacity':1 }, p, 0 );
-    }
-    NEO.DOM(null, 'rect', '', {width:'100%', height:'60px', x:0, fill:'url(#'+this.degradId+')'}, this.degrad );
-
-    this.degradStop = p.childNodes[0];
-    this.c[5].insertBefore(this.degrad, this.c[5].childNodes[0]);*/
-
 
 };
 
@@ -1328,7 +1284,7 @@ NEO.Flag = function(obj){
     this.type = 'flag';
 
     this.names = obj.names || [];
-    this.currentName = '';
+    this.value = '';
     
     NEO.Proto.call( this, obj );
 
@@ -1339,19 +1295,17 @@ NEO.Flag.prototype = Object.create( NEO.Proto.prototype );
 NEO.Flag.prototype.constructor = NEO.Flag;
 
 NEO.Flag.prototype.update = function(f){
-    if(f==0) this.currentName = '';
-    var active = false;
-    if (this.keys.indexOf(f) > -1) active = true;
 
-    if(active){ 
-        this.c[5].style.background = 'rgba(86,175,178,0.3)';
-        this.currentName = this.items[this.keys.indexOf(f)].name;
-    }
-    else{ 
-        this.c[5].style.background = 'none';
-    }
+    if(f==0) this.value = '';
 
-    this.callback(this.currentName);
+    var k = this.keys.indexOf(f);
+
+    if(k > -1){ 
+        this.c[6].style.background = 'rgba(86,175,178,0.3)';
+        this.value = this.items[k].name;
+    }else{ 
+        this.c[6].style.background = 'none';
+    }
     
 };
 
@@ -1446,27 +1400,20 @@ NEO.Switch.prototype = Object.create( NEO.Proto.prototype );
 NEO.Switch.prototype.constructor = NEO.Switch;
 
 NEO.Switch.prototype.update = function(f){
-    var active = false;
+    //var f = NEO.frame;
+    this.value = false;
+    this.c[6].style.background = 'none';
+
     var i = this.keys.length;
     while(i--){
-        if(f>=this.keys[i] && f<=this.ends[i]) active = true;
+        if(f>=this.keys[i] && f<=this.ends[i]){ 
+            this.value = true;
+            this.c[6].style.background = 'rgba(86,175,178,0.3)';
+            return;
+        }
     }
-    /*
-    var i = this.items.length, it;
-    while(i--){
-        it = this.items[i];
-        if(f>=it.id && f<=it.end) active = true;
-    }*/
 
-    /*if (this.keys.indexOf(f) > -1){
-
-        active = true;
-    }*/
-
-    if(active) this.c[5].style.background = 'rgba(86,175,178,0.3)';
-    else this.c[5].style.background = 'none';
-
-    this.callback(active);
+    
 };
 
 

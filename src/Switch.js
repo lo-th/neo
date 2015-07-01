@@ -13,27 +13,20 @@ NEO.Switch.prototype = Object.create( NEO.Proto.prototype );
 NEO.Switch.prototype.constructor = NEO.Switch;
 
 NEO.Switch.prototype.update = function(f){
-    var active = false;
+    //var f = NEO.frame;
+    this.value = false;
+    this.c[6].style.background = 'none';
+
     var i = this.keys.length;
     while(i--){
-        if(f>=this.keys[i] && f<=this.ends[i]) active = true;
+        if(f>=this.keys[i] && f<=this.ends[i]){ 
+            this.value = true;
+            this.c[6].style.background = 'rgba(86,175,178,0.3)';
+            return;
+        }
     }
-    /*
-    var i = this.items.length, it;
-    while(i--){
-        it = this.items[i];
-        if(f>=it.id && f<=it.end) active = true;
-    }*/
 
-    /*if (this.keys.indexOf(f) > -1){
-
-        active = true;
-    }*/
-
-    if(active) this.c[5].style.background = 'rgba(86,175,178,0.3)';
-    else this.c[5].style.background = 'none';
-
-    this.callback(active);
+    
 };
 
 

@@ -2,6 +2,13 @@ NEO.Proto = function(obj){
 
     obj = obj || {};
 
+    this.autoName = true;
+    if(obj.name) this.autoName = false;
+
+    this.name = obj.name || this.type;
+
+    this.value = null;
+
     this.h = 80;
     this.show = true;
     this.mbutton = 0;
@@ -19,7 +26,7 @@ NEO.Proto = function(obj){
     this.color = NEO.COLOR;
     
     this.target = obj.target || null;
-    this.callback = obj.callback || function(){};
+    //this.callback = obj.callback || function(){};
 
     this.c = [];
     this.f = [];
@@ -49,7 +56,7 @@ NEO.Proto = function(obj){
     this.c[3].onclick = this.f[0];
     this.c[4].onclick = this.f[1];
 
-    this.c[1].textContent = this.type;
+    ;
 
     
 
@@ -74,11 +81,19 @@ NEO.Proto.prototype = {
         this.c[5].onmousemove = function(e){ this.onMove(e); }.bind(this);
         //this.c[5].onmouseover = function(e){ this.onOver(e); }.bind(this);
 
+        this.c[1].textContent = this.name;
         this.c[5].name = this.type;
 
         this.setSize();
 
         if(this.keys.length) this.addKeys();
+    },
+
+    rename:function(){
+        if(this.autoName){
+            this.name = this.id+'-'+this.type;
+            this.c[1].textContent = this.name;
+        }
     },
 
 
@@ -143,8 +158,10 @@ NEO.Proto.prototype = {
             while(i--) this.f[i] = null;
             this.f = null
         }
-        if(this.callback)this.callback = null;
+        //if(this.callback)this.callback = null;
         if(this.value) this.value = null;
+
+        //NEO.main.data[this.name] = false;
 
         if(selfClear){
             if(NEO.main)NEO.main.remove(this.id);

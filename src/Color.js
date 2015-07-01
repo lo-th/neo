@@ -26,7 +26,7 @@ NEO.Color = function(obj){
     this.degradId = 'degrad'+NEO.DID;
     this.degrad = [];
     this.linear = [];
-    this.degNumber = 10;
+    this.degNumber = 5;
     
     NEO.Proto.call( this, obj );
 
@@ -45,8 +45,9 @@ NEO.Color.prototype = Object.create( NEO.Proto.prototype );
 NEO.Color.prototype.constructor = NEO.Color;
 
 NEO.Color.prototype.update = function(f){
-    var color = this.findColor(f);
-    this.callback(color);
+
+    this.value = this.findColor(f);
+
 };
 
 /*NEO.Color.prototype.Inter = function(a,b,lerp){
@@ -85,8 +86,7 @@ NEO.Color.prototype.findColor = function(f){
         if(!c1) color = c2;
         if(!c2) color = c1;
         if(c1 && c2){
-            color = NEO.lerpColor(c1, c2, ((f-f1))/(f2-f1)   );
-            //color = this.Inter(NEO.numToHex(c1), NEO.numToHex(c2), ((f-f1))/(f2-f1)   );
+            color = NEO.lerpColor(c1, c2, ((f-f1))/(f2-f1) );
         }
     }
 
@@ -94,108 +94,21 @@ NEO.Color.prototype.findColor = function(f){
 }
 
 NEO.Color.prototype.createDegrad = function(){
-    //var max = NEO.main.maxFrame;
-    //var fsize = NEO.main.frameSize;
-
-    // CSS methode
-    /*var grd = 'linear-gradient(to right';
-    var lng = this.keys.length, percent;
-    for(var i=0; i<lng; i++){
-        percent = ((this.keys[i]*100)/max).toFixed(4) + '%';
-        grd+=','+this.colors[i] + ' '+ percent;
-    }
-    grd+=')';
-    this.c[5].style.background = grd;
-    */
-
-    // SVG methode
-    
-    /*if(this.degrad)this.c[5].removeChild(this.degrad);
-    this.degrad = NEO.DOM('NEO', 'defs', 'width:100%; height:60px;', {} );
-    var p = NEO.DOM(null, 'linearGradient', '', {id:this.degradId, x1:'0%', y1:'0%', x2:'100%', y2:'0%', gradientUnits:'userSpaceOnUse'}, this.degrad, 0 );
-
-    var lng = this.keys.length, percent;
-    //while(i--){
-    for(var i=0; i<lng; i++){
-        percent = ((this.keys[i]*100)/max).toFixed(4)/100;// + '%'
-        NEO.DOM(null, 'stop', '', { offset: percent, 'stop-color':this.colors[i], 'stop-opacity':1 }, p, 0 );
-    }
-    NEO.DOM(null, 'rect', '', {width:'100%', height:'60px', x:0, fill:'url(#'+this.degradId+')'}, this.degrad );
-
-    this.degradStop = p.childNodes[0];
-    this.c[5].insertBefore(this.degrad, this.c[5].childNodes[0]);*/
 
     var i;
 
-    /*if(this.degrad.length){
-        i = this.degrad.length;
-        while(i--) this.c[5].removeChild(this.degrad[i]);
-        this.degrad = [];
-        this.linear = [];
-    }*/
-    //var fbygrad = max/this.degNumber;
-    //var size = fbygrad*NEO.main.frameSize;
-    //var size = (NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize;
-    //var per = 100/this.degNumber;
-    
     var degrad, linear;
     i = this.degNumber;
     while(i--){
-    //for(i=0; i<this.degNumber; i++){
         degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:100px; width:100px; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:'+(size*i)+'px; width:'+size+'px; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', ' left:'+(per*i)+'%; width:'+per+'%; height:60px;', {} );
-       // degrad = NEO.DOM('NEO', 'defs', 'position:relative; display:block-inline; width:'+per+'%; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', 'position:relative; display:block-inline; left:'+(per*i)+'%; width:'+per+'%; height:60px;', {} );
-        //degrad = NEO.DOM('NEO', 'defs', 'left:'+(300*i)+'px; width:'+per+'%; height:60px;', {} );
-        //linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%', spreadMethod:"pad", gradientUnits:'userSpaceOnUse'}, degrad, 0 );
         linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%' }, degrad, 0 );
-
-        
-        //NEO.DOM(null, 'stop', '', { offset: '1', 'stop-color':'#FF0000', 'stop-opacity':1 }, linear, 0 );
-        //NEO.DOM(null, 'stop', '', { offset:0, 'stop-color':'#00FF00', 'stop-opacity':1 }, linear, 0 );
-        //NEO.DOM(null, 'stop', '', { offset:0, 'stop-color':'#00FFFF', 'stop-opacity':1 }, linear, 0 );
-
         NEO.DOM(null, 'rect', '', {width:'100%', height:'60', stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
-
-        //this.c[5].insertBefore(degrad, this.c[5].childNodes[0]);
-
         this.c[5].appendChild(degrad);
-
         this.degrad[i] = degrad;
         this.linear[i] = linear;
     }
 
     this.upDegrad();
-
-
-    //NEO.DOM(null, 'stop', '', { offset:'0%', 'stop-color':'#00FF00', 'stop-opacity':1 }, this.linear[0], 0 );
-
-
-
-
-
-
-
-
-
-    /*if(this.degrad)this.c[5].removeChild(this.degrad);
-    this.degrad = NEO.DOM('NEO', 'defs', 'width:20%; height:60px;', {} );
-    var p = NEO.DOM(null, 'linearGradient', '', {id:this.degradId, x1:'0%', y1:'0%', x2:'100%', y2:'0%', spreadMethod:"pad", gradientUnits:'userSpaceOnUse'}, this.degrad, 0 );
-
-    var lng = this.keys.length, percent, color;
-    //while(i--){
-    for(var i=0; i<lng; i++){
-        color = NEO.hexToHtml(this.colors[i]);
-        //console.log(color)
-        percent = ((this.keys[i]*100)/max).toFixed(4)/20;// + '%'
-        NEO.DOM(null, 'stop', '', { offset: percent, 'stop-color':color, 'stop-opacity':1 }, p, 0 );
-    }
-    NEO.DOM(null, 'rect', '', {width:'100%', height:'60px', x:0, fill:'url(#'+this.degradId+')'}, this.degrad );
-
-    this.degradStop = p.childNodes[0];
-    this.c[5].insertBefore(this.degrad, this.c[5].childNodes[0]);*/
-
 
 };
 

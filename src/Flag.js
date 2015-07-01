@@ -3,7 +3,7 @@ NEO.Flag = function(obj){
     this.type = 'flag';
 
     this.names = obj.names || [];
-    this.currentName = '';
+    this.value = '';
     
     NEO.Proto.call( this, obj );
 
@@ -14,19 +14,17 @@ NEO.Flag.prototype = Object.create( NEO.Proto.prototype );
 NEO.Flag.prototype.constructor = NEO.Flag;
 
 NEO.Flag.prototype.update = function(f){
-    if(f==0) this.currentName = '';
-    var active = false;
-    if (this.keys.indexOf(f) > -1) active = true;
 
-    if(active){ 
-        this.c[5].style.background = 'rgba(86,175,178,0.3)';
-        this.currentName = this.items[this.keys.indexOf(f)].name;
-    }
-    else{ 
-        this.c[5].style.background = 'none';
-    }
+    if(f==0) this.value = '';
 
-    this.callback(this.currentName);
+    var k = this.keys.indexOf(f);
+
+    if(k > -1){ 
+        this.c[6].style.background = 'rgba(86,175,178,0.3)';
+        this.value = this.items[k].name;
+    }else{ 
+        this.c[6].style.background = 'none';
+    }
     
 };
 
