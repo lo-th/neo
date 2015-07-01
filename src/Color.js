@@ -15,13 +15,11 @@ NEO.lerpColor = function(a,b,lerp){
     return ( A[0] * 255 ) << 16 ^ ( A[1] * 255 ) << 8 ^ ( A[2] * 255 ) << 0;
 }
 
-
 NEO.Color = function(obj){
 
     this.type = 'color';
 
     this.colors =  obj.colors || [];
-    //console.log(this.colors)
     NEO.DID++;
     this.degradId = 'degrad'+NEO.DID;
     this.degrad = [];
@@ -32,13 +30,7 @@ NEO.Color = function(obj){
 
     this.createDegrad();
 
-   
-
     this.init();
-
-    
-
-    //console.log(this.findColor(0));
 }
 
 NEO.Color.prototype = Object.create( NEO.Proto.prototype );
@@ -49,26 +41,6 @@ NEO.Color.prototype.update = function(f){
     this.value = this.findColor(f);
 
 };
-
-/*NEO.Color.prototype.Inter = function(a,b,lerp){
-    var m1 = 0xff00ff, m2 = 0x00ff00, f2 = 256 * lerp, f1 = 256 - f2;
-    var c = ((((( a & m1 ) * f1 ) + ( ( b & m1 ) * f2 )) >> 8 ) & m1 ) | ((((( a & m2 ) * f1 ) + ( ( b & m2 ) * f2 )) >> 8 ) & m2 );
-    return NEO.numToHex(c);
-};
-
-
-NEO.Color.prototype.Inter = function(a,b,lerp){
-
-    var A = [( a >> 16 & 255 ) / 255, ( a >> 8 & 255 ) / 255, ( a & 255 ) / 255];
-    var B = [( b >> 16 & 255 ) / 255, ( b >> 8 & 255 ) / 255, ( b & 255 ) / 255];
-    A[0] += ( B[0] - A[0] ) * lerp;
-    A[1] += ( B[1] - A[1] ) * lerp;
-    A[2] += ( B[2] - A[2] ) * lerp;
-
-    return ( A[0] * 255 ) << 16 ^ ( A[1] * 255 ) << 8 ^ ( A[3] * 255 ) << 0;
-
-};*/
-
 
 NEO.Color.prototype.findColor = function(f){
     var color;
@@ -94,9 +66,7 @@ NEO.Color.prototype.findColor = function(f){
 }
 
 NEO.Color.prototype.createDegrad = function(){
-
     var i;
-
     var degrad, linear;
     i = this.degNumber;
     while(i--){
@@ -142,7 +112,7 @@ NEO.Color.prototype.upDegrad = function(){
 }
 
 NEO.Color.prototype.moveDegrad = function(id, f){
-    this.keys[id] = f
+    this.keys[id] = f;
     this.upDegrad();
 };
 
@@ -177,11 +147,9 @@ NEO.KeyColor = function(f, color, parent){
     var l = f*frameSize;
     this.w = frameSize;
     this.content = NEO.DOM('NEO', 'div','width:10px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
-    //this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:NEO.hexToHtml(this.color), stroke:'#000', 'stroke-width':1 } ));
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
-    ///this.content.name = 'color'; 
 
     this.colorSelect = NEO.DOM('NEO', 'div','left:-6px; width:24px; height:24px; top:0; pointer-events:auto; cursor:pointer;');
     this.colorSelect.name = 'colorselect';
@@ -198,7 +166,8 @@ NEO.KeyColor = function(f, color, parent){
 NEO.KeyColor.prototype = {
     constructor: NEO.KeyColor,
     clear:function(){
-        
+        NEO.clearDOM(this.content);
+        this.content = null;
     },
     reSize:function(w){
         this.w = w;

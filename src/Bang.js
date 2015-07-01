@@ -11,6 +11,7 @@ NEO.Bang.prototype = Object.create( NEO.Proto.prototype );
 NEO.Bang.prototype.constructor = NEO.Bang;
 
 NEO.Bang.prototype.update = function(f){
+
     if (this.keys.indexOf(f) > -1){ 
         this.value = true;
         this.c[6].style.background = 'rgba(86,175,178,0.3)';
@@ -18,6 +19,7 @@ NEO.Bang.prototype.update = function(f){
         this.value = false;
         this.c[6].style.background = 'none';
     }
+    
 };
 
 
@@ -36,7 +38,8 @@ NEO.KeyBang = function(f){
 NEO.KeyBang.prototype = {
     constructor: NEO.KeyBang,
     clear:function(){
-        
+        NEO.clearDOM(this.content);
+        this.content = null;
     },
     reSize:function(w){
         this.w = w;

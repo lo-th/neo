@@ -25,10 +25,7 @@ NEO.Switch.prototype.update = function(f){
             return;
         }
     }
-
-    
 };
-
 
 
 // ------------------------------------------
@@ -36,9 +33,7 @@ NEO.Switch.prototype.update = function(f){
 
 NEO.KeySwitch = function(f, end){
     this.id = f;
-    
-    //this.length = length || 3;
-    this.end = end || (f+3); //this.id+this.length;
+    this.end = end || (f+3);
     this.length = this.end-this.id;
 
     var frameSize = NEO.main.frameSize;
@@ -49,17 +44,15 @@ NEO.KeySwitch = function(f, end){
     this.content.appendChild(NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; top:0; left:0; pointer-events:auto; cursor:e-resize; background:#56afb2;' ));
     this.content.appendChild(NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; top:0; right:0; pointer-events:auto; cursor:e-resize; background:#56afb2;' ));
     this.content.name = 'switch';
-    //this.content.children[0].name = 'switch';
     this.content.childNodes[1].name = 'switch';
     this.content.childNodes[2].name = 'switch';
-
-    //console.log(this.content.childNodes)
 }
 
 NEO.KeySwitch.prototype = {
     constructor: NEO.KeyBang,
     clear:function(){
-        
+        NEO.clearDOM(this.content);
+        this.content = null;
     },
     reSize:function(w){
         this.w = w;

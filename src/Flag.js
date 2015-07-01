@@ -15,17 +15,15 @@ NEO.Flag.prototype.constructor = NEO.Flag;
 
 NEO.Flag.prototype.update = function(f){
 
-    if(f==0) this.value = '';
-
-    var k = this.keys.indexOf(f);
-
-    if(k > -1){ 
-        this.c[6].style.background = 'rgba(86,175,178,0.3)';
-        this.value = this.items[k].name;
-    }else{ 
-        this.c[6].style.background = 'none';
+    var i = this.keys.length, k;
+    while(i--){
+        k = this.keys[i];
+        if(f==k){ this.value = this.items[i].name; this.c[6].style.background = 'rgba(86,175,178,0.3)'; return;}
+        if(f>k){ this.value = this.items[i].name; this.c[6].style.background = 'none';return;}
     }
-    
+    this.c[6].style.background = 'none';
+    this.value = '';
+
 };
 
 
@@ -46,7 +44,9 @@ NEO.KeyFlag = function(f, name){
 NEO.KeyFlag.prototype = {
     constructor: NEO.KeyFlag,
     clear:function(){
-        
+        this.flagName.clear()
+        NEO.clearDOM(this.content);
+        this.content = null;
     },
     reSize:function(w){
         this.w = w;
