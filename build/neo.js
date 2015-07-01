@@ -44,6 +44,7 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; border:none; ');
 
             NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none; pointer-events:auto; transition:height, 0.1s ease-out;');
+            NEO.CC('NEO.topcontent', 'bottom:0; left:0; width:100px; background:none;');
 
             
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
@@ -161,8 +162,10 @@ NEO.Timeline = function(css, decal){
     this.content = NEO.DOM('NEO content', 'div', css);
     document.body.appendChild(this.content);
 
-    this.top = parseFloat(this.content.style.top.substring(0,this.content.style.top.length-2));
+    this.topcontent = NEO.DOM('NEO topcontent', 'div', css);
+    document.body.appendChild(this.topcontent);
 
+    this.top = parseFloat(this.content.style.top.substring(0,this.content.style.top.length-2));
 
     // TOP MENU
 
@@ -251,6 +254,10 @@ NEO.Timeline = function(css, decal){
     this.content.appendChild(this.marker);
     this.content.appendChild(this.topmenu);
 
+
+    // TOP CONTENT HIDDEN
+    this.colorSelect = new UIL.Color({target:this.topcontent, callback:null, name:' ', color:'no', size:100, pos:{left:'10px', top:'20px', display:'none' }, simple:true, side:'up', type:'hex' });
+  
 
 
 
@@ -496,6 +503,7 @@ NEO.Timeline.prototype = {
 
         this.content.style.height = this.height+'px';
         this.content.style.width = this.width+'px';
+        this.topcontent.style.height = this.height+'px';
         this.timescale.style.width = this.width+'px';
         this.setScaler();
         this.move();
@@ -523,6 +531,7 @@ NEO.Timeline.prototype = {
         while(i--) total+=this.neo[i].h;
         this.height = 60+(total-1);
         this.content.style.height = this.height+'px';
+        this.topcontent.style.height = this.height+'px';
         this.marker.style.height = (this.height-20)+'px';
 
         this.topLimite = this.viewHeight-(this.height-10);
@@ -546,6 +555,24 @@ NEO.Timeline.prototype = {
     
     dels:function(){
         return NEO.DOM('NEO', 'path','width:16px; height:20px; right:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 12 L 8 8 4 12 M 4 4 L 8 8 12 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
+    },
+
+
+
+    showColorSelect:function(x,y, key){
+        this.colorSelect.setCallBack (function(v){ key.setColor(v); });
+        this.colorSelect.setColor(NEO.hexToHtml(key.color));
+
+        var tt = this.inner.getBoundingClientRect();
+        
+        //this.colorSelect.callback = null;
+        this.colorSelect.hide();
+        this.colorSelect.c[0].style.display = 'block';
+        this.colorSelect.c[0].style.left = x+'px';
+        this.colorSelect.c[0].style.top = (y-tt.top+40)+'px';
+        
+
+        
     }
 }
 
@@ -756,7 +783,7 @@ NEO.Proto.prototype = {
             case 'bang' : item = new NEO.KeyBang(f); break;
             case 'switch' : item = new NEO.KeySwitch(f, this.ends[this.keys.indexOf(f)] ); break;
             case 'flag' : item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] ); break;
-            case 'color' : item = new NEO.KeyColor(f, this.colors[this.keys.indexOf(f) ] || this.findColor(f)); break;
+            case 'color' : item = new NEO.KeyColor(f, this.colors[this.keys.indexOf(f) ] || this.findColor(f), this); break;
         }
         this.c[5].appendChild(item.content);
         this.items.push(item);
@@ -813,7 +840,7 @@ NEO.Proto.prototype = {
         var type = e.target.name || 'none';
         this.currentType = type;
         
-        if(type=='input') return;
+        if(type=='input' || type=='colorselect') return;
 
         var f = NEO.main.getFrameClick(e.clientX);
 
@@ -981,6 +1008,8 @@ NEO.Color = function(obj){
     NEO.Proto.call( this, obj );
 
     this.createDegrad();
+
+   
 
     this.init();
 
@@ -1204,7 +1233,8 @@ NEO.Color.prototype.setSize = function(){
 // ------------------------------------------
 
 
-NEO.KeyColor = function(f, color){
+NEO.KeyColor = function(f, color, parent){
+    this.parent = parent;
     this.id = f;
     var frameSize = NEO.main.frameSize;
     this.color = color || 0x0000FF;
@@ -1215,8 +1245,20 @@ NEO.KeyColor = function(f, color){
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
-    this.content.name = 'color'; 
+    ///this.content.name = 'color'; 
+
+    this.colorSelect = NEO.DOM('NEO', 'div','left:-6px; width:24px; height:24px; top:0; pointer-events:auto; cursor:pointer;');
+    this.colorSelect.name = 'colorselect';
+    this.content.appendChild(this.colorSelect);
+
+    this.colorSelect.onclick = function(e){
+        var rect = this.parent.c[0].getBoundingClientRect();
+        NEO.main.showColorSelect(e.clientX, rect.top, this);
+    }.bind(this);
+
+    this.content.name = 'color';
 }
+
 NEO.KeyColor.prototype = {
     constructor: NEO.KeyColor,
     clear:function(){
@@ -1230,6 +1272,14 @@ NEO.KeyColor.prototype = {
     move:function(f){
         this.id = f;
         this.content.style.left = (this.id*this.w) + 'px';
+    },
+    setColor:function(color){
+        this.color = NEO.numToHex(color);
+        NEO.setSVG(this.content.childNodes[1], 'fill', NEO.hexToHtml(this.color), 0);
+
+        this.parent.sort();
+        this.parent.upDegrad();
+
     }
 }
 NEO.Curve = function(obj){

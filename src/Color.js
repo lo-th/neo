@@ -32,6 +32,8 @@ NEO.Color = function(obj){
 
     this.createDegrad();
 
+   
+
     this.init();
 
     
@@ -254,7 +256,8 @@ NEO.Color.prototype.setSize = function(){
 // ------------------------------------------
 
 
-NEO.KeyColor = function(f, color){
+NEO.KeyColor = function(f, color, parent){
+    this.parent = parent;
     this.id = f;
     var frameSize = NEO.main.frameSize;
     this.color = color || 0x0000FF;
@@ -265,8 +268,20 @@ NEO.KeyColor = function(f, color){
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
     this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
-    this.content.name = 'color'; 
+    ///this.content.name = 'color'; 
+
+    this.colorSelect = NEO.DOM('NEO', 'div','left:-6px; width:24px; height:24px; top:0; pointer-events:auto; cursor:pointer;');
+    this.colorSelect.name = 'colorselect';
+    this.content.appendChild(this.colorSelect);
+
+    this.colorSelect.onclick = function(e){
+        var rect = this.parent.c[0].getBoundingClientRect();
+        NEO.main.showColorSelect(e.clientX, rect.top, this);
+    }.bind(this);
+
+    this.content.name = 'color';
 }
+
 NEO.KeyColor.prototype = {
     constructor: NEO.KeyColor,
     clear:function(){
@@ -280,5 +295,13 @@ NEO.KeyColor.prototype = {
     move:function(f){
         this.id = f;
         this.content.style.left = (this.id*this.w) + 'px';
+    },
+    setColor:function(color){
+        this.color = NEO.numToHex(color);
+        NEO.setSVG(this.content.childNodes[1], 'fill', NEO.hexToHtml(this.color), 0);
+
+        this.parent.sort();
+        this.parent.upDegrad();
+
     }
 }

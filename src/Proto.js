@@ -187,7 +187,7 @@ NEO.Proto.prototype = {
             case 'bang' : item = new NEO.KeyBang(f); break;
             case 'switch' : item = new NEO.KeySwitch(f, this.ends[this.keys.indexOf(f)] ); break;
             case 'flag' : item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] ); break;
-            case 'color' : item = new NEO.KeyColor(f, this.colors[this.keys.indexOf(f) ] || this.findColor(f)); break;
+            case 'color' : item = new NEO.KeyColor(f, this.colors[this.keys.indexOf(f) ] || this.findColor(f), this); break;
         }
         this.c[5].appendChild(item.content);
         this.items.push(item);
@@ -244,7 +244,7 @@ NEO.Proto.prototype = {
         var type = e.target.name || 'none';
         this.currentType = type;
         
-        if(type=='input') return;
+        if(type=='input' || type=='colorselect') return;
 
         var f = NEO.main.getFrameClick(e.clientX);
 
