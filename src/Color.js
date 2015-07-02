@@ -117,10 +117,10 @@ NEO.Color.prototype.moveDegrad = function(id, f){
 };
 
 
-NEO.Color.prototype.setSize = function(){
-    this.c[5].style.width = NEO.main.maxSize+'px';
+NEO.Color.prototype.setSize = function(w){
+    //this.c[5].style.width = NEO.main.maxSize+'px';
 
-    var w = NEO.main.frameSize;
+    //var w = NEO.main.frameSize;
     var i = this.items.length, item;
     while(i--){
         item = this.items[i];

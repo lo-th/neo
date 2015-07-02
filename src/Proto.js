@@ -55,11 +55,7 @@ NEO.Proto = function(obj){
 
     this.c[3].onclick = this.f[0];
     this.c[4].onclick = this.f[1];
-
-    ;
-
     
-
     //this.setSize();
 }
 
@@ -87,7 +83,8 @@ NEO.Proto.prototype = {
         this.c[1].textContent = this.name;
         this.c[5].name = this.type;
 
-        this.setSize();
+        //this.setSize();
+        this.syncroTrack(NEO.main.leftFrame,NEO.main.frameSize, NEO.main.maxSize);
 
         if(this.keys.length) this.addKeys();
     },
@@ -97,6 +94,10 @@ NEO.Proto.prototype = {
             this.name = this.id+'-'+this.type;
             this.c[1].textContent = this.name;
         }
+    },
+
+    getValue:function(){
+        return this.value;
     },
 
 
@@ -123,21 +124,24 @@ NEO.Proto.prototype = {
         if(NEO.main) NEO.main.calc();
     },
 
-
-
-    move:function(){
-        this.c[5].style.left = -NEO.main.currentPosition+'px';
+    syncroTrack:function(x,w,mw){
+        this.c[5].style.left = -x+'px';
+        if(w){
+            this.c[5].style.width = mw+'px';
+            this.setSize(w);
+        }
     },
 
+
     
-    setSvg:function(domId, type, value, id){
+    /*setSvg:function(domId, type, value, id){
         this.c[domId].childNodes[id || 0].setAttributeNS(null, type, value );
     },
   
 
     setDom:function(id, type, value){
         this.c[id].style[type] = value+'px';
-    },
+    },*/
     
     clear:function(selfClear){
         var ev = NEO.events;
@@ -179,16 +183,11 @@ NEO.Proto.prototype = {
 
     // KEY SIDE
 
-    setSize:function(){
-        this.c[5].style.width = NEO.main.maxSize+'px';
-
-        var w = NEO.main.frameSize;
+    setSize:function(w){
         var i = this.items.length, item;
         while(i--){
             item = this.items[i];
             item.reSize(w);
-            //item.style.width = w + 'px';
-            //item.style.left = (item.id*w) + 'px';
         }
     },
 

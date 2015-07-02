@@ -26,6 +26,11 @@ NEO.Curve.prototype.update = function(f){
     
 };
 
+NEO.Curve.prototype.ofRange = function(a,b){
+    this.range[0] = a;
+    this.range[1] = b;
+}
+
 
 // ------------------------------------------
 

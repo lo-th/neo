@@ -23,7 +23,7 @@ var NEO = NEO || ( function () {
         svgns:"http://www.w3.org/2000/svg",
         classDefine:function(){
             NEO.COLOR = 'NO';
-            //NEO.SELECT = '#035fcf';
+            NEO.SELECT = '#035fcf';
             //NEO.SELECTDOWN = '#024699';
             //NEO.SVGB = 'rgba(0,0,0,0.2)';
             //NEO.SVGC = 'rgba(120,120,120,0.6)';
@@ -38,6 +38,8 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.topmenu', 'width:100%; height:24px; background:none; ');
             NEO.CC('NEO.timeBar', 'width:100px; height:20px; top:20px; background:none; pointer-events:auto; cursor:e-resize;');
             NEO.CC('NEO.timescale', 'width:100px; height:20px; background:none; bottom:0; pointer-events:auto; cursor:e-resize;');
+            
+            NEO.CC('NEO.scaler', 'width:200px; height:16px; top:2px; background:none;');
             NEO.CC('NEO.inner', 'width:100%; top:40px; height:auto; overflow:hidden; background:none;');
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
@@ -50,6 +52,7 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.text', NEO.txt1);
 
             NEO.DEF = true;
+            //console.log(document.styleSheets)
         },
         bgcolor: function(p, a){
             var r=48, g=48, b=48;
@@ -78,11 +81,12 @@ var NEO = NEO || ( function () {
         },
         DOM:function(cc, type, css, obj, dom, id){
             type = type || 'div';
-            if(type=='rect' || type=='path' || type=='polygon' || type=='text' || type=='pattern' || type=='defs' || type=='g' || type=='line' || type=='foreignObject' || type=='linearGradient' || type=='stop' || type=='animate' || type=='radialGradient' ){
+            if(type=='rect' || type=='circle' || type=='path' || type=='polygon' || type=='text' || type=='pattern' || type=='defs' || type=='g' || type=='line' || type=='foreignObject' || type=='linearGradient' || type=='stop' || type=='animate' || type=='radialGradient' ){
                 if(dom==undefined) dom = document.createElementNS( this.svgns, 'svg' );
                 var g = document.createElementNS( this.svgns, type );
-
+                g.setAttributeNS(null, 'pointer-events', 'none' );
                 for(var e in obj){
+
                     if(e=='txt') g.textContent = obj[e];
                     else g.setAttributeNS(null, e, obj[e] );
                 }
@@ -110,6 +114,8 @@ var NEO = NEO || ( function () {
             document.getElementsByTagName('head')[0].appendChild(style);
             if(!(style.sheet||{}).insertRule) (style.styleSheet || style.sheet).addRule(adds+name, rules);
             else style.sheet.insertRule(adds+name+"{"+rules+"}",0);
+
+            //console.log(style.sheet)
         }
     };
 })();
@@ -126,9 +132,15 @@ NEO.Timeline = function(css, decal){
     this.maxTop = 145;
     this.decal = decal || 0;
 
+    this.range = {start:0, end:136, lng:136};
+
     this.frameSize = 10;
-    this.currentLeftFrame = 0;
-    this.viewFrame = Math.round(this.width/this.frameSize);
+    this.leftFrame = 0;
+    this.maxFrame = 750; // default flash
+
+
+    //this.currentLeftFrame = 0;
+    //this.viewFrame = Math.round(this.width/this.frameSize);
     this.fps = 60;
     this.timerStep = 1000/this.fps;
 
@@ -136,17 +148,19 @@ NEO.Timeline = function(css, decal){
     this.delta = 0;
     this.then = Date.now();
 
-    this.maxFrame = 750; // default flash
+    
 
-    this.maxSize = this.frameSize*this.maxFrame;
-    this.currentPosition = this.currentLeftFrame*this.frameSize;
+    //this.maxSize = this.frameSize*this.maxFrame;
+    //this.currentPosition = this.currentLeftFrame*this.frameSize;
     this.ratio = this.maxFrame/this.width;
     this.invRatio = this.width/this.maxFrame;
-    this.viewFrame = this.width/this.frameSize;
-    this.posX = 0;
+    //this.viewFrame = this.width/this.frameSize;
+    //this.posX = 0;
 
     this.timerdown = false;
     this.scrolldown = false;
+    this.currentAction = '';
+
     this.inPlay = false;
 
 
@@ -166,16 +180,16 @@ NEO.Timeline = function(css, decal){
     this.topmenu = NEO.DOM('NEO topmenu');
     this.topmenu.appendChild(this.liner(1));
 
-    var callbackSize = function(v){ this.scaletime(v); }.bind(this);
+    //var callbackSize = function(v){ this.scaletime(v); }.bind(this);
     var callbackFps = function(v){ this.setFps(v); }.bind(this);
     var callbackList = function(v){ this.add(v); this.addList.text('ADD'); }.bind(this);
     var callbackPlay = function(v){ this.play(); }.bind(this);
-    var callbackStart = function(v){ this.goTo(0, true); }.bind(this);
-    var callbackEnd = function(v){ this.goTo(this.maxFrame, true); }.bind(this);
+    var callbackStart = function(v){ this.moveTo(0); }.bind(this);
+    var callbackEnd = function(v){ this.moveTo(this.maxFrame); }.bind(this);
 
    
-    this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0', top:'2px' }});
-    this.butFps = new UIL.Number({target:this.topmenu, callback:callbackFps, name:'fps', min:12, max:60, value:60, step:1, color:'no', size:82, pos:{left:'auto', right:'130px', top:'2px' }});
+    //this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0', top:'2px' }});
+    this.butFps = new UIL.Number({target:this.topmenu, callback:callbackFps, name:'fps', min:12, max:60, value:60, step:1, color:'no', size:82, pos:{left:'auto', right:'0px', top:'2px' }});
     this.title = new UIL.Title({target:this.topmenu, name:'0:00:00', color:'no', size:120, height:20, pos:{top:'2px' } });
     this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:80, pos:{left:'100px', top:'auto', bottom:'2px'}, simple:true, side:'up', full:true });
     this.addList.text('ADD');
@@ -215,19 +229,33 @@ NEO.Timeline = function(css, decal){
     this.timescale.appendChild(this.liner(20));
     this.timescale.name = 'timescale';
 
-    this.pattern2 = NEO.DOM('NEO', 'defs', 'width:100%; height:10px; top:5px;', {} );
-    p = NEO.DOM(null, 'pattern', '', {id:'timeScale', width:10, height:10, patternUnits:'userSpaceOnUse'}, this.pattern2, 0 );
+    this.hatchPattern = NEO.DOM('NEO', 'defs', 'width:100%; height:10px; top:5px;', {} );
+    p = NEO.DOM(null, 'pattern', '', {id:'timeScale', width:10, height:10, patternUnits:'userSpaceOnUse'}, this.hatchPattern, 0 );
     g = NEO.DOM(null, 'g', '', { stroke:'#888', 'stroke-width':'1', fill:'none'}, p, 0 );
     NEO.DOM(null, 'path', '', { d:'M0 10 L10 0 M0 5 L5 0 M5 10 L10 5'}, g, 0 );
-    NEO.DOM(null, 'rect', '', {width:'100%', height:10, x:0, fill:'url(#timeScale)'}, this.pattern2 );
-    this.timescale.appendChild(this.pattern2);
+    NEO.DOM(null, 'rect', '', {width:'100%', height:10, x:0, fill:'url(#timeScale)'}, this.hatchPattern );
+    //this.timescale.appendChild(this.hatchPattern);
 
-    this.scaler = NEO.DOM('NEO', 'rect', 'width:40px; height:16px; top:2px', {width:40, height:16, x:0, y:0, fill:'rgba(0,0,0,0.5)', stroke:'#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+    // BOTTOM TIME SCALE SCROLLER
+
+    this.scaler = NEO.DOM('NEO scaler');
+
+    //this.scaler = NEO.DOM('NEO', 'rect', 'width:40px; height:16px; top:2px;', {width:40, height:16, x:0, y:0, fill:'rgba(0,0,0,0.5)', stroke:'#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+    this.scalerLine = this.liner(8);
+    this.scalerLeft = NEO.DOM('NEO', 'circle', 'width:16px; height:16px; top:0px; left:-8px;  pointer-events:auto; cursor:pointer;', {cx:8, cy:8, r:6, fill:'rgba(0,0,0,0.5)', stroke:'#888', 'stroke-width':2} );
+    this.scalerRight = NEO.DOM('NEO', 'circle', 'width:16px; height:16px; top:0px; right:-8px;  pointer-events:auto; cursor:pointer;', {cx:8, cy:8, r:6, fill:'rgba(0,0,0,0.5)', stroke:'#888', 'stroke-width':2} );
+    this.scalerLeft.name = 'scaleLeft';
+    this.scalerRight.name = 'scaleRight';
+    this.scaler.appendChild(this.scalerLine);
+    this.scaler.appendChild(this.scalerLeft);
+    this.scaler.appendChild(this.scalerRight);
     this.timescale.appendChild(this.scaler);
 
     this.miniFramePos = this.vliner(1, '#F00');
     this.timescale.appendChild(this.miniFramePos);
 
+
+    
 
 
     // TRACK CONTENT
@@ -261,40 +289,77 @@ NEO.Timeline = function(css, decal){
     this.f[0] = function(e){
         if(e.target.name){
             var name = e.target.name;
-            if(name=='timeBar'){
+            //console.log(name);
+            /*switch(name){
+                case 'timeBar': this.timerdown = true; break;
+                case 'timescale': this.scrolldown = true; this.currentAction = name;break;
+                case 'scaleRight': NEO.setSVG(this.scalerRight, 'fill', NEO.SELECT ); break;
+                case 'scaleLeft': NEO.setSVG(this.scalerLeft, 'fill', NEO.SELECT ); break;
+                default : name = '';
+            }*/
+
+            if(name == 'timeBar' || name == 'timescale' || name == 'scaleRight' || name == 'scaleLeft'){ 
+                this.currentAction = name;
+                this.f[1](e);
+            }
+            else this.currentAction = '';
+
+            
+            //this.currentAction = name;
+            /*if(name=='timeBar'){
                 this.timerdown = true;
                 
             }else if(name=='timescale'){
                 this.scrolldown = true;
-
-            }
-            this.f[1](e);
-        }
+            }*/
+            //this.f[1](e);
+        } else this.currentAction = '';
     }.bind(this);
 
     // content.mouseMouve
     this.f[1] = function(e){
+        if(!this.currentAction) return;
+        //console.log('yoooo')
         var x = e.clientX;
         var y = e.clientY;
-        if(y<this.topLimite)this.f[2]();
 
-        if(this.timerdown){
-            //this.frame = this.getFrameClick(x);
-            //this.updateTime();
+        if(y<this.topLimite) this.currentAction = '';
 
+        switch(this.currentAction){
+            case 'timeBar': this.goTo( this.getFrameClick(x) ); break;
+            case 'timescale': this.moveScroll(x); break;
+            case 'scaleLeft': this.changeRange(x); break;
+            case 'scaleRight': this.changeRange(x, true); break;
+
+        }
+
+        /*if(this.timerdown){
             this.goTo(this.getFrameClick(x));
         }
         if(this.scrolldown){
             this.posX = x;
             this.move();
-        }
+        }*/
     }.bind(this);
 
     // content.mouseUp
     this.f[2] = function(e){
-        this.timerdown = false;
-        this.scrolldown = false;
+        this.currentAction = '';
+        //this.timerdown = false;
+        // this.scrolldown = false;
     }.bind(this);
+
+    this.f[3] = function(e){
+        NEO.setSVG(e.target, 'fill', NEO.SELECT );
+    }.bind(this);
+    this.f[4] = function(e){
+        NEO.setSVG(e.target, 'fill', 'none' );
+    }.bind(this);
+
+    this.scalerLeft.onmouseover = this.f[3];
+    this.scalerLeft.onmouseout = this.f[4];
+    this.scalerRight.onmouseover = this.f[3];
+    this.scalerRight.onmouseout = this.f[4];
 
     this.content.onmousedown = this.f[0];
     this.content.onmousemove = this.f[1];
@@ -303,15 +368,20 @@ NEO.Timeline = function(css, decal){
     this.content.oncontextmenu = function(e){e.preventDefault()};
 
 
-
     
 
     this.title.text2(this.frame);
 
     window.addEventListener("resize", function(e){this.resize(e)}.bind(this), false );
+
+
+
+
     this.resize();
 
-    this.scaletime(0.8);//default FLASH
+    //this.scaletime(0.8);//default FLASH
+
+    //this.changeRange();
 
     //this.scaletime(0.1);
     //this.scaletime(1);
@@ -386,7 +456,7 @@ NEO.Timeline.prototype = {
 
         if(rootUpdate) rootUpdate();
 
-        if(move)this.move(this.width*(f/this.maxFrame));
+        //if(move)this.move(this.width*(f/this.maxFrame));
     },
     show:function(){
         this.content.style.display = 'block';
@@ -394,45 +464,106 @@ NEO.Timeline.prototype = {
     hide:function(){
         this.content.style.display = 'none';
     },
+    setRatio:function(){
+        this.ratio = this.maxFrame/this.width;
+        this.invRatio = this.width/this.maxFrame;
+    },
+
     autoScroll:function(){
-        var right = this.currentLeftFrame+this.viewFrame;
+        if(this.frame>this.range.end) {
+            this.moveTo(this.range.end);
+            //this.scaler.style.left = px +'px';
+            //var rec = this.scaler.getBoundingClientRect();
+            //this.moveScroll(rec.left+(this.range.mid*2))
+        }
+
+        /*var right = this.currentLeftFrame+this.viewFrame;
         if(this.frame>right) {
             this.move(this.currentScrollPosition+this.miniScaleView+this.mid);
-        }
+        }*/
     },
-    move:function(x){
-        x = x || this.posX;
 
-        this.mid = this.miniScaleView*0.5;
-        this.currentScrollPosition = Math.floor(Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ) );
-        this.currentLeftFrame = Math.floor(this.currentScrollPosition*this.ratio);
-        this.currentPosition =  Math.floor(this.currentLeftFrame*this.frameSize);
+    moveScroll:function(x){
+        var px = (x-this.range.mid);
 
-        if(this.currentPosition<0){ 
-            this.currentPosition = 0;
-            this.currentLeftFrame = 0;
-        }
+        if(px<0) px = 0;
+        if(px>this.range.max) px = this.range.max;
 
-        this.scaler.style.left = this.currentScrollPosition+'px';
-        this.timeBar.style.left = -this.currentPosition+'px';
+        this.scaler.style.left = px +'px';
+
+        this.moveRange();
+    },
+
+    moveTo:function(f){
+        if(f> (this.maxFrame-this.range.lng)) f = this.maxFrame-this.range.lng;
+        if(f<0) f=0;
+
+        this.scaler.style.left = Math.round(f*this.invRatio) + 'px';
+
+        this.moveRange();
+    },
+
+    moveRange:function(){
+        var rec = this.scaler.getBoundingClientRect();
+        this.range.start = Math.round(rec.left * this.ratio);
+        this.range.end = Math.round(rec.right * this.ratio);
+        this.leftFrame = this.frameSize*this.range.start;
+        this.timeBar.style.left = -this.leftFrame+'px';
+
+//this.currentScrollPosition = Math.floor(Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ) );
         this.moveMarker();
 
         var i = this.neo.length;
-        while(i--) this.neo[i].move();
+        while(i--) this.neo[i].syncroTrack( this.leftFrame );
     },
+
+    
+    changeRange:function(x, isRight){
+        var rec = this.scaler.getBoundingClientRect();
+
+        if(x){
+            if(isRight){
+                this.scaler.style.width = (rec.width+(x-rec.right))+'px';
+            }else{
+                this.scaler.style.left = x+'px';
+                this.scaler.style.width = (rec.right-x)+'px';
+            }
+        }
+
+        this.range.start = Math.round(rec.left * this.ratio);
+        this.range.end = Math.round(rec.right * this.ratio);
+        this.range.lng = Math.round(rec.width * this.ratio);
+        this.range.mid = rec.width * 0.5;
+        this.range.max = this.width - rec.width;
+
+        this.frameSize = (this.width/this.range.lng).toFixed(2)*1;
+        this.maxSize = this.frameSize*this.maxFrame;
+
+        this.leftFrame = this.frameSize*this.range.start;
+        
+
+        this.timeBar.style.left = -this.leftFrame+'px';
+
+        this.scaletime();
+
+        var i = this.neo.length;
+        while(i--) this.neo[i].syncroTrack( this.leftFrame, this.frameSize, this.maxSize );
+
+
+
+        //console.log( this.range, this.frameSize );
+    },
+
     moveMarker:function(){
-        this.marker.style.left = ((this.frame-this.currentLeftFrame)*this.frameSize)+'px';
+        this.marker.style.left = ((this.frame-this.range.start)*this.frameSize)+'px';
         this.miniFramePos.style.left = (this.frame*this.invRatio)+'px';
     },
     getFrameClick:function(x){
-        var f = Math.floor(x/this.frameSize)+this.currentLeftFrame;
+        var f = Math.floor(x/this.frameSize)+this.range.start;
         if(f>this.maxFrame) f = this.maxFrame;
         return f;
     },
-    scaletime:function(s){
-
-        this.frameSize = Math.floor(s*10);
-        this.maxSize = (this.maxFrame+1)*this.frameSize;
+    scaletime:function(){
 
         var n = [
             Math.round(this.frameSize)+0.5,
@@ -448,34 +579,16 @@ NEO.Timeline.prototype = {
         NEO.setSVG(this.pattern.childNodes[0], 'width', this.frameSize*5, 0);
 
       
-        this.timeBar.style.width = this.maxSize + 'px';
-
-        var i = this.neo.length;
-        while(i--) this.neo[i].setSize();
-
+        
         var middle = (this.frameSize*0.5)+0.5;
         NEO.setSVG(this.marker, 'width',this.frameSize);
         NEO.setSVG(this.marker, 'x1',middle, 1);
         NEO.setSVG(this.marker, 'x2',middle, 1);
 
-
-        this.setScaler();
-        this.move();
+        this.timeBar.style.width = this.maxSize + 'px';
 
     },
-    setScaler:function(){
-        this.ratio = this.maxFrame/this.width;
-        this.viewFrame = Math.floor(this.width/this.frameSize);
-        this.miniScaleView = Math.floor(this.invRatio * this.viewFrame);
 
-        if(this.maxSize<this.width){
-            this.scaler.style.display = 'none';
-        }else{
-            this.scaler.style.display = 'block';
-            this.scaler.style.width = this.miniScaleView+'px';
-            NEO.setSVG(this.scaler, 'width',this.miniScaleView);
-        }
-    },
     setFps:function(fps){
         this.fps = fps;
         this.timerStep = 1000/this.fps; 
@@ -488,12 +601,12 @@ NEO.Timeline.prototype = {
         switch(type){
             case 'bang':  n = new NEO.Bang(obj); break;
             case 'flag':  n = new NEO.Flag(obj);  break;
-            case 'switch':  n = new NEO.Switch(obj);  break;
+            case 'switch':n = new NEO.Switch(obj);  break;
             case 'color': n = new NEO.Color(obj); break;
             case 'curve': n = new NEO.Curve(obj); break;
             case 'lfo':   n = new NEO.Lfo(obj);  break;
-            case 'audio':   n = new NEO.Audio(obj);   break;
-            case 'video':   n = new NEO.Video(obj);   break;
+            case 'audio': n = new NEO.Audio(obj);   break;
+            case 'video': n = new NEO.Video(obj);   break;
         }
         n.id = this.neo.length;
         n.rename();
@@ -516,14 +629,18 @@ NEO.Timeline.prototype = {
 
         this.width = this.viewWidth - this.decal;
         this.maxHeight = this.viewHeight - this.maxTop;
-        this.invRatio = this.width/this.maxFrame;
+        
 
         this.content.style.height = this.height+'px';
         this.content.style.width = this.width+'px';
         this.topcontent.style.height = this.height+'px';
         this.timescale.style.width = this.width+'px';
-        this.setScaler();
-        this.move();
+
+
+        //this.setScaler();
+        //this.move();
+        this.setRatio();
+        this.changeRange();
 
         this.topLimite = this.viewHeight-(this.height-10);
     },
