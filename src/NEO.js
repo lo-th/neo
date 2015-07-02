@@ -52,7 +52,36 @@ var NEO = NEO || ( function () {
             NEO.CC('NEO.text', NEO.txt1);
 
             NEO.DEF = true;
-            //console.log(document.styleSheets)
+        },
+        changecss: function (theClass,element,value) {
+            var cssRules;
+            
+            for (var S = 0; S < document.styleSheets.length; S++){
+                try{// exporer
+                    document.styleSheets[S].insertRule(theClass+' { '+element+': '+value+'; }',document.styleSheets[S][cssRules].length);
+                } catch(e){// chrome
+                    try{document.styleSheets[S].addRule(theClass,element+': '+value+';');
+                    }catch(ee){// firefox
+                        try{
+                            if (document.styleSheets[S]['rules']) {
+                                cssRules = 'rules';
+                            } else if (document.styleSheets[S]['cssRules']) {
+                                cssRules = 'cssRules';
+                            }/* else {
+                            //no rules found... browser unknown
+                            }*/
+                            for (var R = 0; R < document.styleSheets[S][cssRules].length; R++) {
+                                if (document.styleSheets[S][cssRules][R].selectorText == theClass) {
+                                    if(document.styleSheets[S][cssRules][R].style[element]){
+                                        document.styleSheets[S][cssRules][R].style[element] = value;
+                                        break;
+                                    }
+                                }
+                            }
+                        } catch (eee){}
+                    }
+                }
+            }
         },
         bgcolor: function(p, a){
             var r=48, g=48, b=48;
@@ -77,7 +106,8 @@ var NEO = NEO || ( function () {
             dom.style[type] = value+'px';
         },
         clearDOM:function(dom){
-            while ( dom.children.length ) dom.removeChild( dom.lastChild );
+            while ( dom.childNodes.length ) dom.removeChild( dom.lastChild );
+            //while ( dom.children.length ) dom.removeChild( dom.lastChild );
         },
         DOM:function(cc, type, css, obj, dom, id){
             type = type || 'div';
@@ -111,6 +141,8 @@ var NEO = NEO || ( function () {
             if(name == '*') adds = '';
             var style = document.createElement('style');
             style.type = 'text/css';
+            style.id = name;
+            //console.log(name)
             document.getElementsByTagName('head')[0].appendChild(style);
             if(!(style.sheet||{}).insertRule) (style.styleSheet || style.sheet).addRule(adds+name, rules);
             else style.sheet.insertRule(adds+name+"{"+rules+"}",0);
@@ -387,6 +419,10 @@ NEO.Timeline = function(css, decal){
     //this.scaletime(1);
 
     NEO.main = this;
+
+    //NEO.changecss('.NEO.topmenu', 'background', '#FF0');
+
+
 }
 
 
@@ -711,3 +747,5 @@ NEO.Timeline.prototype = {
 }
 
 NEO.classDefine();
+//NEO.setRules('default', "NEO.track", "height")
+

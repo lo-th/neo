@@ -146,13 +146,13 @@ NEO.KeyColor = function(f, color, parent){
     this.color = color || 0x0000FF;
     var l = f*frameSize;
     this.w = frameSize;
-    this.content = NEO.DOM('NEO', 'div','width:10px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
+    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:50%; margin-left:-12px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:50%; margin-left:-12px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
     //this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:50%; margin-left:-12px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
 
-    this.colorSelect = NEO.DOM('NEO', 'div','left:-8px; width:25px; height:24px; top:1px; pointer-events:auto; cursor:pointer;');
+    this.colorSelect = NEO.DOM('NEO', 'div','left:50%; margin-left:-12px; width:25px; height:24px; top:1px; pointer-events:auto; cursor:pointer;');
     this.colorSelect.name = 'colorselect';
     this.content.appendChild(this.colorSelect);
 
@@ -172,7 +172,7 @@ NEO.KeyColor.prototype = {
     },
     reSize:function(w){
         this.w = w;
-        //this.content.style.width = this.w + 'px';
+        this.content.style.width = this.w + 'px';
         this.content.style.left = (this.id*this.w) + 'px';
     },
     move:function(f){
