@@ -68,7 +68,7 @@ NEO.Proto.prototype = {
 
     init:function(){
         this.c[0].style.background = NEO.bgcolor(this.color);
-        for(var i = 0; i<this.c.length; i++){
+        for(var i=0, lng=this.c.length; i!==lng; i++){
             if(i==0){ 
                 if(this.target!==null) this.target.appendChild(this.c[0]);
                 else NEO.main.inner.appendChild(this.c[0]);
@@ -221,11 +221,11 @@ NEO.Proto.prototype = {
     },
 
     sort:function(){
-        var i, py = 0;
+        var i, py = 0, lng = this.items.length;
         this.items.sort( function ( a, b ) { return a.id - b.id; } );
 
         if(this.names){
-            for(i=0; i<this.items.length; i++){
+            for(i=0; i!==lng; i++){
                 this.names[i] = this.items[i].name;
                 this.items[i].setPy(py);
                 if(py<2) py++;
@@ -234,13 +234,13 @@ NEO.Proto.prototype = {
         }
 
         if(this.ends){
-            for(i=0; i<this.items.length; i++){
+            for(i=0; i!==lng; i++){
                 this.ends[i] = this.items[i].end;
             }
         }
 
         if(this.colors){
-            for(i=0; i<this.items.length; i++){
+            for(i=0; i!==lng; i++){
                 this.colors[i] = this.items[i].color;
             }
         }

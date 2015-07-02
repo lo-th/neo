@@ -21,14 +21,6 @@ var NEO = NEO || ( function () {
         BW:190,
         AW:100, 
         svgns:"http://www.w3.org/2000/svg",
-        sizer:function(w){
-            this.WIDTH = w.toFixed(0);
-            var s = this.WIDTH/3;
-            this.BW = (s*2)-10;
-            this.AW = s;
-
-            if(this.main) this.main.changeWidth();
-        },
         classDefine:function(){
             NEO.COLOR = 'NO';
             //NEO.SELECT = '#035fcf';
@@ -39,7 +31,7 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO', 'position:absolute; pointer-events:none; box-sizing:border-box; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; margin:0; padding:0; border:none; ');
 
-            NEO.CC('NEO.content', 'bottom:0; left:0; width:100px; overflow:hidden; background:none; pointer-events:auto; transition:height, 0.1s ease-out;');
+            NEO.CC('NEO.content', 'bottom:0; left:0; width:100px;  background:none; pointer-events:auto; transition:height, 0.1s ease-out;');
             NEO.CC('NEO.topcontent', 'bottom:0; left:0; width:100px; background:none;');
 
             
@@ -143,9 +135,11 @@ NEO.Timeline = function(css, decal){
     this.then = Date.now();
 
     this.maxFrame = 750; // default flash
+
     this.maxSize = this.frameSize*this.maxFrame;
     this.currentPosition = this.currentLeftFrame*this.frameSize;
     this.ratio = this.maxFrame/this.width;
+    this.invRatio = this.width/this.maxFrame;
     this.viewFrame = this.width/this.frameSize;
     this.posX = 0;
 
@@ -181,7 +175,7 @@ NEO.Timeline = function(css, decal){
     this.sizer = new UIL.Slide({target:this.topmenu, callback:callbackSize, name:'scale', min:0.1, max:4, value:0.8, step:0.1, color:'no', size:150, pos:{left:'auto', right:'0', top:'2px' }});
     this.butFps = new UIL.Number({target:this.topmenu, callback:callbackFps, name:'fps', min:12, max:60, value:60, step:1, color:'no', size:82, pos:{left:'auto', right:'130px', top:'2px' }});
     this.title = new UIL.Title({target:this.topmenu, name:'0:00:00', color:'no', size:120, height:20, pos:{top:'2px' } });
-    this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:80, pos:{left:'100px', top:'2px' }, simple:true });
+    this.addList = new UIL.List({target:this.topmenu, callback:callbackList, name:' ', color:'no', list:['bang', 'flag', 'curve', 'lfo', 'color', 'switch', 'audio', 'video'], size:80, pos:{left:'100px', top:'auto', bottom:'2px'}, simple:true, side:'up', full:true });
     this.addList.text('ADD');
 
     this.playButton = new UIL.Button({target:this.topmenu, callback:callbackPlay, name:'X', color:'no', size:40, pos:{left:'210px', top:'2px' }, simple:true });
@@ -370,9 +364,7 @@ NEO.Timeline.prototype = {
 
             this.then = this.now - (this.delta % this.timerStep);
 
-
-            if(this.frame === this.maxFrame){ this.stop();}
-
+            if(this.frame == this.maxFrame){ this.stop();}
         }
 
     },
@@ -409,7 +401,6 @@ NEO.Timeline.prototype = {
     move:function(x){
         x = x || this.posX;
 
-       
         this.mid = this.miniScaleView*0.5;
         this.currentScrollPosition = Math.floor(Math.min( this.width-this.miniScaleView, Math.max( 0, (x-this.mid) ) ) );
         this.currentLeftFrame = Math.floor(this.currentScrollPosition*this.ratio);
@@ -429,7 +420,7 @@ NEO.Timeline.prototype = {
     },
     moveMarker:function(){
         this.marker.style.left = ((this.frame-this.currentLeftFrame)*this.frameSize)+'px';
-        this.miniFramePos.style.left = ((this.frame*(this.width/this.maxFrame)))+'px';
+        this.miniFramePos.style.left = (this.frame*this.invRatio)+'px';
     },
     getFrameClick:function(x){
         var f = Math.floor(x/this.frameSize)+this.currentLeftFrame;
@@ -473,7 +464,7 @@ NEO.Timeline.prototype = {
     setScaler:function(){
         this.ratio = this.maxFrame/this.width;
         this.viewFrame = Math.floor(this.width/this.frameSize);
-        this.miniScaleView = Math.floor((this.width/this.maxFrame) * this.viewFrame);
+        this.miniScaleView = Math.floor(this.invRatio * this.viewFrame);
 
         if(this.maxSize<this.width){
             this.scaler.style.display = 'none';
@@ -522,7 +513,8 @@ NEO.Timeline.prototype = {
         this.viewHeight = window.innerHeight;
 
         this.width = this.viewWidth - this.decal;
-        this.maxHeight = this.viewHeight-this.maxTop;
+        this.maxHeight = this.viewHeight - this.maxTop;
+        this.invRatio = this.width/this.maxFrame;
 
         this.content.style.height = this.height+'px';
         this.content.style.width = this.width+'px';
