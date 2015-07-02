@@ -42,7 +42,9 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
 
-            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; background:none; ');
+            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; background:none; border-top:1px solid transparent; border-bottom:1px solid transparent;');
+            NEO.CC('NEO.track:hover', 'border-top:1px solid #035fcf; border-bottom:1px solid #035fcf;');
+
             NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:none; background:none; ');
 
             NEO.CC('NEO.text', NEO.txt1);
@@ -441,7 +443,7 @@ NEO.Timeline.prototype = {
         ];
 
         // timeline pattern
-        var path = 'M0.5 10 L0.5 18' + 'M'+n[0]+' 15 L'+n[0]+' 18' + 'M'+n[1]+' 15 L'+n[1]+' 18' + 'M'+n[2]+' 15 L'+n[2]+' 18' + 'M'+n[3]+' 15 L'+n[3]+' 18' + 'M-0.5 20 L'+n[4]+' 20';
+        var path = 'M0.5 10 L0.5 18' + 'M'+n[0]+' 15 L'+n[0]+' 18' + 'M'+n[1]+' 15 L'+n[1]+' 18' + 'M'+n[2]+' 15 L'+n[2]+' 18' + 'M'+n[3]+' 15 L'+n[3]+' 18' + 'M 0 19.5 L'+n[4]+' 19.5';//+ 'M-0.5 20 L'+n[4]+' 20';
         NEO.setSVG(this.patternLine, 'd', path, 0);
         NEO.setSVG(this.pattern.childNodes[0], 'width', this.frameSize*5, 0);
 
@@ -556,13 +558,13 @@ NEO.Timeline.prototype = {
 
 
     liner:function(top, color){
-        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0.5, x2:'100%', y2:0.5, stroke:color || '#888888', 'stroke-width':1, 'stroke-linecap':'butt', fill:'none', 'stroke-opacity':1 } );
     },
     linerBottom:function(color){
-        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; bottom:0', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; bottom:0', {x1:0, y1:0.5, x2:'100%', y2:0.5, stroke:color || '#888888', 'stroke-width':1, 'stroke-linecap':'butt', fill:'none', 'stroke-opacity':1} );
     },
     vliner:function(top, color){
-        return NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+        return NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888888', 'stroke-width':1, 'stroke-linecap':'butt', fill:'none', 'stroke-opacity':1} );
     },
     pins:function(){
         return NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );

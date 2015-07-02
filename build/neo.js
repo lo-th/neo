@@ -45,7 +45,9 @@ var NEO = NEO || ( function () {
 
             NEO.CC('NEO.base', 'position:relative; transition:height, 0.1s ease-out; height:80px; overflow:hidden;');
 
-            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; background:none; ');
+            NEO.CC('NEO.track', 'position:absolute; left:0; top:20px; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; background:none; border-top:1px solid transparent; border-bottom:1px solid transparent;');
+            NEO.CC('NEO.track:hover', 'border-top:1px solid #035fcf; border-bottom:1px solid #035fcf;');
+
             NEO.CC('NEO.trackTop', 'position:absolute; left:0; top:20px; width:100%; height:60px; overflow:hidden; pointer-events:none; background:none; ');
 
             NEO.CC('NEO.text', NEO.txt1);
@@ -444,7 +446,7 @@ NEO.Timeline.prototype = {
         ];
 
         // timeline pattern
-        var path = 'M0.5 10 L0.5 18' + 'M'+n[0]+' 15 L'+n[0]+' 18' + 'M'+n[1]+' 15 L'+n[1]+' 18' + 'M'+n[2]+' 15 L'+n[2]+' 18' + 'M'+n[3]+' 15 L'+n[3]+' 18' + 'M-0.5 20 L'+n[4]+' 20';
+        var path = 'M0.5 10 L0.5 18' + 'M'+n[0]+' 15 L'+n[0]+' 18' + 'M'+n[1]+' 15 L'+n[1]+' 18' + 'M'+n[2]+' 15 L'+n[2]+' 18' + 'M'+n[3]+' 15 L'+n[3]+' 18' + 'M 0 19.5 L'+n[4]+' 19.5';//+ 'M-0.5 20 L'+n[4]+' 20';
         NEO.setSVG(this.patternLine, 'd', path, 0);
         NEO.setSVG(this.pattern.childNodes[0], 'width', this.frameSize*5, 0);
 
@@ -559,13 +561,13 @@ NEO.Timeline.prototype = {
 
 
     liner:function(top, color){
-        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; top:'+(top-1)+'px;', {x1:0, y1:0.5, x2:'100%', y2:0.5, stroke:color || '#888888', 'stroke-width':1, 'stroke-linecap':'butt', fill:'none', 'stroke-opacity':1 } );
     },
     linerBottom:function(color){
-        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; bottom:0', {x1:0, y1:0, x2:'100%', y2:0, stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+        return NEO.DOM('NEO', 'line', 'width:100%; height:1px; bottom:0', {x1:0, y1:0.5, x2:'100%', y2:0.5, stroke:color || '#888888', 'stroke-width':1, 'stroke-linecap':'butt', fill:'none', 'stroke-opacity':1} );
     },
     vliner:function(top, color){
-        return NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888', 'stroke-width':1, 'stroke-linecap':'butt'} );
+        return NEO.DOM('NEO', 'line', 'width:1px; height:100%; top:'+(top-1)+'px;', {x1:0, y1:0, x2:0, y2:'100%', stroke:color || '#888888', 'stroke-width':1, 'stroke-linecap':'butt', fill:'none', 'stroke-opacity':1} );
     },
     pins:function(){
         return NEO.DOM('NEO', 'path','width:16px; height:20px; left:0px; top:1px; pointer-events:auto; cursor:pointer;',{ width:16, height:16, 'd':'M 12 6 L 8 10 4 6', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' } );
@@ -647,7 +649,7 @@ NEO.Proto = function(obj){
 
     this.c[0] = NEO.DOM('NEO base');
     this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
-    this.c[2] = NEO.main.liner(20);
+    this.c[2] = NEO.main.liner(21);
     this.c[3] = NEO.main.pins();
     this.c[4] = NEO.main.dels();
 
@@ -687,7 +689,10 @@ NEO.Proto.prototype = {
                 if(this.target!==null) this.target.appendChild(this.c[0]);
                 else NEO.main.inner.appendChild(this.c[0]);
             }
-            else this.c[0].appendChild(this.c[i]);
+            else{ 
+                if(i==7) this.c[0].insertBefore(this.c[i], this.c[2]);
+                else this.c[0].appendChild(this.c[i]);
+            }
         }
 
         this.c[5].onmouseup = function(e){ this.onUp(e); }.bind(this);
@@ -819,6 +824,7 @@ NEO.Proto.prototype = {
             case 'switch' : item = new NEO.KeySwitch(f, this.ends[this.keys.indexOf(f)] ); break;
             case 'flag' : item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] ); break;
             case 'color' : item = new NEO.KeyColor(f, this.colors[this.keys.indexOf(f) ] || this.findColor(f), this); break;
+            case 'curve' : item = new NEO.KeyCurve(f, this.pos[this.keys.indexOf(f) ] || 0); break;
         }
         this.c[5].appendChild(item.content);
         this.items.push(item);
@@ -856,6 +862,12 @@ NEO.Proto.prototype = {
         if(this.colors){
             for(i=0; i!==lng; i++){
                 this.colors[i] = this.items[i].color;
+            }
+        }
+
+        if(this.pos){
+            for(i=0; i!==lng; i++){
+                this.pos[i] = this.items[i].pos;
             }
         }
 
@@ -1085,9 +1097,9 @@ NEO.Color.prototype.createDegrad = function(){
     var degrad, linear;
     i = this.degNumber;
     while(i--){
-        degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:100px; width:100px; height:60px;', {} );
+        degrad = NEO.DOM('NEO', 'defs', 'position:absolute; top:0px; left:100px; width:100px; height:58px;', {} );
         linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%' }, degrad, 0 );
-        NEO.DOM(null, 'rect', '', {width:'100%', height:'60', stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
+        NEO.DOM(null, 'rect', '', {width:'100%', height:58, stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
         this.c[5].appendChild(degrad);
         this.degrad[i] = degrad;
         this.linear[i] = linear;
@@ -1142,7 +1154,7 @@ NEO.Color.prototype.setSize = function(){
         item.reSize(w);
     }
 
-    var size = (NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize;
+    var size = Math.floor((NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize);
 
     i = this.degrad.length
     while(i--){
@@ -1162,11 +1174,12 @@ NEO.KeyColor = function(f, color, parent){
     var l = f*frameSize;
     this.w = frameSize;
     this.content = NEO.DOM('NEO', 'div','width:10px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
+    //this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
 
-    this.colorSelect = NEO.DOM('NEO', 'div','left:-6px; width:24px; height:24px; top:0; pointer-events:auto; cursor:pointer;');
+    this.colorSelect = NEO.DOM('NEO', 'div','left:-8px; width:25px; height:24px; top:1px; pointer-events:auto; cursor:pointer;');
     this.colorSelect.name = 'colorselect';
     this.content.appendChild(this.colorSelect);
 
@@ -1204,33 +1217,13 @@ NEO.KeyColor.prototype = {
 }
 NEO.Curve = function(obj){
 
-    obj = obj || {};
-    
+    this.pos =  obj.pos || [];
+    this.ease = obj.ease || [];
+    this.range = obj.range || [-100,100];
+
     this.type = 'curve';
-
+    
     NEO.Proto.call( this, obj );
-
-    this.value = obj.value || false;
-
-    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
-    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
-
-    if(!this.value) this.c[3].style.display = 'none';
-
-    this.f[0] = function(e){
-        if(this.value){
-            this.value = false;
-            this.c[3].style.display = 'none';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
-        } else {
-            this.value = true;
-            this.c[3].style.display = 'block';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
-        }
-        this.callback( this.value );
-    }.bind(this);
-
-    this.c[2].onclick = this.f[0];*/
 
     this.init();
 }
@@ -1238,11 +1231,48 @@ NEO.Curve = function(obj){
 NEO.Curve.prototype = Object.create( NEO.Proto.prototype );
 NEO.Curve.prototype.constructor = NEO.Curve;
 
-NEO.Curve.prototype.rSize = function(){
-    //NEO.Proto.prototype.rSize.call( this );
-    //this.setDom(2, 'left', this.sa);
-    //this.setDom(3, 'left', this.sa);
+NEO.Curve.prototype.update = function(f){
+
+    if (this.keys.indexOf(f) > -1){ 
+        this.value = true;
+        this.c[6].style.background = 'rgba(86,175,178,0.3)';
+    }else{ 
+        this.value = false;
+        this.c[6].style.background = 'none';
+    }
+    
 };
+
+
+// ------------------------------------------
+
+
+NEO.KeyCurve = function(f, pos){
+    this.id = f;
+    this.pos = pos || 0;
+    var frameSize = NEO.main.frameSize;
+    var l = f*frameSize;
+    this.w = frameSize;
+    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
+    this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:'#56afb2' } ));
+    this.content.name = 'bang'; 
+}
+NEO.KeyCurve.prototype = {
+    constructor: NEO.KeyBang,
+    clear:function(){
+        NEO.clearDOM(this.content);
+        this.content = null;
+    },
+    reSize:function(w){
+        this.w = w;
+        this.content.style.width = this.w + 'px';
+        this.content.style.left = (this.id*this.w) + 'px';
+    },
+    move:function(f){
+        this.id = f;
+        this.content.style.left = (this.id*this.w) + 'px';
+    }
+}
 NEO.Flag = function(obj){
 
     this.type = 'flag';

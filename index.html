@@ -41,6 +41,7 @@ neo.add('bang', { keys:[20, 40] });
 neo.add('flag', {  keys:[10, 30, 50, 70, 90, 110], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline'] });
 neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
 neo.add('color', { name:'logocolor', keys:[10, 40, 70, 100, 350] , colors:[0xFF0000, 0x7f7f00, 0x00FF00, 0xFFFF00, 0xFFFFFF] });
+neo.add('curve', { keys:[20, 40] , pos:[30, 50] });
 
 var loop = function () {
     if(neo.inPlay){ 

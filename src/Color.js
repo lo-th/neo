@@ -70,9 +70,9 @@ NEO.Color.prototype.createDegrad = function(){
     var degrad, linear;
     i = this.degNumber;
     while(i--){
-        degrad = NEO.DOM('NEO', 'defs', 'position:absolute; left:100px; width:100px; height:60px;', {} );
+        degrad = NEO.DOM('NEO', 'defs', 'position:absolute; top:0px; left:100px; width:100px; height:58px;', {} );
         linear = NEO.DOM(null, 'linearGradient', '', {id:(this.degradId+i), x1:'0%', y1:'0%', x2:'100%', y2:'0%' }, degrad, 0 );
-        NEO.DOM(null, 'rect', '', {width:'100%', height:'60', stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
+        NEO.DOM(null, 'rect', '', {width:'100%', height:58, stroke:'none', x:0, fill:'url(#'+(this.degradId+i)+')'}, degrad );
         this.c[5].appendChild(degrad);
         this.degrad[i] = degrad;
         this.linear[i] = linear;
@@ -127,7 +127,7 @@ NEO.Color.prototype.setSize = function(){
         item.reSize(w);
     }
 
-    var size = (NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize;
+    var size = Math.floor((NEO.main.maxFrame/this.degNumber)*NEO.main.frameSize);
 
     i = this.degrad.length
     while(i--){
@@ -147,11 +147,12 @@ NEO.KeyColor = function(f, color, parent){
     var l = f*frameSize;
     this.w = frameSize;
     this.content = NEO.DOM('NEO', 'div','width:10px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
-    this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'rgba(0,0,0,0.3)', fill:'none', 'stroke-width':5, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 0 0 Z', stroke:'none', fill:NEO.hexToHtml(this.color) } ));
+    //this.content.appendChild(NEO.DOM('NEO', 'path','left:-6px; width:24px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 24 0 M 12 60 L 12 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
+    this.content.appendChild(NEO.DOM('NEO', 'path','left:-8px; width:25px; height:60px; top:0; ',{ d:'M 0 0 L 12 12 13 12 25 0 M 12.5 60 L 12.5 12', stroke:'#56afb2', fill:'none', 'stroke-width':1, 'stroke-linecap':'butt' } ));
 
-    this.colorSelect = NEO.DOM('NEO', 'div','left:-6px; width:24px; height:24px; top:0; pointer-events:auto; cursor:pointer;');
+    this.colorSelect = NEO.DOM('NEO', 'div','left:-8px; width:25px; height:24px; top:1px; pointer-events:auto; cursor:pointer;');
     this.colorSelect.name = 'colorselect';
     this.content.appendChild(this.colorSelect);
 

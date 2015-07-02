@@ -1,32 +1,12 @@
 NEO.Curve = function(obj){
 
-    obj = obj || {};
-    
+    this.pos =  obj.pos || [];
+    this.ease = obj.ease || [];
+    this.range = obj.range || [-100,100];
+
     this.type = 'curve';
-
+    
     NEO.Proto.call( this, obj );
-
-    this.value = obj.value || false;
-
-    /*this.c[2] = UIL.DOM('UIL svgbox', 'rect', 'width:17px;', {width:17, height:17, fill:UIL.SVGB, 'stroke-width':1, stroke:UIL.SVGC });
-    this.c[3] = UIL.DOM('UIL svgbox', 'path','width:17px; pointer-events:none;',{ width:17, height:17, d:'M 4 9 L 6 12 14 4', 'stroke-width':2, stroke:'#e2e2e2', fill:'none', 'stroke-linecap':'butt' });
-
-    if(!this.value) this.c[3].style.display = 'none';
-
-    this.f[0] = function(e){
-        if(this.value){
-            this.value = false;
-            this.c[3].style.display = 'none';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.2)');
-        } else {
-            this.value = true;
-            this.c[3].style.display = 'block';
-            UIL.setSVG(this.c[2], 'fill','rgba(0,0,0,0.4)');
-        }
-        this.callback( this.value );
-    }.bind(this);
-
-    this.c[2].onclick = this.f[0];*/
 
     this.init();
 }
@@ -34,8 +14,45 @@ NEO.Curve = function(obj){
 NEO.Curve.prototype = Object.create( NEO.Proto.prototype );
 NEO.Curve.prototype.constructor = NEO.Curve;
 
-NEO.Curve.prototype.rSize = function(){
-    //NEO.Proto.prototype.rSize.call( this );
-    //this.setDom(2, 'left', this.sa);
-    //this.setDom(3, 'left', this.sa);
+NEO.Curve.prototype.update = function(f){
+
+    if (this.keys.indexOf(f) > -1){ 
+        this.value = true;
+        this.c[6].style.background = 'rgba(86,175,178,0.3)';
+    }else{ 
+        this.value = false;
+        this.c[6].style.background = 'none';
+    }
+    
 };
+
+
+// ------------------------------------------
+
+
+NEO.KeyCurve = function(f, pos){
+    this.id = f;
+    this.pos = pos || 0;
+    var frameSize = NEO.main.frameSize;
+    var l = f*frameSize;
+    this.w = frameSize;
+    this.content = NEO.DOM('NEO', 'div','width:'+this.w+'px; height:60px; left:'+l+'px; top:0; pointer-events:auto; cursor:e-resize;');
+    this.content.appendChild(NEO.DOM('NEO', 'rect','width:100%; height:60px; top:0; ',{ width:'100%', height:60, fill:'#56afb2' } ));
+    this.content.name = 'bang'; 
+}
+NEO.KeyCurve.prototype = {
+    constructor: NEO.KeyBang,
+    clear:function(){
+        NEO.clearDOM(this.content);
+        this.content = null;
+    },
+    reSize:function(w){
+        this.w = w;
+        this.content.style.width = this.w + 'px';
+        this.content.style.left = (this.id*this.w) + 'px';
+    },
+    move:function(f){
+        this.id = f;
+        this.content.style.left = (this.id*this.w) + 'px';
+    }
+}

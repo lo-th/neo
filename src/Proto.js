@@ -33,7 +33,7 @@ NEO.Proto = function(obj){
 
     this.c[0] = NEO.DOM('NEO base');
     this.c[1] = NEO.DOM('NEO text', 'div', 'left:10px');
-    this.c[2] = NEO.main.liner(20);
+    this.c[2] = NEO.main.liner(21);
     this.c[3] = NEO.main.pins();
     this.c[4] = NEO.main.dels();
 
@@ -73,7 +73,10 @@ NEO.Proto.prototype = {
                 if(this.target!==null) this.target.appendChild(this.c[0]);
                 else NEO.main.inner.appendChild(this.c[0]);
             }
-            else this.c[0].appendChild(this.c[i]);
+            else{ 
+                if(i==7) this.c[0].insertBefore(this.c[i], this.c[2]);
+                else this.c[0].appendChild(this.c[i]);
+            }
         }
 
         this.c[5].onmouseup = function(e){ this.onUp(e); }.bind(this);
@@ -205,6 +208,7 @@ NEO.Proto.prototype = {
             case 'switch' : item = new NEO.KeySwitch(f, this.ends[this.keys.indexOf(f)] ); break;
             case 'flag' : item = new NEO.KeyFlag(f, this.names[this.keys.indexOf(f)] ); break;
             case 'color' : item = new NEO.KeyColor(f, this.colors[this.keys.indexOf(f) ] || this.findColor(f), this); break;
+            case 'curve' : item = new NEO.KeyCurve(f, this.pos[this.keys.indexOf(f) ] || 0); break;
         }
         this.c[5].appendChild(item.content);
         this.items.push(item);
@@ -242,6 +246,12 @@ NEO.Proto.prototype = {
         if(this.colors){
             for(i=0; i!==lng; i++){
                 this.colors[i] = this.items[i].color;
+            }
+        }
+
+        if(this.pos){
+            for(i=0; i!==lng; i++){
+                this.pos[i] = this.items[i].pos;
             }
         }
 
