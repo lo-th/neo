@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
-    <defs>
-          <pattern id="textPattern" x="7" y="7" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                  <rect x="5" y="5" width="5" height="5" fill= "#876fc1" />
-          </pattern>
-    </defs>
-    <text x="0" y="50%" font-size="200" fill="url(#textPattern)">Text</text>
-</svg>
