@@ -1,5 +1,5 @@
-test
-src
-build
-_compile
+test/
+src/
+build/
+_compile/
 index_dev.html
