@@ -18,7 +18,7 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 #logo{position:absolute; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
 </style>
 <script type="text/javascript" src="js/libs/uil.min.js"></script>
-<script type="text/javascript" src="js/libs/zmin.js"></script>
+<script type="text/javascript" src="js/libs/z.js"></script>
 </head>
 
 <body>
@@ -34,34 +34,6 @@ var debug = document.getElementById('debug');
 var logo = document.getElementById('logoin');
 var version = document.getElementById('version');
 var neo = null;
-
-var xhr = new XMLHttpRequest();
-xhr.responseType = 'arraybuffer';
-xhr.open('GET', 'js/neo.js', true);
-xhr.onreadystatechange = function() {
-    if ( xhr.readyState === 4 ) {
-        if ( xhr.status === 200 || xhr.status === 0 ) {
-            LZMA.decompress( new Uint8Array(this.response), function on_complete(result) { pushScript(result); } );             
-        }
-    }       
-}
-
-xhr.send();
-
-var pushScript = function(result){
-    var nscript = document.createElement("script");
-    nscript.type = "text/javascript";
-    nscript.name = "topScript";
-    nscript.id = "topScript";
-    nscript.charset = "utf-8";
-    nscript.async = true;
-    nscript.text = result;
-    document.getElementsByTagName('head')[0].appendChild(nscript);
-
-    init();
-}
-
-
 
 var init = function(){
 
