@@ -14,6 +14,7 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
     background:-webkit-linear-gradient( 15deg, #111 20%, rgba(17,17,17,0.3) 50%, #111 80% ), -webkit-linear-gradient( 105deg, #111 30%, rgba(17,17,17,0) 90% );
 }
 #version { position:absolute; top:98px; left:50%; width:90px; height:10px; pointer-events:none; text-align:right;  font-size:16px;}
+#message { position:absolute; margin-left:-128px; top:120px; left:50%; width:256px; height:20px; pointer-events:none; text-align:center;  font-size:16px;}
 #debug { position:absolute; top:10px; left:10px; width:600px; pointer-events:none;}
 #logo{position:absolute; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
 </style>
@@ -28,11 +29,13 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 </svg>
 
 <div id='version'></div>
+<div id='message'>YOOO</div>
 <div id='debug'></div>
 <script>
 var debug = document.getElementById('debug');
 var logo = document.getElementById('logoin');
 var version = document.getElementById('version');
+var message = document.getElementById('message');
 var neo = null;
 
 var init = function(){
@@ -41,7 +44,7 @@ var init = function(){
     neo = new NEO.Timeline();
 
     neo.add('bang', { keys:[20, 40] });
-    neo.add('flag', {  keys:[10, 30, 50, 70, 90, 110], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline'] });
+    neo.add('flag', { name:'message', keys:[10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210 ], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline', 'click', 'to add', ' key', 'right click', 'to remove', 'key'] });
     neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
     neo.add('color', { name:'logocolor', keys:[10, 40, 70, 100, 350] , colors:[0xFF0000, 0x7f7f00, 0x00FF00, 0xFFFF00, 0xFFFFFF] });
     neo.add('curve', { keys:[20, 40] , pos:[30, 50] });
@@ -60,7 +63,8 @@ var loop = function () {
 
 var rootUpdate = function(){
 
-    debug.innerHTML = JSON.stringify(neo.data);
+    debug.innerHTML = neo.dataToSting();
+    message.textContent = neo.data.message;
     var c = NEO.hexToHtml(neo.data.logocolor);
     logo.setAttributeNS(null, 'fill', c)
     version.style.color = c;
