@@ -18,7 +18,7 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 #logo{position:absolute; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
 </style>
 <script type="text/javascript" src="js/libs/uil.min.js"></script>
-<script type="text/javascript" src="build/neo.min.js"></script>
+<script type="text/javascript" src="js/libs/zmin.js"></script>
 </head>
 
 <body>
@@ -32,31 +32,69 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111; background-i
 <script>
 var debug = document.getElementById('debug');
 var logo = document.getElementById('logoin');
-var version = document.getElementById('version')
-version.innerHTML = 'eo '+NEO.REVISION;
+var version = document.getElementById('version');
+var neo = null;
 
-var neo = new NEO.Timeline();
+var xhr = new XMLHttpRequest();
+xhr.responseType = 'arraybuffer';
+xhr.open('GET', 'js/neo.js', true);
+xhr.onreadystatechange = function() {
+    if ( xhr.readyState === 4 ) {
+        if ( xhr.status === 200 || xhr.status === 0 ) {
+            LZMA.decompress( new Uint8Array(this.response), function on_complete(result) { pushScript(result); } );             
+        }
+    }       
+}
 
-neo.add('bang', { keys:[20, 40] });
-neo.add('flag', {  keys:[10, 30, 50, 70, 90, 110], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline'] });
-neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
-neo.add('color', { name:'logocolor', keys:[10, 40, 70, 100, 350] , colors:[0xFF0000, 0x7f7f00, 0x00FF00, 0xFFFF00, 0xFFFFFF] });
-neo.add('curve', { keys:[20, 40] , pos:[30, 50] });
+xhr.send();
+
+var pushScript = function(result){
+    var nscript = document.createElement("script");
+    nscript.type = "text/javascript";
+    nscript.name = "topScript";
+    nscript.id = "topScript";
+    nscript.charset = "utf-8";
+    nscript.async = true;
+    nscript.text = result;
+    document.getElementsByTagName('head')[0].appendChild(nscript);
+
+    init();
+}
+
+
+
+var init = function(){
+
+    version.innerHTML = 'eo '+NEO.REVISION;
+    neo = new NEO.Timeline();
+
+    neo.add('bang', { keys:[20, 40] });
+    neo.add('flag', {  keys:[10, 30, 50, 70, 90, 110], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline'] });
+    neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
+    neo.add('color', { name:'logocolor', keys:[10, 40, 70, 100, 350] , colors:[0xFF0000, 0x7f7f00, 0x00FF00, 0xFFFF00, 0xFFFFFF] });
+    neo.add('curve', { keys:[20, 40] , pos:[30, 50] });
+
+};
 
 var loop = function () {
+
     if(neo.inPlay){ 
         requestAnimationFrame( loop );
         neo.update();
         rootUpdate();
     }
+
 };
 
 var rootUpdate = function(){
+
     debug.innerHTML = JSON.stringify(neo.data);
     var c = NEO.hexToHtml(neo.data.logocolor);
     logo.setAttributeNS(null, 'fill', c)
     version.style.color = c;
-}
+
+};
+
 </script>
 </body>
 </html>
