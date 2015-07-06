@@ -64,7 +64,7 @@ var loop = function () {
 
 var rootUpdate = function(){
 
-    var time = Date.now();
+    var time = performance.now();
 
     neo.update();
 
@@ -73,9 +73,9 @@ var rootUpdate = function(){
     logo.setAttributeNS(null, 'fill', c)
     version.style.color = c;
 
-    time = (Date.now() - time);
+    time = Math.round((performance.now() - time)*1000);
 
-    debug.innerHTML = neo.dataToString() +'<br>up : ' +time + " ms";
+    debug.innerHTML = neo.dataToString() +'<br>up : ' +time + " micro-s";
 
 };
 
