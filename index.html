@@ -8,15 +8,19 @@
 <style>
 *{ margin: 0; padding: 0; border: 0; -o-user-select:none; -ms-user-select:none; -khtml-user-select:none; -webkit-user-select:none; -moz-user-select:none; } 
 html{ overflow:hidden; width:100%; height:100%; }
-body { font-family: 'Open Sans', sans-serif; background-color:#111; background-image:url(images/orion.png); font-size:11px; color:#fff;}
+body { font-family: 'Open Sans', sans-serif; background-color:#111;  background-image:url(images/orion.png); font-size:11px; color:#fff;}
 #bg{position:absolute; top:0; left:0; width:100%; height:100%;   
-    background:linear-gradient( 75deg, #111 20%, rgba(17,17,17,0.3) 50%, #111 80% ), linear-gradient( -15deg, #111 30%, rgba(17,17,17,0) 90% );
-    background:-webkit-linear-gradient( 15deg, #111 20%, rgba(17,17,17,0.3) 50%, #111 80% ), -webkit-linear-gradient( 105deg, #111 30%, rgba(17,17,17,0) 90% );
+    position:absolute; top:0; left:0; bottom:0; right:0;   
+    background: url(images/bg.png) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
 }
-#version { position:absolute; top:98px; left:50%; width:90px; height:10px; pointer-events:none; text-align:right;  font-size:16px;}
-#message { position:absolute; margin-left:-128px; top:120px; left:50%; width:256px; height:20px; pointer-events:none; text-align:center;  font-size:16px;}
-#debug { position:absolute; top:10px; left:10px; width:600px; pointer-events:none;}
-#logo{position:absolute; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
+#version { position:absolute; bottom:92px; left:50%; width:90px; height:10px; pointer-events:none; text-align:right;  font-size:16px;}
+#message { position:absolute; bottom:60px; margin-left:-128px; left:50%; width:256px; height:20px; pointer-events:none; text-align:center;  font-size:16px;}
+#debug { position:absolute; bottom:10px; left:10px; width:600px; pointer-events:none; }
+#logo{position:absolute; bottom:0; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
 </style>
 <script type="text/javascript" src="js/libs/uil.min.js"></script>
 <script type="text/javascript" src="js/libs/neo_load.js"></script>
@@ -47,7 +51,7 @@ var init = function(){
     neo.add('flag', { keys:[10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210 ], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline', 'click', 'to add', ' key', 'right click', 'to remove', 'key'] });
     neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
     neo.add('color', { keys:[10, 40, 70, 100, 350, 700] , colors:[0xFFFFFF, 0x7f7f00, 0x00FF00, 0xFFFF00, 0xFF0000 ,0xFFFFFF] });
-    neo.add('curve', { keys:[20, 40, 60, 80, 300, 500] , pos:[0, 100, -100, 0, 100, 0], ease:['linear', 'linear','linear', 'linear'] });
+    neo.add('curve', { keys:[20, 40, 60, 80, 300, 500] , pos:[0, 80, -80, 0, 100, 0], ease:['linear', 'inOutSine','linear', 'linear'] });
     //neo.add('curve', { keys:[20, 40, 60, 80] , pos:[0, 100, -100, 0], ease:['inQuad', 'inQuad','inQuad', 'inQuad'] });
 
     neo.goTo(0);
@@ -76,7 +80,7 @@ var rootUpdate = function(){
 
     time = Math.round((performance.now() - time)*1000);
 
-    debug.innerHTML = neo.dataToString() +'<br>up : ' +time + " micro-s";
+    debug.innerHTML = neo.dataToString() +'<br>up : ' +time + " &micro;";
 
 };
 
