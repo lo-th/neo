@@ -52,7 +52,7 @@ var init = function(){
     neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
     neo.add('color', { keys:[10, 40, 70, 100, 350, 700] , colors:[0xFFFFFF, 0x7f7f00, 0x00FF00, 0xFFFF00, 0xFF0000 ,0xFFFFFF] });
     neo.add('curve', { keys:[20, 40, 60, 80, 300, 500] , pos:[0, 80, -80, 0, 100, 0], ease:['linear', 'inOutSine','linear', 'linear'] });
-    //neo.add('curve', { keys:[20, 40, 60, 80] , pos:[0, 100, -100, 0], ease:['inQuad', 'inQuad','inQuad', 'inQuad'] });
+    neo.add('lfo', { keys:[2, 40, 60, 80, 300, 500] , curves:['sine', 'sine', 'sine', 'sine'] });
 
     neo.goTo(0);
 
