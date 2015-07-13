@@ -22,8 +22,7 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111;  background-
 #debug { position:absolute; bottom:10px; left:10px; width:600px; pointer-events:none; }
 #logo{position:absolute; bottom:0; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
 </style>
-<script type="text/javascript" src="js/libs/uil.min.js"></script>
-<script type="text/javascript" src="js/libs/neo_load.js"></script>
+<script type="text/javascript" src="js/Extract.js"></script>
 </head>
 
 <body>
@@ -60,16 +59,9 @@ var init = function(){
 
 var loop = function () {
 
-    if(neo.inPlay){ 
-        requestAnimationFrame( loop );
-        rootUpdate();
-    }
+    if(neo.inPlay) requestAnimationFrame( loop );
 
-};
-
-var rootUpdate = function(){
-
-    var time = performance.now();
+    var time = window.perfNow();
 
     neo.update();
 
@@ -78,13 +70,13 @@ var rootUpdate = function(){
     logo.setAttributeNS(null, 'fill', c)
     version.style.color = c;
 
-    time = Math.round((performance.now() - time)*1000);
+    time = Math.round((window.perfNow() - time)*1000);
 
     debug.innerHTML = neo.dataToString() +'<br>up : ' +time + " &micro;";
 
 };
 
-
+var z = new EXTRACT.Pool(['uil','neo'], init);
 
 </script>
 </body>
