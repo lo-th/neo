@@ -31,7 +31,7 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111;  background-
 <script>
 var debug = document.getElementById('debug');
 var container = document.getElementById('container');
-var camera, scene, renderer, loader, logo;
+var camera, scene, renderer, logo;
 var neo = null;
 var pi = Math.PI;
 var pi90 = pi*0.5;
@@ -40,44 +40,31 @@ var pi2 = pi*2;
 
 var init = function(){
 
-    
-
     neo = new NEO.Timeline(100);
     neo.add('color', { keys:[1, 187, 375, 562, 740] , colors:[0xFFFFFF, 0x00FF00, 0xFFFF00, 0xFF0000 ,0xFFFFFF] });
     neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, pi90/2, -pi90/2, pi90/2, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
     neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, -pi90/8, pi90/8, -pi90/8, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
     neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, pi90, -pi90, pi90, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
 
-    
-
     init3d();
-
-
-    
 
 };
 
 var init3d = function(){
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-    scene = new THREE.Scene();              
 
-    //  Environment Light
-    //  SEA3D Standard is 0xFFFFFF
+    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+    scene = new THREE.Scene();
     
-    //var ambient = new THREE.AmbientLight( 0x666666 );
-    //scene.add( ambient );                                               
+    var ambient = new THREE.AmbientLight( 0x333333 );
+    scene.add( ambient );
     
-    //  Renderer
-    
-    renderer = new THREE.WebGLRenderer({alpha:true, antialias:true });               
-    renderer.physicallyBasedShading = true;
+    renderer = new THREE.WebGLRenderer({alpha:true, antialias:true });
     renderer.setClearColor( 0x000000, 0 );
     
     renderer.setSize( window.innerWidth, window.innerHeight );
     container.appendChild( renderer.domElement );
 
-    loader = new THREE.SEA3D({ container:scene, parser:THREE.SEA3D.AUTO }); 
-                
+    var loader = new THREE.SEA3D({ container:scene, parser:THREE.SEA3D.AUTO }); 
     loader.onComplete = function( e ) {
         logo = loader.meshes[0];
         var cam = loader.cameras[0];
@@ -86,28 +73,29 @@ var init3d = function(){
 
         neo.goTo(0);
     }
-    
     loader.load( 'neo.sea' );
 
     window.addEventListener( 'resize', resize, false );
+
 }
 
 var resize = function () {
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.render( scene, camera );
+
 }
 
 var loop = function () {
-    if(neo.inPlay) requestAnimationFrame( loop );
 
+    if(neo.inPlay) requestAnimationFrame( loop );
     neo.update();
     logo.material.color.setHex(neo.data.color0);
     logo.rotation.set(neo.data.curve1, neo.data.curve2, neo.data.curve3);
     renderer.render( scene, camera );
+
 };
 
 var z = new EXTRACT.Pool(['uil','neo','three','sea'], init);
