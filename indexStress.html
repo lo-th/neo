@@ -34,10 +34,14 @@ var max = 100;
 var init = function(){
 
     neo = new NEO.Timeline({zone:100, nframe:400});
-    var i = max, r=0;
+    var i = max, r=0, t =0, ease;
     while(i--){
-        r = Math.random() * pi2
-        neo.add('curve', { name:i+1, keys:[0, 100, 200, 300, 400] , pos:[0, r, -r, r, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
+        t = Math.floor(Math.random() * 3);
+        r = (pi90/2)+ Math.random() * (pi-(pi90/2));
+        ease = ['inOutSine', 'inOutSine','inOutSine', 'inOutSine'];
+        if(t==1) ease = ['inOutBounce', 'inOutBounce','inOutBounce', 'inOutBounce'];
+        if(t==2) ease = ['inOutElastic', 'inOutElastic','inOutElastic', 'inOutElastic'];
+        neo.add('curve', { name:i+1, keys:[0, 100, 200, 300, 400] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2] });
     }
     
     init3d();
