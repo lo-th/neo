@@ -40,7 +40,7 @@ var pi2 = pi*2;
 
 var init = function(){
 
-    neo = new NEO.Timeline(100);
+    neo = new NEO.Timeline({zone:100});
     neo.add('color', { keys:[1, 187, 375, 562, 740] , colors:[0xFFFFFF, 0x00FF00, 0xFFFF00, 0xFF0000 ,0xFFFFFF] });
     neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, pi90/2, -pi90/2, pi90/2, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
     neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, -pi90/8, pi90/8, -pi90/8, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
@@ -95,6 +95,8 @@ var loop = function () {
     logo.material.color.setHex(neo.data.color0);
     logo.rotation.set(neo.data.curve1, neo.data.curve2, neo.data.curve3);
     renderer.render( scene, camera );
+
+    debug.innerHTML = neo.dataToString();
 
 };
 

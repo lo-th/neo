@@ -44,7 +44,7 @@ var neo = null;
 var init = function(){
 
     version.innerHTML = 'eo '+NEO.REVISION;
-    neo = new NEO.Timeline();
+    neo = new NEO.Timeline({bottom:200});
 
     neo.add('bang', { keys:[20, 40] });
     neo.add('flag', { keys:[10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210 ], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline', 'click', 'to add', ' key', 'right click', 'to remove', 'key'] });
@@ -59,9 +59,7 @@ var init = function(){
 
 var loop = function () {
 
-    if(neo.inPlay) requestAnimationFrame( loop );
-
-    var time = window.perfNow();
+    if(neo.inPlay) requestAnimationFrame( loop );;
 
     neo.update();
 
@@ -70,9 +68,7 @@ var loop = function () {
     logo.setAttributeNS(null, 'fill', c)
     version.style.color = c;
 
-    time = Math.round((window.perfNow() - time)*1000);
-
-    debug.innerHTML = neo.dataToString() +'<br>up : ' +time + " &micro;";
+    debug.innerHTML = neo.dataToString();
 
 };
 
