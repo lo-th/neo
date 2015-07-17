@@ -35,14 +35,14 @@ var init = function(){
 
     neo = new NEO.Timeline({zone:100, nframe:400});
     var i = max, r=0, t =0, ease;
-    while(i--){
+    do{
         t = Math.floor(Math.random() * 3);
         r = (pi90/2)+ Math.random() * (pi-(pi90/2));
         ease = ['inOutSine', 'inOutSine','inOutSine', 'inOutSine'];
         if(t==1) ease = ['inOutBounce', 'inOutBounce','inOutBounce', 'inOutBounce'];
         if(t==2) ease = ['inOutElastic', 'inOutElastic','inOutElastic', 'inOutElastic'];
-        neo.add('curve', { name:i+1, keys:[0, 100, 200, 300, 400] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2] });
-    }
+        neo.add('curve', { keys:[0, 100, 200, 300, 400] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2] });
+    }while(--i)
     
     init3d();
 
@@ -65,15 +65,15 @@ var init3d = function(){
     container.appendChild( renderer.domElement );
 
     var i = max, p, n=0, m=0;
-    while(i--){
+    do{
         p = new THREE.Mesh(new THREE.PlaneBufferGeometry(4,4,1,1))
         scene.add(p);
         n++;
         p.position.set(n*4,m*4,0);
         if(n>9){ n = 0; m++};
 
-        planes[i] = p;
-    }
+        planes[i-1] = p;
+    }while(--i);
 
     
 
@@ -99,9 +99,10 @@ var loop = function () {
     neo.update();
 
     var i = max;
-    while(i--) planes[i].rotation.set(neo.data[i+1], 0, 0);
+    do{ planes[i-1].rotation.set(neo.data['curve'+(i-1)], 0, 0);}while(--i);
+    //while(i--) planes[i].rotation.set(neo.data[i+1], 0, 0);
     renderer.render( scene, camera );
-    debug.innerHTML = neo.dataToString();
+    //debug.innerHTML = neo.dataToString();
 
 };
 
