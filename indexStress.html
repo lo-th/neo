@@ -33,7 +33,7 @@ var max = 100;
 
 var init = function(){
 
-    neo = new NEO.Timeline({zone:100, nframe:400});
+    neo = new NEO.Timeline({zone:100, nframe:800});
     var i = max, r=0, t =0, ease;
     do{
         t = Math.floor(Math.random() * 3);
@@ -41,7 +41,7 @@ var init = function(){
         ease = ['inOutSine', 'inOutSine','inOutSine', 'inOutSine'];
         if(t==1) ease = ['inOutBounce', 'inOutBounce','inOutBounce', 'inOutBounce'];
         if(t==2) ease = ['inOutElastic', 'inOutElastic','inOutElastic', 'inOutElastic'];
-        neo.add('curve', { keys:[0, 100, 200, 300, 400] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2], precision:5 });
+        neo.add('curve', { keys:[0, 200, 400, 600, 780] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2], precision:5 });
     }while(--i)
     
     init3d();
@@ -65,6 +65,10 @@ var init3d = function(){
     var light1 = new THREE.PointLight( 0x00FFFF, 2, 1000 );
     light1.position.set(50,50,-50);
     scene.add( light1 );
+
+    var light3 = new THREE.PointLight( 0xFFFF00, 2, 1000 );
+    light3.position.set(-10,-10,-50);
+    scene.add( light3 );
     
     renderer = new THREE.WebGLRenderer({alpha:false, antialias:true });
     renderer.setClearColor( 0x333333, 1 );
