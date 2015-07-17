@@ -35,14 +35,14 @@ var init = function(){
 
     neo = new NEO.Timeline({zone:100, nframe:800});
     var i = max, r=0, t =0, ease;
-    do{
+    while(i--){
         t = Math.floor(Math.random() * 3);
         r = Math.random() * pi2;
         ease = ['inOutSine', 'inOutSine','inOutSine', 'inOutSine'];
         if(t==1) ease = ['inOutBounce', 'inOutBounce','inOutBounce', 'inOutBounce'];
         if(t==2) ease = ['inOutElastic', 'inOutElastic','inOutElastic', 'inOutElastic'];
         neo.add('curve', { keys:[0, 200, 400, 600, 780] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2], precision:5 });
-    }while(--i)
+    }
     
     init3d();
 
@@ -78,7 +78,7 @@ var init3d = function(){
 
     var i = max, p, n=0, m=0;
     var mat = new THREE.MeshPhongMaterial( { color: 0x505050, specular: 0xffffff, shininess: 50, side:THREE.DoubleSide } )
-    do{
+    while(i--){
         p = new THREE.Mesh(new THREE.PlaneBufferGeometry(4,4,1,1), mat)
         //p.material.side = THREE.DoubleSide;
         scene.add(p);
@@ -86,8 +86,8 @@ var init3d = function(){
         p.position.set(n*4,m*4,0);
         if(n>9){ n = 0; m++};
 
-        planes[i-1] = p;
-    }while(--i);
+        planes[i] = p;
+    }
 
     
 
@@ -113,8 +113,8 @@ var loop = function () {
     neo.update();
 
     var i = max;
-    do{ planes[i-1].rotation.set(neo.data['curve'+(i-1)], 0, 0);}while(--i);
-    //while(i--) planes[i].rotation.set(neo.data[i+1], 0, 0);
+    while(i--) planes[i].rotation.set(neo.data['curve'+i], 0, 0);
+    
     renderer.render( scene, camera );
     //debug.innerHTML = neo.dataToString();
 
