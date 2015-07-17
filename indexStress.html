@@ -37,11 +37,11 @@ var init = function(){
     var i = max, r=0, t =0, ease;
     do{
         t = Math.floor(Math.random() * 3);
-        r = (pi90/2)+ Math.random() * (pi-(pi90/2));
+        r = Math.random() * pi2;
         ease = ['inOutSine', 'inOutSine','inOutSine', 'inOutSine'];
         if(t==1) ease = ['inOutBounce', 'inOutBounce','inOutBounce', 'inOutBounce'];
         if(t==2) ease = ['inOutElastic', 'inOutElastic','inOutElastic', 'inOutElastic'];
-        neo.add('curve', { keys:[0, 100, 200, 300, 400] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2] });
+        neo.add('curve', { keys:[0, 100, 200, 300, 400] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2], precision:5 });
     }while(--i)
     
     init3d();
@@ -50,13 +50,21 @@ var init = function(){
 
 var init3d = function(){
 
-    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+    camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1000 );
     camera.position.set(20,20,100)//z = 100;
     camera.lookAt(new THREE.Vector3(20,20,0));
     scene = new THREE.Scene();
     
-    var ambient = new THREE.AmbientLight( 0x333333 );
-    scene.add( ambient );
+    //var ambient = new THREE.AmbientLight( 0x333333 );
+    //scene.add( ambient );
+
+    var light0 = new THREE.PointLight( 0xFFFFFF, 2, 500 );
+    light0.position.set(-10,-10,50);
+    scene.add( light0 );
+
+    var light1 = new THREE.PointLight( 0x00FFFF, 2, 1000 );
+    light1.position.set(50,50,-50);
+    scene.add( light1 );
     
     renderer = new THREE.WebGLRenderer({alpha:false, antialias:true });
     renderer.setClearColor( 0x333333, 1 );
@@ -65,8 +73,10 @@ var init3d = function(){
     container.appendChild( renderer.domElement );
 
     var i = max, p, n=0, m=0;
+    var mat = new THREE.MeshPhongMaterial( { color: 0x505050, specular: 0xffffff, shininess: 50, side:THREE.DoubleSide } )
     do{
-        p = new THREE.Mesh(new THREE.PlaneBufferGeometry(4,4,1,1))
+        p = new THREE.Mesh(new THREE.PlaneBufferGeometry(4,4,1,1), mat)
+        //p.material.side = THREE.DoubleSide;
         scene.add(p);
         n++;
         p.position.set(n*4,m*4,0);
