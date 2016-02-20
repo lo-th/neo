@@ -17,19 +17,17 @@ body { font-family: 'Open Sans', sans-serif; background-color:#111;  background-
     -o-background-size: cover;
     background-size: cover;
 }
-#version { position:absolute; bottom:92px; left:50%; width:90px; height:10px; pointer-events:none; text-align:right;  font-size:16px;}
-#message { position:absolute; bottom:60px; margin-left:-128px; left:50%; width:256px; height:20px; pointer-events:none; text-align:center;  font-size:16px;}
-#debug { position:absolute; bottom:10px; left:10px; width:600px; pointer-events:none; }
-#logo{position:absolute; bottom:0; left:50%; margin-left:-128px;  margin-top:-60px; transform: scale(0.5,0.5);}
+#version { position:absolute; bottom:87px; left:50%; width:90px; margin-left:35px; height:10px; pointer-events:none; font-size:11px;}
+#message { position:absolute; bottom:10px; margin-left:-100px; left:50%; width:200px; height:20px; pointer-events:none; text-align:center;  font-size:16px;}
+#debug { position:absolute; bottom:10px; left:10px; width:200px; pointer-events:none; font-size:11px; }
+#logo{ position:absolute; bottom:-60px; left:50%; margin-left:-128px; transform: scale(0.35,0.35);}
 </style>
 <script type="text/javascript" src="js/Extract.js"></script>
 </head>
 
 <body>
 <div id='bg'></div>
-<svg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' id='logo' preserveAspectRatio='none' x='0px' y='0px' width='256px' height='256px' viewBox='0 0 256 256'>
-<path id='logoin' fill='#FFFFFF' stroke='none' d='M 219 52 L 206 52 206 166 Q 206 183.4 193.75 195.65 181.4 208 164 208 146.6 208 134.35 195.65 122 183.4 122 166 L 122 90 Q 122 77.6 113.15 68.85 104.4 60 92 60 79.55 60 70.75 68.85 62 77.6 62 90 L 62 204 75 204 75 90 Q 75 83 79.95 78 84.95 73 92 73 99 73 104 78 109 83 109 90 L 109 166 Q 109 188.8 125.15 204.85 141.2 221 164 221 186.75 221 202.95 204.85 219 188.8 219 166 L 219 52 M 194 52 L 181 52 181 166 Q 181 173 176.05 178 171.05 183 164 183 157 183 152 178 147 173 147 166 L 147 90 Q 147 67.2 130.85 51.15 114.8 35 92 35 69.25 35 53.05 51.15 37 67.2 37 90 L 37 204 50 204 50 90 Q 50 72.6 62.25 60.35 74.6 48 92 48 109.4 48 121.65 60.35 134 72.6 134 90 L 134 166 Q 134 178.4 142.85 187.15 151.6 196 164 196 176.45 196 185.25 187.15 194 178.4 194 166 L 194 52 Z'/>
-</svg>
+<svg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' id='logo' preserveAspectRatio='none' x='0px' y='0px' width='256px' height='256px' viewBox='0 0 256 256'><path id='logoin' fill='#FFFFFF' stroke='none' d='M 219 52 L 206 52 206 166 Q 206 183.4 193.75 195.65 181.4 208 164 208 146.6 208 134.35 195.65 122 183.4 122 166 L 122 90 Q 122 77.6 113.15 68.85 104.4 60 92 60 79.55 60 70.75 68.85 62 77.6 62 90 L 62 204 75 204 75 90 Q 75 83 79.95 78 84.95 73 92 73 99 73 104 78 109 83 109 90 L 109 166 Q 109 188.8 125.15 204.85 141.2 221 164 221 186.75 221 202.95 204.85 219 188.8 219 166 L 219 52 M 194 52 L 181 52 181 166 Q 181 173 176.05 178 171.05 183 164 183 157 183 152 178 147 173 147 166 L 147 90 Q 147 67.2 130.85 51.15 114.8 35 92 35 69.25 35 53.05 51.15 37 67.2 37 90 L 37 204 50 204 50 90 Q 50 72.6 62.25 60.35 74.6 48 92 48 109.4 48 121.65 60.35 134 72.6 134 90 L 134 166 Q 134 178.4 142.85 187.15 151.6 196 164 196 176.45 196 185.25 187.15 194 178.4 194 166 L 194 52 Z'></path></svg>
 
 <div id='version'></div>
 <div id='message'>YOOO</div>
@@ -43,30 +41,33 @@ var neo = null;
 
 var init = function(){
 
-    version.innerHTML = 'eo '+NEO.REVISION;
-    neo = new NEO.Timeline({bottom:200});
+    version.innerHTML = 'eo ' + NEO.REVISION;
+    neo = new NEO.Timeline({bottom:125, zone:25});
 
-    neo.add('bang', { keys:[20, 40] });
-    neo.add('flag', { keys:[10, 30, 50, 70, 90, 110, 130, 150, 170, 190, 210 ], names:['welcome', 'to', 'Neo', 'the', 'ultimate', 'timeline', 'click', 'to add', ' key', 'right click', 'to remove', 'key'] });
-    neo.add('switch', { keys:[20, 40] , ends:[30, 50] });
-    neo.add('color', { keys:[10, 40, 70, 100, 350, 700] , colors:[0xFFFFFF, 0x7f7f00, 0x00FF00, 0xFFFF00, 0xFF0000 ,0xFFFFFF] });
-    neo.add('curve', { keys:[20, 40, 60, 80, 300, 500] , pos:[0, 80, -80, 0, 100, 0], ease:['linear', 'inOutSine','linear', 'linear'] });
-    neo.add('lfo', { keys:[2, 40, 60, 80, 300, 500] , curves:['sine', 'sine', 'sine', 'sine'] });
+    neo.add('bang', { frame:{ 20:1, 40:1 } });
+    neo.add('flag', { frame:{ 10:'Welcome', 30:'to', 50:'NEO', 70:'the', 90:'ultimate', 110:'timeline' } });
+    neo.add('color', { frame:{ 10:0xFFFFFF, 40:0x7f7f00, 70:0x00FF00, 100:0xFFFF00, 350:0xFF0000 , 700:0xFFFFFF} });
+    neo.add('curve', { 
+        frame:{ 20:[100,'inOutQuint'], 40:[100,'inOutQuint'], 60:[-80,'inOutQuint'], 120:[70,'inOutElastic'], 300:[-70,'inOutBounce'], 400:[0,'inOutExpo'], 700:[ -100,'inOutExpo'] },
+        range:[-120, 120] 
+     });
+    neo.add('switch', { frame:{ 20:30, 40:80 } });
 
+    neo.callback = loop;
     neo.goTo(0);
 
 };
 
 var loop = function () {
 
-    if(neo.inPlay) requestAnimationFrame( loop );;
-
-    neo.update();
-
     message.textContent = neo.data.flag1;
-    var c = NEO.hexToHtml(neo.data.color3);
-    logo.setAttributeNS(null, 'fill', c)
+    var c = NEO.hexToHtml(neo.data.color2);
+    logo.setAttributeNS(null, 'fill', c);
     version.style.color = c;
+    version.style.bottom = ~~(67 + ( neo.data.curve3*0.2)) + 'px';
+
+    if(neo.data.switch4) message.style.color = "#0FF";
+    else message.style.color = "#FFF";
 
     debug.innerHTML = neo.dataToString();
 

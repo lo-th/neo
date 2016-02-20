@@ -33,7 +33,7 @@ var max = 100;
 
 var init = function(){
 
-    neo = new NEO.Timeline({zone:100, nframe:800});
+    neo = new NEO.Timeline({zone:100, nframe:400});
     var i = max, r=0, t =0, ease;
     while(i--){
         t = Math.floor(Math.random() * 3);
@@ -41,8 +41,10 @@ var init = function(){
         ease = ['inOutSine', 'inOutSine','inOutSine', 'inOutSine'];
         if(t==1) ease = ['inOutBounce', 'inOutBounce','inOutBounce', 'inOutBounce'];
         if(t==2) ease = ['inOutElastic', 'inOutElastic','inOutElastic', 'inOutElastic'];
-        neo.add('curve', { keys:[0, 200, 400, 600, 780] , pos:[0, r, -r, r, 0], ease:ease, range:[-pi2, pi2], precision:5 });
+        neo.add('curve', { frame:{0:[0, ease[0]], 100:[r, ease[1]], 200:[-r, ease[2]], 300:[r, ease[3]], 400:[0] }, range:[-pi2, pi2] });
     }
+
+    
     
     init3d();
 
@@ -93,6 +95,7 @@ var init3d = function(){
 
     window.addEventListener( 'resize', resize, false );
 
+    neo.callback = loop;
     neo.goTo(0);
 
 }
@@ -107,10 +110,6 @@ var resize = function () {
 }
 
 var loop = function () {
-
-    if(neo.inPlay) requestAnimationFrame( loop );
-
-    neo.update();
 
     var i = max;
     while(i--) planes[i].rotation.set(neo.data['curve'+i], 0, 0);

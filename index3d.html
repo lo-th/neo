@@ -40,11 +40,15 @@ var pi2 = pi*2;
 
 var init = function(){
 
+    var p1 = pi90/2;
+    var p2 = pi90/8;
+    var p3 = pi90;
+
     neo = new NEO.Timeline({zone:100});
-    neo.add('color', { keys:[1, 187, 375, 562, 740] , colors:[0xFFFFFF, 0x00FF00, 0xFFFF00, 0xFF0000 ,0xFFFFFF] });
-    neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, pi90/2, -pi90/2, pi90/2, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
-    neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, -pi90/8, pi90/8, -pi90/8, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
-    neo.add('curve', { keys:[0, 187, 375, 562, 750] , pos:[0, pi90, -pi90, pi90, 0], ease:['inOutSine', 'inOutSine','inOutSine', 'inOutSine'], range:[-pi2, pi2] });
+    neo.add('color', { frame:{1:0xFFFFFF, 187:0x00FF00, 375:0xFFFF00, 562:0xFF0000, 740:0xFFFFFF}  });
+    neo.add('curve', { frame:{0:[0,'inOutSine'], 187:[p1,'inOutSine'], 375:[-p1,'inOutSine'], 562:[p1,'inOutSine'], 750:[0,'inOutSine']}, range:[-pi2, pi2] });
+    neo.add('curve', { frame:{0:[0,'inOutSine'], 187:[-p2,'inOutSine'], 375:[p2,'inOutSine'], 562:[-p2,'inOutSine'], 750:[0,'inOutSine']}, range:[-pi2, pi2] });
+    neo.add('curve', { frame:{0:[0,'inOutSine'], 187:[p3,'inOutSine'], 375:[-p3,'inOutSine'], 562:[p3,'inOutSine'], 750:[0,'inOutSine']}, range:[-pi2, pi2] });
 
     init3d();
 
@@ -71,6 +75,7 @@ var init3d = function(){
         camera.position.copy( cam.position );
         camera.rotation.copy( cam.rotation );
 
+        neo.callback = loop;
         neo.goTo(0);
     }
     loader.load( 'neo.sea' );
@@ -90,12 +95,9 @@ var resize = function () {
 
 var loop = function () {
 
-    if(neo.inPlay) requestAnimationFrame( loop );
-    neo.update();
     logo.material.color.setHex(neo.data.color0);
     logo.rotation.set(neo.data.curve1, neo.data.curve2, neo.data.curve3);
     renderer.render( scene, camera );
-
     debug.innerHTML = neo.dataToString();
 
 };
