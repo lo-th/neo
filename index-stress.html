@@ -13,6 +13,7 @@ body { font-family: "Lucida Console", Monaco, monospace; background-color:#333; 
 #container { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
 </style>
 <script type="text/javascript" src="js/Extract.js"></script>
+<script type="text/javascript" src="js/Stats.js"></script>
 </head>
 
 <body>
@@ -21,7 +22,7 @@ body { font-family: "Lucida Console", Monaco, monospace; background-color:#333; 
 <script>
 var debug = document.getElementById('debug');
 var container = document.getElementById('container');
-var camera, scene, renderer, logo;
+var camera, scene, renderer, logo, stats;
 var neo = null;
 var pi = Math.PI;
 var pi90 = pi*0.5;
@@ -42,6 +43,12 @@ var init = function(){
         if(t==2) ease = ['inOutElastic', 'inOutElastic','inOutElastic', 'inOutElastic'];
         neo.add('curve', { frame:{0:[0, ease[0]], 100:[r, ease[1]], 200:[-r, ease[2]], 300:[r, ease[3]], 400:[0] }, range:[-pi2, pi2] });
     }
+
+    stats = new Stats();
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
+    stats.domElement.style.left = '380px';
+    container.appendChild( stats.domElement );
 
     
     
@@ -114,6 +121,7 @@ var loop = function () {
     while(i--) planes[i].rotation.set(neo.data['curve'+i], 0, 0);
     
     renderer.render( scene, camera );
+    stats.update();
     //debug.innerHTML = neo.dataToString();
 
 };
