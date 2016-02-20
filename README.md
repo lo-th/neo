@@ -6,6 +6,6 @@ neo.js is a lightweight ultimate timeline for javascript.
 
 [**3D EXAMPLE**](http://lo-th.github.io/neo/index3d.html)
 
-[**STRESS TEST**](http://lo-th.github.io/neo/indexStress.html)
+[**STRESS TEST**](http://lo-th.github.io/neo/index_stress.html)
 
 note: code of this project is private !
