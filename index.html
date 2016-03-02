@@ -47,10 +47,16 @@ var init = function(){
     neo.add('flag', { frame:{ 10:'Welcome', 30:'to', 50:'NEO', 70:'the', 90:'ultimate', 110:'timeline' } });
     neo.add('color', { frame:{ 10:0xFFFFFF, 40:0x7f7f00, 70:0x00FF00, 100:0xFFFF00, 350:0xFF0000 , 700:0xFFFFFF} });
     neo.add('curve', { 
-        frame:{ 20:[100,'inOutQuint'], 40:[100,'inOutQuint'], 60:[-80,'inOutQuint'], 120:[70,'inOutElastic'], 300:[-70,'inOutBounce'], 400:[0,'inOutExpo'], 700:[ -100,'inOutExpo'] },
+        frame:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
         range:[-120, 120] 
      });
     neo.add('switch', { frame:{ 20:30, 40:80 } });
+    neo.add('curve', { 
+        frame_x:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
+        frame_y:{ 20:[10,'quint-in-out'], 100:[100,'quint-in-out'] },
+        frame_z:{ 20:[-10,'quint-in-out'], 103:[-100,'quint-in-out'] },
+        range:[-120, 120], nAxe:3 
+    });
 
     neo.callback = loop;
     neo.goTo(0);

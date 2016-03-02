@@ -45,9 +45,21 @@ var init = function(){
 
     neo = new NEO.Timeline({zone:100});
     neo.add('color', { frame:{1:0xFFFFFF, 187:0x00FF00, 375:0xFFFF00, 562:0xFF0000, 740:0xFFFFFF}  });
+
+    neo.add('curve', { 
+        frame_x:{0:[0,'sine-in-out'], 187:[p1,'sine-in-out'], 375:[-p1,'sine-in-out'], 562:[p1,'sine-in-out'], 750:[0,'sine-in-out']},
+        frame_y:{0:[0,'sine-in-out'], 187:[-p2,'sine-in-out'], 375:[p2,'sine-in-out'], 562:[-p2,'sine-in-out'], 750:[0,'sine-in-out']},
+        frame_z:{0:[0,'sine-in-out'], 187:[p3,'sine-in-out'], 375:[-p3,'sine-in-out'], 562:[p3,'sine-in-out'], 750:[0,'sine-in-out']}, 
+        range:[-pi2/3, pi2/3], nAxe:3 
+    });
+
+    neo.add('audio', { frame:{0:'exp.mp3', 110:'tap.mp3', 130:'tap.mp3', 150:'tap.mp3', 310:'tap.mp3', 330:'tap.mp3', 350:'tap.mp3'} });
+    neo.add('audio', { frame:{ 150:'go.mp3', 300:'go.mp3'} });
+
+    /*
     neo.add('curve', { frame:{0:[0,'inOutSine'], 187:[p1,'inOutSine'], 375:[-p1,'inOutSine'], 562:[p1,'inOutSine'], 750:[0,'inOutSine']}, range:[-pi2, pi2] });
     neo.add('curve', { frame:{0:[0,'inOutSine'], 187:[-p2,'inOutSine'], 375:[p2,'inOutSine'], 562:[-p2,'inOutSine'], 750:[0,'inOutSine']}, range:[-pi2, pi2] });
-    neo.add('curve', { frame:{0:[0,'inOutSine'], 187:[p3,'inOutSine'], 375:[-p3,'inOutSine'], 562:[p3,'inOutSine'], 750:[0,'inOutSine']}, range:[-pi2, pi2] });
+    neo.add('curve', { frame:{0:[0,'inOutSine'], 187:[p3,'inOutSine'], 375:[-p3,'inOutSine'], 562:[p3,'inOutSine'], 750:[0,'inOutSine']}, range:[-pi2, pi2] });*/
 
     init3d();
 
@@ -95,7 +107,7 @@ var resize = function () {
 var loop = function () {
 
     logo.material.color.setHex(neo.data.color0);
-    logo.rotation.set(neo.data.curve1, neo.data.curve2, neo.data.curve3);
+    logo.rotation.set(neo.data.curve1.x, neo.data.curve1.y, neo.data.curve1.z );
     renderer.render( scene, camera );
     debug.innerHTML = neo.dataToString();
 
