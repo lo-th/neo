@@ -43,7 +43,8 @@ var init = function(){
     var p2 = pi90/8;
     var p3 = pi90;
 
-    neo = new NEO.Timeline({zone:100});
+   // neo = new NEO.Timeline({zone:100});
+    neo.init({ zone:100, callback:loop })
     neo.add('color', { frame:{1:0xFFFFFF, 187:0x00FF00, 375:0xFFFF00, 562:0xFF0000, 740:0xFFFFFF}  });
 
     neo.add('curve', { 
