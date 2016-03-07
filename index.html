@@ -41,7 +41,7 @@ var message = document.getElementById('message');
 var init = function(){
 
     version.innerHTML = 'eo ' + NEO.REVISION;
-    neo.init({ bottom:125, zone:25, callback:loop });
+    neo.init({ bottom:125, zone:25, callback:loop, top:10 });
 
     neo.add('bang', { frame:{ 20:1, 40:1 } });
     neo.add('flag', { frame:{ 10:'Welcome', 30:'to', 50:'NEO', 70:'the', 90:'ultimate', 110:'timeline' } });
@@ -58,6 +58,8 @@ var init = function(){
         range:[-120, 120], nAxe:3 
     });
 
+    neo.add('lfo', { frame:{ 0:['noise', 0.1], 150:['sine', 0.25], 450:['noise', 0.5] } });
+
 };
 
 var loop = function ( ) {
@@ -67,6 +69,8 @@ var loop = function ( ) {
     logo.setAttributeNS(null, 'fill', c);
     version.style.color = c;
     version.style.bottom = ~~(67 + ( neo.data.curve3*0.2)) + 'px';
+
+    message.style.marginLeft = -100 + (neo.data.lfo6*10) + 'px';
 
     if(neo.data.switch4) message.style.color = "#0FF";
     else message.style.color = "#FFF";
