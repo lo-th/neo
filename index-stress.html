@@ -41,7 +41,7 @@ var init = function(){
         ease = ['sine-in-out', 'sine-in-out','sine-in-out', 'sine-in-out'];
         if(t==1) ease = ['bounce-in-out', 'bounce-in-out','bounce-in-out', 'bounce-in-out'];
         if(t==2) ease = ['elastic-in-out', 'elastic-in-out','elastic-in-out', 'elastic-in-out'];
-        neo.add('curve', { frame:{0:[0, ease[0]], 100:[r, ease[1]], 200:[-r, ease[2]], 300:[r, ease[3]], 400:[0] }, range:[-pi2, pi2], h:50 });
+        neo.add('curve', { frame:{x:{0:[0, ease[0]], 100:[r, ease[1]], 200:[-r, ease[2]], 300:[r, ease[3]], 400:[0] }, range:[-pi2, pi2] }, h:50 });
     }
     
     init3d();

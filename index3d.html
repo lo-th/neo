@@ -48,10 +48,13 @@ var init = function(){
     neo.add('color', { frame:{1:0xFFFFFF, 187:0x00FF00, 375:0xFFFF00, 562:0xFF0000, 740:0xFFFFFF}  });
 
     neo.add('curve', { 
-        frame_x:{0:[0,'sine-in-out'], 187:[p1,'sine-in-out'], 375:[-p1,'sine-in-out'], 562:[p1,'sine-in-out'], 750:[0,'sine-in-out']},
-        frame_y:{0:[0,'sine-in-out'], 187:[-p2,'sine-in-out'], 375:[p2,'sine-in-out'], 562:[-p2,'sine-in-out'], 750:[0,'sine-in-out']},
-        frame_z:{0:[0,'sine-in-out'], 187:[p3,'sine-in-out'], 375:[-p3,'sine-in-out'], 562:[p3,'sine-in-out'], 750:[0,'sine-in-out']}, 
-        range:[-pi2/3, pi2/3], nAxe:3 
+        frame:{
+            x:{0:[0,'sine-in-out'], 187:[p1,'sine-in-out'], 375:[-p1,'sine-in-out'], 562:[p1,'sine-in-out'], 750:[0,'sine-in-out']},
+            y:{0:[0,'sine-in-out'], 187:[-p2,'sine-in-out'], 375:[p2,'sine-in-out'], 562:[-p2,'sine-in-out'], 750:[0,'sine-in-out']},
+            z:{0:[0,'sine-in-out'], 187:[p3,'sine-in-out'], 375:[-p3,'sine-in-out'], 562:[p3,'sine-in-out'], 750:[0,'sine-in-out']}, 
+            range:[-pi2/3, pi2/3] 
+        }
+        
     });
 
     neo.add('audio', { frame:{0:'exp.mp3', 110:'tap.mp3', 130:'tap.mp3', 150:'tap.mp3', 310:'tap.mp3', 330:'tap.mp3', 350:'tap.mp3'} });

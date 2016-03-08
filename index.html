@@ -18,7 +18,7 @@ body { font-family:"Lucida Console", Monaco, monospace; background-color:#111;  
 }
 #version { position:absolute; bottom:87px; left:50%; width:90px; margin-left:35px; height:10px; pointer-events:none; font-size:11px;}
 #message { position:absolute; bottom:10px; margin-left:-100px; left:50%; width:200px; height:20px; pointer-events:none; text-align:center;  font-size:16px;}
-#debug { position:absolute; bottom:10px; left:10px; width:200px; pointer-events:none; font-size:11px; }
+#debug { position:absolute; bottom:10px; left:10px; width:300px; pointer-events:none; font-size:11px; }
 #logo{ position:absolute; bottom:-60px; left:50%; margin-left:-128px; transform: scale(0.35,0.35);}
 </style>
 <script type="text/javascript" src="js/Extract.js"></script>
@@ -47,15 +47,19 @@ var init = function(){
     neo.add('flag', { frame:{ 10:'Welcome', 30:'to', 50:'NEO', 70:'the', 90:'ultimate', 110:'timeline' } });
     neo.add('color', { frame:{ 10:0xFFFFFF, 40:0x7f7f00, 70:0x00FF00, 100:0xFFFF00, 350:0xFF0000 , 700:0xFFFFFF} });
     neo.add('curve', { 
-        frame:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
-        range:[-120, 120] 
-     });
+        frame:{
+            x:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
+            range:[-120, 120]
+        },
+    });
     neo.add('switch', { frame:{ 20:30, 40:80 } });
     neo.add('curve', { 
-        frame_x:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
-        frame_y:{ 20:[10,'quint-in-out'], 100:[100,'quint-in-out'] },
-        frame_z:{ 20:[-10,'quint-in-out'], 103:[-100,'quint-in-out'] },
-        range:[-120, 120], nAxe:3 
+        frame : {
+            x:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
+            y:{ 20:[10,'quint-in-out'], 100:[100,'quint-in-out'] },
+            z:{ 20:[-10,'quint-in-out'], 103:[-100,'quint-in-out'] },
+            range:[-120, 120]
+        }
     });
 
     neo.add('lfo', { frame:{ 0:['noise', 0.1], 150:['sine', 0.25], 450:['noise', 0.5] } });
