@@ -109,8 +109,10 @@ var resize = function () {
 
 var loop = function () {
 
+    var d = neo.data;
+
     var i = max;
-    while(i--) planes[i].rotation.set(neo.data['curve'+i], 0, 0);
+    while(i--) planes[i].rotation.set(d['curve'+i], 0, 0);
     
     renderer.render( scene, camera );
     

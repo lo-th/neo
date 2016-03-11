@@ -62,21 +62,24 @@ var init = function(){
         }
     });
 
-    neo.add('lfo', { frame:{ 0:['noise', 0.1], 150:['sine', 0.25], 450:['noise', 0.5] } });
+    neo.add('lfo', { frame:{ 0:['noise', 0.98], 80:['sine', 0.25], 450:['noise', 0.5] } });
+    neo.add('module', { name:'camera', frame:{ 20:[30, 'camera'], 40:[80, 'camera'] } });
 
 };
 
 var loop = function ( ) {
 
-    message.textContent = neo.data.flag1;
-    var c = NEO.hexToHtml(neo.data.color2);
+    var d = neo.data;
+
+    message.textContent = d.flag1;
+    var c = NEO.hexToHtml(d.color2);
     logo.setAttributeNS(null, 'fill', c);
     version.style.color = c;
-    version.style.bottom = ~~(67 + ( neo.data.curve3*0.2)) + 'px';
+    version.style.bottom = ~~(67 + ( d.curve3*0.2)) + 'px';
 
-    message.style.marginLeft = -100 + (neo.data.lfo6*10) + 'px';
+    message.style.marginLeft = -100 + (d.lfo6*10) + 'px';
 
-    if(neo.data.switch4) message.style.color = "#0FF";
+    if(d.switch4) message.style.color = "#0FF";
     else message.style.color = "#FFF";
 
     debug.innerHTML = neo.dataToString();

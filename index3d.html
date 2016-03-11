@@ -57,7 +57,7 @@ var init = function(){
         
     });
 
-    neo.add('audio', { frame:{0:'exp.mp3', 110:'tap.mp3', 130:'tap.mp3', 150:'tap.mp3', 310:'tap.mp3', 330:'tap.mp3', 350:'tap.mp3'} });
+    neo.add('audio', { frame:{ 110:'tap.mp3', 130:'tap.mp3', 150:'tap.mp3', 310:'tap.mp3', 330:'tap.mp3', 350:'tap.mp3'} });
     neo.add('audio', { frame:{ 150:'go.mp3', 300:'go.mp3'} });
 
     /*
@@ -110,10 +110,13 @@ var resize = function () {
 
 var loop = function () {
 
-    logo.material.color.setHex(neo.data.color0);
-    logo.rotation.set(neo.data.curve1.x, neo.data.curve1.y, neo.data.curve1.z );
+    var d = neo.data;
+
+    logo.material.color.setHex(d.color0);
+    logo.rotation.set(d.curve1.x, d.curve1.y, d.curve1.z );
     renderer.render( scene, camera );
-    debug.innerHTML = neo.dataToString();
+    
+    debug.innerHTML = neo.info();
 
 };
 
