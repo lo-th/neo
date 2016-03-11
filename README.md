@@ -11,6 +11,5 @@ neo.js is a lightweight timeline for javascript.
 [**VIDEO TEST**](http://lo-th.github.io/neo/index-video.html)
 
 note:<br>
-code of this project is private and encrypt<br>
-final project with Soixante circuits team<br>
-which will add power of node.
+code of this project is private and encrypt for this moment<br>
+final project with friend work's team, will add power of node...
