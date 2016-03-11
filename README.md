@@ -1,6 +1,6 @@
-<img src="http://lo-th.github.io/neo/images/neo.png"/> neo v0.5
+<img src="http://lo-th.github.io/neo/images/neo.png"/>eo v0.78
 
-neo.js is a lightweight ultimate timeline for javascript.
+neo.js is a lightweight timeline for javascript.
 
 [**BASE EXAMPLE**](http://lo-th.github.io/neo/index.html)
 
