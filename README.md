@@ -8,4 +8,9 @@ neo.js is a lightweight ultimate timeline for javascript.
 
 [**STRESS TEST**](http://lo-th.github.io/neo/index_stress.html)
 
-note: code of this project is private !
+[**VIDEO TEST**](http://lo-th.github.io/neo/index-video.html)
+
+note:<br>
+code of this project is private and encrypt<br>
+final project with Soixante circuits team<br>
+which will add power of node.
