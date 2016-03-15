@@ -23,26 +23,19 @@ body { font-family:"Lucida Console", Monaco, monospace; background-color:#333;  
 <div id='message'>YOOO</div>
 <div id='debug'></div>
 <script>
+
 var debug = document.getElementById('debug');
 var logo = document.getElementById('logoin');
 var version = document.getElementById('version');
 var message = document.getElementById('message');
-version.innerHTML = 'eo '+NEO.REVISION
 
-var loop = function () {
-
-    debug.innerHTML = neo.info();
-
-};
 var init = function(){
 
+    version.innerHTML = 'eo '+NEO.REVISION
     maps.init({ bottom:125 });
     maps.add();
 
 };
-
-
-
 
 var z = new EXTRACT.Pool(['uil','neo'], init);
 
