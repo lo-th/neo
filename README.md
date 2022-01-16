@@ -14,9 +14,10 @@ neo.add('color', { frame:{ 1:0xFFFFFF, 187:0x00FF00, 375:0xFFFF00, 562:0xFF0000,
 ```
 **3 - feature improvements**
 
-better performance
-best video and sound support
-more advanced examples
+better performance<br>
+best video and sound support<br>
+more advanced examples<br>
+more track option
 
 **4 - other examples**
 
