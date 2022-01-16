@@ -30,3 +30,7 @@ more track option
 [**VIDEO TEST**](http://lo-th.github.io/neo/examples/neo_video.html)
 
 [**MAP TEST**](http://lo-th.github.io/neo/examples/neo_sound.html)
+
+**5 - uil is on npm**
+```sh
+npm i neo_uil

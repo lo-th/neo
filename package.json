@@ -1,5 +1,5 @@
 {
-  "name": "neo",
+  "name": "neo_uil",
   "version": "0.5.0",
   "description": "JavaScript timeline library",
   "main": "build/neo.js",
