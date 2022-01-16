@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Neo stress</title>
+<link rel="shortcut icon" href="./assets/favicon.ico">
+<link rel="stylesheet" type="text/css" href="./assets/style.css">
+
+</style>
+</head>
+
+<body>
+<div id='container'></div>
+<div id='debug'></div>
+<script type="module">
+
+    import * as NEO from '../build/neo.module.js';
+    import * as THREE from './three/build/three.module.js';
+    import { OrbitControls } from './three/examples/jsm/controls/OrbitControls.js';
+
+var debug = document.getElementById('debug');
+var camera, scene, renderer, logo, controls, needResize = false;
+var neo = null;
+var pi = Math.PI;
+var pi90 = pi*0.5;
+var pi2 = pi*2;
+var planes = [];
+var max = 100;
+
+init3d()
+init()
+
+// NEO
+
+function init(){
+
+    neo = new NEO.Timeline({ zone:100, maxframe:400, top:10, bottom:10, open:false }).onChange( loop )
+    var i = max, r=0, t =0, ease;
+    while(i--){
+        t = Math.floor(Math.random() * 3);
+        r = Math.random() * pi2;
+        ease = ['sine-in-out', 'sine-in-out','sine-in-out', 'sine-in-out'];
+        if(t==1) ease = ['bounce-in-out', 'bounce-in-out','bounce-in-out', 'bounce-in-out'];
+        if(t==2) ease = ['elastic-in-out', 'elastic-in-out','elastic-in-out', 'elastic-in-out'];
+        neo.add('curve', { frame:{x:{0:[0, ease[0]], 100:[r, ease[1]], 200:[-r, ease[2]], 300:[r, ease[3]], 400:[0] }, range:[-pi2, pi2] }, h:70 });
+    }
+
+    neo.goTo(0)
+    
+}
+
+function loop() {
+
+    var d = neo.data;
+
+    var i = max;
+    while(i--) planes[i].rotation.set(d['curve'+i], 0, 0);
+    //debug.innerHTML = neo.info();
+
+}
+
+// THREE
+
+function init3d (){
+
+    renderer = new THREE.WebGLRenderer({alpha:true, antialias:true });
+    renderer.setClearColor( 0x000000, 0 )
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
+
+    camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1000 );
+    camera.position.set(20,20,100)
+    controls = new OrbitControls( camera, renderer.domElement );
+    controls.target.set(20,20,0)
+    controls.update()
+
+    scene = new THREE.Scene()
+
+    var light0 = new THREE.PointLight( 0xFFFFFF, 2, 500 );
+    light0.position.set(-10,-10,50);
+    scene.add( light0 );
+
+    var light1 = new THREE.PointLight( 0x00FFFF, 2, 1000 );
+    light1.position.set(50,50,-50);
+    scene.add( light1 );
+
+    var light3 = new THREE.PointLight( 0xFFFF00, 2, 1000 );
+    light3.position.set(-10,-10,-50);
+    scene.add( light3 );
+    
+    
+
+    var i = max, p, n=0, m=0;
+    var mat = new THREE.MeshPhongMaterial( { color: 0x505050, specular: 0xffffff, shininess: 50, side:THREE.DoubleSide } )
+    while(i--){
+        p = new THREE.Mesh(new THREE.PlaneBufferGeometry(4,4,1,1), mat)
+        scene.add(p);
+        n++;
+        p.position.set(n*4,m*4,0);
+        if(n>9){ n = 0; m++};
+        planes[i] = p;
+    }
+
+    window.addEventListener( 'resize', function(){ needResize = true;}, false );
+
+    render()
+
+}
+
+function resize() {
+
+    if(!needResize) return;
+    renderer.setSize( window.innerWidth, window.innerHeight )
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    needResize = false
+
+}
+
+function render(time) {
+
+    requestAnimationFrame( render )
+    resize()
+    renderer.render( scene, camera )
+
+}
+
+
+
+
+
+</script>
+</body>
+</html>

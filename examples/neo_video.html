@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Neo</title>
+<link rel="shortcut icon" href="./assets/favicon.ico">
+<link rel="stylesheet" type="text/css" href="./assets/style.css">
+</head>
+
+<body>
+
+<div id='message'>YOOO</div>
+<div id='debug'></div>
+
+<script type="module">
+    import { NEO } from '../src/Neo-direct.js';
+
+var debug = document.getElementById('debug');
+var logo = document.getElementById('logoin');
+var message = document.getElementById('message');
+
+const neo = new NEO.Timeline({ left:10, right:10, bottom:20, zone:100, maxframe:4000, fps:60, callback:loop })//.onChange( loop )
+neo.add('video', { frame:{0:['bunny.mp4', 23.962 ]} });
+
+//var neo = null;
+var loop = function () {
+
+    debug.innerHTML = neo.info();
+
+};
+
+</script>
+</body>
+</html>

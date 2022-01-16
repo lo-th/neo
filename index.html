@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Neo</title>
+<link rel="shortcut icon" href="./examples/assets/favicon.ico">
+<link rel="stylesheet" type="text/css" href="./examples/assets/style.css">
+</style>
+<script type="text/javascript" src="build/neo.js"></script>
+</head>
+
+<body>
+<div id='logo'></div>
+<div id='version'></div>
+<div id='message'></div>
+<div id='debug'></div>
+<script>
+
+    const c = NEO.add('button', { w:64, h:64, pos:{right:'10px', bottom:'10px'}, simple:true }).icon( NEO.Tools.icon('github', '#DEDEDE', 50) ).onChange( function(v){ let w = window.open('https://github.com/lo-th/neo','_blank'); } )
+    const callbackLink = function(v){ let w = window.open("./examples/"+v+".html", "_blank"); }
+    const demos = ['neo_video', 'neo_sound', 'neo_stress', 'neo_3d']
+    let i = demos.length
+    while(i--){
+        NEO.add('button', { name:demos[i], w:120, h:22, pos:{right:'79px', bottom:((23*i)+10)+'px'}, simple:true }).onChange( callbackLink )
+    }
+
+    document.getElementById('logo').innerHTML = NEO.Tools.icon('neo', '#FFF', 64)
+    const debug = document.getElementById('debug')
+    const logo = document.getElementById('logoin')
+    const version = document.getElementById('version')
+    const message = document.getElementById('message')
+
+    const neo = new NEO.Timeline({ bottom:125, zone:25, top:10 }).onChange( loop )
+
+    neo.add('bang', { frame:{ 20:1, 40:1 } })
+    neo.add('flag', { frame:{ 10:'Welcome', 30:'to', 50:'NEO', 70:'the', 90:'ultimate', 110:'timeline' } })
+    neo.add('color', { frame:{ 10:0xFFFFFF, 40:0x7f7f00, 70:0x00FF00, 100:0xFFFF00, 350:0xFF0000 , 700:0xFFFFFF} })
+    neo.add('curve', { 
+        frame:{
+            x:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
+            range:[-120, 120]
+        },
+    })
+    neo.add('switch', { frame:{ 20:30, 40:80 } });
+    neo.add('curve', { 
+        frame : {
+            x:{ 20:[100,'quint-in-out'], 40:[100,'quint-in-out'], 60:[-80,'quint-in-out'], 120:[70,'elastic-in-out'], 300:[-70,'bounce-in-out'], 400:[0,'expo-in-out'], 700:[ -100,'expo-in-out'] },
+            y:{ 20:[10,'quint-in-out'], 100:[100,'quint-in-out'] },
+            z:{ 20:[-10,'quint-in-out'], 103:[-100,'quint-in-out'] },
+            range:[-120, 120]
+        }
+    })
+
+    neo.add('lfo', { frame:{ 0:['noise', 0.98], 80:['sine', 0.25], 450:['noise', 0.5] } })
+    neo.add('module', { name:'camera', frame:{ 20:[30, 'camera'], 40:[80, 'camera'] } })
+
+
+    function loop() {
+
+        var d = neo.data
+
+        message.textContent = d.flag1;
+        var c = NEO.Tools.hexToHtml(d.color2);
+        logo.setAttributeNS(null, 'fill', c);
+        version.style.color = c;
+        version.style.bottom = ~~(67 + ( d.curve3*0.2)) + 'px';
+
+        message.style.marginLeft = -100 + (d.lfo6*10) + 'px';
+
+        if(d.switch4) message.style.color = "#0FF";
+        else message.style.color = "#FFF";
+
+        debug.innerHTML = neo.dataToString();
+
+    }
+
+</script>
+</body>
+</html>

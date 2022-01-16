@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Neo 3d</title>
+<link rel="shortcut icon" href="./assets/favicon.ico">
+<link rel="stylesheet" type="text/css" href="./assets/style.css">
+<script type="text/javascript" src="../build/neo.js"></script>
+</head>
+
+<body>
+<div id='bg'></div>
+<div id='container'></div>
+<div id='debug'></div>
+<script>
+
+var debug = document.getElementById('debug');
+
+var neo = new NEO.Timeline();
+
+neo.add('audio', { frame:{ 110:'tap.mp3', 130:'tap.mp3', 150:'tap.mp3', 310:'tap.mp3', 330:'tap.mp3', 350:'tap.mp3'} });
+neo.add('audio', { frame:{ 150:'go.mp3', 300:'go.mp3'} });
+neo.add('audio', { frame:{0:'door.mp3', 150:'door.mp3', 300:'door.mp3'} });
+//neo.add('audio', { frame:{0:'ghost.mp3'} });
+
+
+neo.callback = function(){ 
+
+    var d = neo.data;
+    debug.innerHTML = neo.dataToString(); 
+
+};
+
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "name": "neo",
+  "version": "0.5.0",
+  "description": "JavaScript timeline library",
+  "main": "build/neo.js",
+  "repository": "lo-th/neo",
+  "jsnext:main": "build/neo.module.js",
+  "module": "build/neo.module.js",
+  "files": [
+    "package.json",
+    "LICENSE",
+    "README.md",
+    "build/neo.js",
+    "build/neo.min.js",
+    "build/neo.module.js"
+  ],
+  "directories": {
+    "doc": "docs",
+    "example": "examples"
+  },
+  "eslintConfig": {
+    "extends": "mdcs"
+  },
+  "scripts": {
+    "start": "npm run dev",
+    "build": "rollup -c utils/rollup.config.js",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/rollup.config.js -w -m inline\" \"servez -p 8151 --index\""
+  },
+  "keywords": [
+    "neo",
+    "neo.js",
+    "timeline"
+  ],
+  "author": "lo-th",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lo-th/neo/issues"
+  },
+  "homepage": "http://lo-th.github.io/neo/",
+  "devDependencies": {
+    "@babel/core": "^7.15.5",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/preset-env": "^7.15.6",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-node-resolve": "^13.0.5",
+    "concurrently": "^6.2.2",
+    "rollup": "^2.39.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "servez": "^1.12.0",
+    "uil": "^4.0.2"
+  }
+}
