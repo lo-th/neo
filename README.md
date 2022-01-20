@@ -1,6 +1,7 @@
 <p align="center"><a href="http://lo-th.github.io/neo/"><img src="http://lo-th.github.io/neo/examples/assets/neo.jpg"/></a><br>NEO v0.5.0</p>
 
-neo.js is a lightweight timeline for javascript.
+neo.js is a lightweight timeline for javascript.<br>
+[**MAIN EXAMPLE**](http://lo-th.github.io/neo/index.html)
 
 **1 - init engine**
 ```sh
@@ -21,15 +22,13 @@ more track option
 
 **4 - other examples**
 
-[**BASE EXAMPLE**](http://lo-th.github.io/neo/index.html)
+[**neo 3d**](http://lo-th.github.io/neo/examples/neo_3d.html)
 
-[**3D EXAMPLE**](http://lo-th.github.io/neo/examples/neo_3d.html)
+[**neo stress**](http://lo-th.github.io/neo/examples/neo_stress.html)
 
-[**STRESS TEST**](http://lo-th.github.io/neo/examples/neo_stress.html)
+[**neo video**](http://lo-th.github.io/neo/examples/neo_video.html)
 
-[**VIDEO TEST**](http://lo-th.github.io/neo/examples/neo_video.html)
-
-[**MAP TEST**](http://lo-th.github.io/neo/examples/neo_sound.html)
+[**neo sound**](http://lo-th.github.io/neo/examples/neo_sound.html)
 
 **5 - uil is on npm**
 ```sh
