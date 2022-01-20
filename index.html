@@ -17,11 +17,12 @@
 <script>
 
     const c = NEO.add('button', { w:64, h:64, pos:{right:'10px', bottom:'10px'}, simple:true }).icon( NEO.Tools.icon('github', '#DEDEDE', 50) ).onChange( function(v){ let w = window.open('https://github.com/lo-th/neo','_blank'); } )
+    const d = NEO.add('button', { w:64, h:64, pos:{right:'84px', bottom:'10px'}, simple:true }).icon( NEO.Tools.icon('donate', '#DEDEDE', 50) ).onChange( function(v){ let w = window.open('https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=8KTXA987XHYNQ','_blank'); } )
     const callbackLink = function(v){ let w = window.open("./examples/"+v+".html", "_blank"); }
     const demos = ['neo_video', 'neo_sound', 'neo_stress', 'neo_3d']
     let i = demos.length
     while(i--){
-        NEO.add('button', { name:demos[i], w:120, h:22, pos:{right:'79px', bottom:((23*i)+10)+'px'}, simple:true }).onChange( callbackLink )
+        NEO.add('button', { name:demos[i], w:120, h:22, pos:{right:'159px', bottom:((23*i)+10)+'px'}, simple:true }).onChange( callbackLink )
     }
 
     document.getElementById('logo').innerHTML = NEO.Tools.icon('neo', '#FFF', 64)

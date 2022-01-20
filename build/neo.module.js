@@ -654,8 +654,12 @@ const R = {
 
                 tw = R.getWidth(u);
                 if( tw ) u.zone.w = u.w = tw;
+                // focrce width if content is canvas
+                else if( u.fw ) u.zone.w = u.w = u.fw;
+                
 
-                //console.log( u.name, u.zone.w, u.w, zone )
+                //console.log( u.name, u.zone.w, u.w, zone, tw )
+                //console.log(  tw )
                 px += u.zone.w;
 
                 if( px >= zone.w ) { 
@@ -737,7 +741,8 @@ const R = {
 
 
 
-        return o.getDom().offsetWidth
+        //return o.getDom().offsetWidth
+        return o.getDom().clientWidth
 
         //let r = o.getDom().getBoundingClientRect();
         //return (r.width)
@@ -1907,6 +1912,9 @@ const T = {
             case 'logo':
             t[1]="<path id='logoin' fill='"+color+"' stroke='none' d='"+T.logoFill_d+"'/>";
             break;
+            case 'donate':
+            t[1]="<path id='logoin' fill='"+color+"' stroke='none' d='"+T.logo_donate+"'/>";
+            break;
             case 'neo':
             t[1]="<path id='logoin' fill='"+color+"' stroke='none' d='"+T.logo_neo+"'/>";
             break;
@@ -1944,6 +1952,23 @@ const T = {
     186.75 221 202.95 204.85 219 188.8 219 166 L 219 52 M 194 52 L 181 52 181 166 Q 181 173 176.05 178 171.05 183 164 183 157 183 152 178 147 173 147 166 L 147 90 Q 147 
     67.2 130.85 51.15 114.8 35 92 35 69.25 35 53.05 51.15 37 67.2 37 90 L 37 204 50 204 50 90 Q 50 72.6 62.25 60.35 74.6 48 92 48 109.4 48 121.65 60.35 134 72.6 134 90 L 
     134 166 Q 134 178.4 142.85 187.15 151.6 196 164 196 176.45 196 185.25 187.15 194 178.4 194 166 L 194 52 Z
+    `,
+
+    logo_donate:`
+    M 171.3 80.3 Q 179.5 62.15 171.3 45.8 164.1 32.5 141.35 30.1 L 94.35 30.1 Q 89.35 30.4 88.3 35.15 L 70.5 148.05 Q 70.2 152.5 73.7 152.6 L 100.95 152.6 107 111.6 Q 108.75 
+    106.55 112.6 106.45 130.45 108.05 145.3 103.9 163.35 98.75 171.3 80.3 M 179.8 71.5 Q 178.6 79.75 174.9 87.85 168.45 102.9 151.9 109.15 140.65 113.95 117.55 113 113.15 
+    112.75 111 117.45 L 102.7 169.95 Q 102.45 173.8 105.5 173.85 L 128.95 173.85 Q 132.2 174.2 133.35 169.65 L 138.3 139.95 Q 139.75 135.6 143.1 135.5 146.6 135.75 150.6 135.65 
+    154.55 135.5 157.35 135.1 160.15 134.7 166.75 132.35 181.35 127.4 187.9 111.2 194.25 95.75 189.5 81.95 186.75 74.85 179.8 71.5 M 103.5 209.9 Q 103.5 202.85 99.7 198.85 95.95 
+    194.75 89.4 194.75 82.8 194.75 79.05 198.85 75.3 202.9 75.3 209.9 75.3 216.85 79.05 220.95 82.8 225.05 89.4 225.05 95.95 225.05 99.7 221 103.5 216.95 103.5 209.9 M 95.45 205.5 
+    Q 95.95 207.3 95.95 209.9 95.95 212.65 95.45 214.35 94.95 216 94 217.3 93.1 218.45 91.9 219 90.7 219.55 89.4 219.55 88.15 219.55 86.95 219.05 85.75 218.55 84.8 217.3 83.9 216.15 
+    83.4 214.35 82.85 212.6 82.85 209.9 82.85 207.3 83.4 205.45 83.95 203.55 84.85 202.45 85.9 201.2 86.95 200.75 88.05 200.25 89.4 200.25 90.7 200.25 91.85 200.8 93.05 201.3 94 202.5 
+    94.9 203.65 95.45 205.5 M 153.3 195.35 L 145.3 195.35 135.5 224.45 142.8 224.45 144.6 218.5 153.75 218.5 155.6 224.45 163.1 224.45 153.3 195.35 M 152.15 213.25 L 146.25 213.25 
+    149.2 203.65 152.15 213.25 M 116.75 195.35 L 107.8 195.35 107.8 224.45 114.5 224.45 114.5 204.2 125.7 224.45 132.75 224.45 132.75 195.35 126.05 195.35 126.05 212.05 116.75 195.35 M 
+    66.5 197.65 Q 64.15 196.15 61.45 195.75 58.8 195.35 55.75 195.35 L 46.7 195.35 46.7 224.45 55.8 224.45 Q 58.8 224.45 61.5 224.05 64.15 223.6 66.4 222.15 69.15 220.45 70.9 217.2 
+    72.7 214 72.7 209.95 72.7 205.7 71 202.6 69.35 199.5 66.5 197.65 M 64.2 205 Q 65.2 207 65.2 209.9 65.2 212.75 64.25 214.75 63.3 216.75 61.5 217.85 60 218.85 58.3 218.9 56.6 219 
+    54.15 219 L 54 219 54 200.8 54.15 200.8 Q 56.4 200.8 58.05 200.9 59.7 200.95 61.15 201.75 63.2 202.95 64.2 205 M 210.2 195.35 L 190.5 195.35 190.5 224.45 210.2 224.45 210.2 218.9 
+    197.75 218.9 197.75 211.55 209.2 211.55 209.2 206 197.75 206 197.75 200.9 210.2 200.9 210.2 195.35 M 187.5 195.35 L 163 195.35 163 200.9 171.6 200.9 171.6 224.45 178.9 224.45 178.9 
+    200.9 187.5 200.9 187.5 195.35 Z
     `,
 
 };
@@ -2110,6 +2135,8 @@ class Proto {
 
         this.isListen = false;
 
+
+
         
         //this.parentGroup = null;
 
@@ -2142,6 +2169,14 @@ class Proto {
         if( o.h !== undefined ) this.h = o.h;
         if( !this.isSpace ) this.h = this.h < 11 ? 11 : this.h;
         else this.lock = true;
+
+
+        // decale for canvas only
+        this.fw = o.fw || 0;
+        /*this.dc = 0
+        if(this.isUI){
+            if( this.main.isCanvasOnly && this.fw) this.dc = (this.main.zone.w - this.w)*0.5
+        }*/
 
         
         this.autoWidth = o.auto || true;// auto width or flex 
@@ -2524,36 +2559,36 @@ class Proto {
     // ----------------------
     // clear node
     // ----------------------
-    
-    clear( nofull ) {
+
+    dispose(){
 
         if( this.isListen ) Roots.removeListen( this );
 
         Tools$1.clear( this.c[0] );
 
-        if( !nofull ){
+        if( this.target !== null ){ 
 
-            if( this.target !== null ){ 
+            if( this.group !== null  ) this.group.clearOne( this );
+            else this.target.removeChild( this.c[0] );
 
-                if( this.group !== null  ) this.group.clearOne( this );
-                else this.target.removeChild( this.c[0] );
+        } else {
 
-            } else {
-
-                if( this.isUI ) this.main.clearOne( this );
-                else document.body.removeChild( this.c[0] );
-
-            }
-
-            if( !this.isUI ) Roots.remove( this );
+            if( this.isUI ) this.main.clearOne( this );
+            else document.body.removeChild( this.c[0] );
 
         }
 
+        if( !this.isUI ) Roots.remove( this );
+        
         this.c = null;
         this.s = null;
         this.callback = null;
         this.target = null;
         this.isListen = false;
+
+    }
+    
+    clear() {
 
     }
 
@@ -2641,6 +2676,8 @@ class Proto {
     // ----------------------
 
     handleEvent( e ) {
+
+        //if(!this.s) return false
 
         if( this.lock ) return
 
@@ -2919,7 +2956,7 @@ class Button extends Proto {
 
         
 
-        this.onName = o.onName || '';
+        this.onName = o.onName || null;
 
         this.on = false;
 
@@ -2954,12 +2991,13 @@ class Button extends Proto {
 
         }
 
-        if( !o.value || !o.values ){
-            if( this.c[1] !== undefined ) this.c[1].textContent = '';
-            this.p = o.p !== undefined ? o.p : 0;
-        } else {
-            if( !this.txt ) this.p = 0; 
-        }
+        if( !o.value && !o.values ){
+            if( this.c[1] !== undefined ) { 
+                this.txt = '';
+                this.c[1].textContent = '';
+            }
+        } 
+        if( !this.txt ) this.p = 0; 
 
         //
 
@@ -2969,16 +3007,16 @@ class Button extends Proto {
             this.initDrager();
         }
 
-        if( this.onName !== '' ) this.values[0] = this.on;
+        //if( this.onName !== '' ) this.values[0] = this.on;
 
         this.init();
 
     }
 
-    onOff ( ){
+    onOff() {
 
         this.on = !this.on;
-        this.c[2].innerHTML = this.on ? this.onName : this.txt;
+        this.label( this.on ? this.onName : this.txt );
         
     }
 
@@ -3010,6 +3048,7 @@ class Button extends Proto {
         if( this.res !== -1 ){
             if( this.value === this.values[this.res] && this.unselectable ) this.value = '';
             else this.value = this.values[this.res];
+            if( this.onName !== null ) this.onOff();
             if( !this.isLoadButton ) this.send();
         }
 
@@ -3070,6 +3109,8 @@ class Button extends Proto {
 
     mode ( n, id ) {
 
+        //if(!this.s) return false
+ 
         let change = false;
         let cc = this.colors, s = this.s;
         let i = id+2;
@@ -3150,6 +3191,21 @@ class Button extends Proto {
 
     }
 
+    addLoader( n, callbackLoad ){
+
+        this.callbackLoad = callbackLoad;
+
+        let l = this.dom( 'input', this.css.basic +'top:0px; opacity:0; height:100%; width:100%; pointer-events:auto; cursor:pointer;' );//
+        l.name = 'loader';
+        l.type = "file";
+        l.addEventListener( 'change', function(e){ this.fileSelect( e.target.files[0] ); }.bind(this), false );
+
+        this.c[n].appendChild( l );
+
+        return this
+
+    }
+
     initLoader () {
 
         this.c[3] = this.dom( 'input', this.css.basic +'top:0px; opacity:0; height:'+(this.h)+'px; pointer-events:auto; cursor:pointer;' );//
@@ -3195,8 +3251,10 @@ class Button extends Proto {
         //else reader.readAsText( file );
 
         reader.onload = function (e) {
+
+            if( this.callbackLoad ) this.callbackLoad( e.target.result, fname, type );
             
-            if( this.callback ) this.callback( e.target.result, fname, type );
+            //if( this.callback ) this.callback( e.target.result, fname, type );
             //this.c[3].type = "file";
             //this.send( e.target.result ); 
         }.bind(this);
@@ -4750,7 +4808,7 @@ class Group extends Proto {
 
     }
 
-    add () {
+    add() {
 
         let a = arguments;
 
@@ -4788,11 +4846,27 @@ class Group extends Proto {
 
     remove ( n ) {
 
-        if( n.clear ) n.clear();
+        if( n.dispose ) n.dispose();
 
     }
 
     // clear all iner 
+
+    dispose() {
+
+        this.clear();
+        if( this.isUI ) this.main.calc();
+
+        super.dispose();
+        //Proto.prototype.clear.call( this );
+
+    }
+
+    clear() {
+
+        this.empty();
+
+    }
 
     empty () {
 
@@ -4858,29 +4932,6 @@ class Group extends Proto {
         this.s[0].height = this.h + 'px';
 
         this.parentHeight();
-
-    }
-
-    clear () {
-
-        this.empty();
-        if( this.isUI ) this.main.calc( -( this.h + 1 ));
-        Proto.prototype.clear.call( this );
-
-    }
-
-    clearGroup () {
-
-        this.empty();
-
-        /*this.close();
-
-        let i = this.uis.length;
-        while(i--){
-            this.uis[i].clear();   
-        }
-        this.uis = [];
-        this.h = this.baseH;*/
 
     }
 
@@ -7801,6 +7852,8 @@ class Pad2D extends Proto {
 
         //console.log(this.range)
 
+        
+
 
 
         this.precision = o.precision === undefined ? 2 : o.precision;
@@ -7890,6 +7943,7 @@ class Pad2D extends Proto {
     mousedown ( e ) {
 
         if ( this.testZone(e) === 'pad' ) {
+
             this.isDown = true;
             this.mousemove( e );
             return this.mode(1);
@@ -8054,8 +8108,8 @@ const add$1 = function () {
 
             ref = true;
             if( a[2] === undefined ) [].push.call(a, {});
-
-            type = a[2].type ? a[2].type : 'slide';//autoType.apply( this, a );
+                
+            type = a[2].type ? a[2].type : autoType( a[0][a[1]], a[2] );
 
             o = a[2];
             o.name = a[1];
@@ -8064,13 +8118,15 @@ const add$1 = function () {
 
         }
 
+        
+
         let name = type.toLowerCase();
 
         if( name === 'group' ) o.add = add$1;
 
         switch( name ){
 
-            case 'bool': n = new Bool(o); break;
+            case 'bool': case 'boolean': n = new Bool(o); break;
             case 'button': n = new Button(o); break;
             case 'circular': n = new Circular(o); break;
             case 'color': n = new Color$1(o); break;
@@ -8099,6 +8155,37 @@ const add$1 = function () {
             return n;
 
         }
+
+};
+
+const autoType = function ( v, o ) {
+
+    let type = 'slide';
+
+    if( typeof v === 'boolean' ) type = 'bool'; 
+    else if( typeof v === 'string' ){ 
+
+        if( v.substring(0,1) === '#' ) type = 'color';
+        else type = 'string'; 
+
+    } else if( typeof v === 'number' ){ 
+
+        if( o.ctype ) type = 'color';
+        else type = 'slide';
+
+    } else if( typeof v === 'array' && v instanceof Array ){
+
+        if( typeof v[0] === 'number' ) type = 'number';
+        else if( typeof v[0] === 'string' ) type = 'list';
+
+    } else if( typeof v === 'object' && v instanceof Object ){
+
+        if( v.x !== undefined ) type = 'number';
+        else type = 'list';
+
+    }
+
+    return type
 
 };
 
@@ -9711,7 +9798,7 @@ class KeyAudio extends KeyFlag {
         this.cct = 'borderColor';
         this.key.style.background = 'none';
 
-        //this.flagName = UIL.add('string', { target:this.content, value:this.value, w:80, h:18, simple:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v; Utils.loadSound(this.value, this) }.bind(this) );
+        this.flagName.onChange( function(v){ this.value = v; Utils.loadSound(this.value, this); }.bind(this) );
 
         if( this.value ) Utils.loadSound( this.value, this );
 
