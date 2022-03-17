@@ -124,140 +124,6 @@ if ( Object.assign === undefined ) {
 
 }
 
-/*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
-var saveAs = function(e) {
-
-    if (typeof e === "undefined" || typeof navigator !== "undefined" && /MSIE [1-9]\./.test(navigator.userAgent)) {
-        return
-    }
-    var t = e.document,
-        n = function() {
-            return e.URL || e.webkitURL || e
-        },
-        r = t.createElementNS("http://www.w3.org/1999/xhtml", "a"),
-        o = "download" in r,
-        a = function(e) {
-            var t = new MouseEvent("click");
-            e.dispatchEvent(t);
-        },
-        i = /constructor/i.test(e.HTMLElement) || e.safari,
-        f = /CriOS\/[\d]+/.test(navigator.userAgent),
-        u = function(t) {
-            (e.setImmediate || e.setTimeout)(function() {
-                throw t
-            }, 0);
-        },
-        s = "application/octet-stream",
-        d = 1e3 * 40,
-        c = function(e) {
-            var t = function() {
-                if (typeof e === "string") {
-                    n().revokeObjectURL(e);
-                } else {
-                    e.remove();
-                }
-            };
-            setTimeout(t, d);
-        },
-        l = function(e, t, n) {
-            t = [].concat(t);
-            var r = t.length;
-            while (r--) {
-                var o = e["on" + t[r]];
-                if (typeof o === "function") {
-                    try {
-                        o.call(e, n || e);
-                    } catch (a) {
-                        u(a);
-                    }
-                }
-            }
-        },
-        p = function(e) {
-            if (/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(e.type)) {
-                return new Blob([String.fromCharCode(65279), e], {
-                    type: e.type
-                })
-            }
-            return e
-        },
-        v = function(t, u, d) {
-            if (!d) {
-                t = p(t);
-            }
-            var v = this,
-                w = t.type,
-                m = w === s,
-                y, h = function() {
-                    l(v, "writestart progress write writeend".split(" "));
-                },
-                S = function() {
-                    if ((f || m && i) && e.FileReader) {
-                        var r = new FileReader;
-                        r.onloadend = function() {
-                            var t = f ? r.result : r.result.replace(/^data:[^;]*;/, "data:attachment/file;");
-                            var n = e.open(t, "_blank");
-                            if (!n) e.location.href = t;
-                            t = undefined;
-                            v.readyState = v.DONE;
-                            h();
-                        };
-                        r.readAsDataURL(t);
-                        v.readyState = v.INIT;
-                        return
-                    }
-                    if (!y) {
-                        y = n().createObjectURL(t);
-                    }
-                    if (m) {
-                        e.location.href = y;
-                    } else {
-                        var o = e.open(y, "_blank");
-                        if (!o) {
-                            e.location.href = y;
-                        }
-                    }
-                    v.readyState = v.DONE;
-                    h();
-                    c(y);
-                };
-            v.readyState = v.INIT;
-            if (o) {
-                y = n().createObjectURL(t);
-                setTimeout(function() {
-                    r.href = y;
-                    r.download = u;
-                    a(r);
-                    h();
-                    c(y);
-                    v.readyState = v.DONE;
-                });
-                return
-            }
-            S();
-        },
-        w = v.prototype,
-        m = function(e, t, n) {
-            return new v(e, t || e.name || "download", n)
-        };
-
-    if (typeof navigator !== "undefined" && navigator.msSaveOrOpenBlob) {
-        return function(e, t, n) {
-            t = t || e.name || "download";
-            if (!n) { e = p(e); }
-            return navigator.msSaveOrOpenBlob(e, t)
-        }
-    }
-
-    w.abort = function() {};
-    w.readyState = w.INIT = 0;
-    w.WRITING = 1;
-    w.DONE = 2;
-    w.error = w.onwritestart = w.onprogress = w.onwrite = w.onabort = w.onerror = w.onwriteend = null;
-    return m
-
-}(typeof self !== "undefined" && self || typeof window !== "undefined" && window );
-
 /**
  * @license
  * Copyright 2010-2021 Uil.js Authors
@@ -1977,6 +1843,244 @@ T.setText();
 
 const Tools$1 = T;
 
+///https://wicg.github.io/file-system-access/#api-filesystemfilehandle-getfile
+
+
+class Files {
+
+    //-----------------------------
+    //  FILE TYPE
+    //-----------------------------
+
+    static autoTypes( type ) {
+
+        let t = [];
+
+        switch( type ){
+            case 'svg':
+            t = [ { accept: { 'image/svg+xml': '.svg'} }, ];
+            break;
+            case 'text':
+            t = [ { description: 'Text Files', accept: { 'text/plain': ['.txt', '.text'], 'text/html': ['.html', '.htm'] } }, ];
+            break;
+            case 'json':
+            t = [ { description: 'JSON Files', accept: { 'text/plain': ['.json'] } }, ];
+            break;
+            case 'image':
+            t = [ { description: 'Images', accept: { 'image/*': ['.png', '.gif', '.jpeg', '.jpg'] } }, ];
+            break;
+
+        }
+
+        return t
+
+    }
+
+
+    //-----------------------------
+    //  LOAD
+    //-----------------------------
+
+	static async load( o = {} ) {
+
+        if (typeof window.showOpenFilePicker !== 'function') {
+            window.showOpenFilePicker = this.showOpenFilePickerPolyfill;
+        }
+
+        try {
+
+        	let type = o.type || '';
+
+            const options = {
+                excludeAcceptAllOption: type ? true : false,
+                multiple: false,
+                //startIn:'./assets'
+            };
+
+            options.types = this.autoTypes( type );
+
+            // create a new handle
+            const handle = await window.showOpenFilePicker( options );
+            const file = await handle[0].getFile();
+            //let content = await file.text()
+
+            if( !file ) return null
+
+            let fname = file.name;
+            let ftype = fname.substring( fname.lastIndexOf('.')+1, fname.length );
+
+            const dataUrl = [ 'png', 'jpg', 'jpeg', 'mp4', 'webm', 'ogg', 'mp3' ];
+            const dataBuf = [ 'sea', 'z', 'hex', 'bvh', 'BVH', 'glb', 'gltf' ];
+            const reader = new FileReader();
+
+            if( dataUrl.indexOf( ftype ) !== -1 ) reader.readAsDataURL( file );
+            else if( dataBuf.indexOf( ftype ) !== -1 ) reader.readAsArrayBuffer( file );
+            else reader.readAsText( file );
+
+            reader.onload = function(e) {
+
+                let content = e.target.result;
+
+                switch(type){
+                    case 'image':
+                        let img = new Image;
+                        img.onload = function() {
+                            if( o.callback ) o.callback( img, fname );
+                        };
+                        img.src = content;
+                    break;
+                    case 'json':
+                        if( o.callback ) o.callback( JSON.parse( content ), fname );
+                    break;
+                    default:
+                        if( o.callback ) o.callback( content, fname );
+                    break;
+                }
+
+            };
+
+        } catch(e) {
+
+            console.log(e);
+
+        }
+
+    }
+
+	static showOpenFilePickerPolyfill( options ) {
+        return new Promise((resolve) => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.multiple = options.multiple;
+            input.accept = options.types
+                .map((type) => type.accept)
+                .flatMap((inst) => Object.keys(inst).flatMap((key) => inst[key]))
+                .join(",");
+
+            input.addEventListener("change", () => {
+                resolve(
+                    [...input.files].map((file) => {
+                        return {
+                            getFile: async () =>
+                                new Promise((resolve) => {
+                                    resolve(file);
+                                }),
+                        };
+                    })
+                );
+            });
+
+            input.click();
+        })
+    }
+
+
+    //-----------------------------
+    //  SAVE
+    //-----------------------------
+
+    static async save( o = {} ) {
+
+        this.usePoly = false;
+
+        if (typeof window.showSaveFilePicker !== 'function') {
+            window.showSaveFilePicker = this.showSaveFilePickerPolyfill;
+            this.usePoly = true;
+        }
+
+        try {
+
+            let type = o.type || '';
+
+            const options = {
+                suggestedName: o.name || 'hello',
+                data: o.data || ''
+            };
+
+
+            options.types = this.autoTypes( type );
+            options.finalType = Object.keys(options.types[0].accept )[0];
+            options.suggestedName += options.types[0].accept[options.finalType][0];
+
+
+            // create a new handle
+            const handle = await window.showSaveFilePicker( options );
+
+            if( this.usePoly ) return
+
+            // create a FileSystemWritableFileStream to write to
+            const file = await handle.createWritable();
+
+            let blob = new Blob([ options.data ], { type: options.finalType });
+
+            // write our file
+            await file.write(blob);
+
+            // close the file and write the contents to disk.
+            await file.close();
+
+        } catch(e) {
+
+            console.log(e);
+
+        }
+
+    }
+
+    static showSaveFilePickerPolyfill( options ) {
+        return new Promise((resolve) => {
+            const a = document.createElement("a");
+            a.download = options.suggestedName || "my-file.txt";
+            let blob = new Blob([ options.data ], { type:options.finalType });
+            a.href = URL.createObjectURL( blob );
+
+            a.addEventListener("click", () => {
+                resolve(
+                    setTimeout( () => URL.revokeObjectURL(a.href), 1000 )
+                );
+            });
+            a.click();
+        })
+    }
+
+
+    //-----------------------------
+    //  FOLDER not possible in poly
+    //-----------------------------
+
+    static async getFolder() {
+
+        try {
+    
+            const handle = await window.showDirectoryPicker();
+            const files = [];
+            for await (const entry of handle.values()) {
+                const file = await entry.getFile();
+                files.push(file);
+            }
+
+            console.log(files);
+            return files;
+
+        } catch(e) {
+
+            console.log(e);
+
+        }
+    
+    }
+
+
+
+
+
+
+
+
+    
+
+}
+
 class V2 {
 
 	constructor( x = 0, y = 0 ) {
@@ -2135,15 +2239,8 @@ class Proto {
 
         this.isListen = false;
 
-
-
-        
-        //this.parentGroup = null;
-
-        //if( o.select !== undefined ) o.selectable = o.select
         this.isSelectable = o.selectable !== undefined ? o.selectable : false;
         this.unselectable =  o.unselect !== undefined ? o.unselect : this.isSelectable;
-
 
         this.ontop = o.ontop ? o.ontop : false; // 'beforebegin' 'afterbegin' 'beforeend' 'afterend'
 
@@ -2173,12 +2270,7 @@ class Proto {
 
         // decale for canvas only
         this.fw = o.fw || 0;
-        /*this.dc = 0
-        if(this.isUI){
-            if( this.main.isCanvasOnly && this.fw) this.dc = (this.main.zone.w - this.w)*0.5
-        }*/
 
-        
         this.autoWidth = o.auto || true;// auto width or flex 
         this.isOpen = false;// open statu
 
@@ -2241,13 +2333,10 @@ class Proto {
         this.s = [];
 
 
-        //this.c[0] = Tools.dom( 'div', this.css.basic + this.css.button +'align-self:stretch; position:relative; height:20px; overflow:hidden;'); //float:left;
-        //this.c[0] = Tools.dom( 'div',  'order: 1;' ); //
         this.useFlex = this.isUI ? this.main.useFlex : false; 
-        let flexible = this.useFlex ? 'disply:flex; justify-content:center; align-items:center; text-align:center; flex: 1 100%;' : 'float:left;';
+        let flexible = this.useFlex ? 'display:flex; justify-content:center; align-items:center; text-align:center; flex: 1 100%;' : 'float:left;';
 
         this.c[0] = Tools$1.dom( 'div', this.css.basic + flexible + 'position:relative; height:20px;');
-        //this.c[0] = Tools.dom( 'div', this.css.basic +'position:relative; height:20px; align-self: auto;');
 
 
         this.s[0] = this.c[0].style;
@@ -2348,10 +2437,16 @@ class Proto {
         }
 
         
+        
+
+    }
+
+    addTransition(){
+
         if( this.baseH && this.transition && this.isUI ){
             this.c[0].style.transition = 'height '+this.transition+'s ease-out';
         }
-
+        
     }
 
     // from Tools
@@ -2677,8 +2772,6 @@ class Proto {
 
     handleEvent( e ) {
 
-        //if(!this.s) return false
-
         if( this.lock ) return
 
         if( this.neverlock ) Roots.lock = false;
@@ -2690,24 +2783,11 @@ class Proto {
     }
 
     wheel( e ) { return false; }
-
     mousedown( e ) { return false; }
-
     mousemove( e ) { return false; }
-
     mouseup( e ) { return false; }
-
     keydown( e ) { return false; }
-
     keyup( e ) { return false; }
-
-
-    /*dragstart ( e ) { return false; }
-    dragover ( e ) { return false; }
-    dragenter ( e ) { return false; }
-    dragleave ( e ) { return false; }
-    dragend ( e ) { return false; }
-    drop ( e ) { return false; }*/
 
 
     // ----------------------
@@ -2721,12 +2801,8 @@ class Proto {
 
     }
 
-    display( v ) {
-        
-        v = v || false;
+    display( v = false ) {
         this.s[0].visibility = v ? 'visible' : 'hidden';
-        //this.s[0].display = v ? (this.useFlex? 'flex':'block') : 'none'
-
     }
 
     // ----------------------
@@ -2960,17 +3036,16 @@ class Button extends Proto {
 
         this.on = false;
 
-        this.customSize = o.forceWidth || -1;
+        // force button width
+        this.bw = o.forceWidth || 0;
+        if(o.bw) this.bw = o.bw;
+        this.space = o.space || 3;
 
         if( typeof this.values === 'string' ) this.values = [ this.values ];
 
         this.isDown = false;
         this.neverlock = true;
-        this.isLoadButton = o.loader || false;
-        this.isDragButton = o.drag || false;
         this.res = 0;
-        
-        if( this.isDragButton ) this.isLoadButton = true;
 
         this.lng = this.values.length;
         this.tmp = [];
@@ -2992,22 +3067,12 @@ class Button extends Proto {
         }
 
         if( !o.value && !o.values ){
-            if( this.c[1] !== undefined ) { 
-                this.txt = '';
+            if( this.c[1] !== undefined ) {
                 this.c[1].textContent = '';
+                //this.txt = ''
             }
         } 
         if( !this.txt ) this.p = 0; 
-
-        //
-
-        if( this.isLoadButton ) this.initLoader();
-        if( this.isDragButton ){ 
-            this.lng ++;
-            this.initDrager();
-        }
-
-        //if( this.onName !== '' ) this.values[0] = this.on;
 
         this.init();
 
@@ -3049,7 +3114,7 @@ class Button extends Proto {
             if( this.value === this.values[this.res] && this.unselectable ) this.value = '';
             else this.value = this.values[this.res];
             if( this.onName !== null ) this.onOff();
-            if( !this.isLoadButton ) this.send();
+            this.send();
         }
 
         return this.mousemove( e )
@@ -3146,121 +3211,6 @@ class Button extends Proto {
 
     }
 
-    // ----------------------
-
-    dragover ( e ) {
-
-        e.preventDefault();
-
-        this.s[4].borderColor = this.colors.select;
-        this.s[4].color = this.colors.select;
-
-    }
-
-    dragend ( e ) {
-
-        e.preventDefault();
-
-        this.s[4].borderColor = this.color.text;
-        this.s[4].color = this.color.text;
-
-    }
-
-    drop ( e ) {
-
-        e.preventDefault();
-
-        this.dragend(e);
-        this.fileSelect( e.dataTransfer.files[0] );
-
-    }
-
-    initDrager () {
-
-        this.c[4] = this.dom( 'div', this.css.txt +' text-align:center; line-height:'+(this.h-8)+'px; border:1px dashed '+this.color.text+'; top:2px;  height:'+(this.h-4)+'px; border-radius:'+this.radius+'px; pointer-events:auto;' );// cursor:default;
-        this.c[4].textContent = 'DRAG';
-
-        this.c[4].addEventListener( 'dragover', function(e){ this.dragover(e); }.bind(this), false );
-        this.c[4].addEventListener( 'dragend', function(e){ this.dragend(e); }.bind(this), false );
-        this.c[4].addEventListener( 'dragleave', function(e){ this.dragend(e); }.bind(this), false );
-        this.c[4].addEventListener( 'drop', function(e){ this.drop(e); }.bind(this), false );
-
-        //this.c[2].events = [  ];
-        //this.c[4].events = [ 'dragover', 'dragend', 'dragleave', 'drop' ];
-
-
-    }
-
-    addLoader( n, callbackLoad ){
-
-        this.callbackLoad = callbackLoad;
-
-        let l = this.dom( 'input', this.css.basic +'top:0px; opacity:0; height:100%; width:100%; pointer-events:auto; cursor:pointer;' );//
-        l.name = 'loader';
-        l.type = "file";
-        l.addEventListener( 'change', function(e){ this.fileSelect( e.target.files[0] ); }.bind(this), false );
-
-        this.c[n].appendChild( l );
-
-        return this
-
-    }
-
-    initLoader () {
-
-        this.c[3] = this.dom( 'input', this.css.basic +'top:0px; opacity:0; height:'+(this.h)+'px; pointer-events:auto; cursor:pointer;' );//
-        this.c[3].name = 'loader';
-        this.c[3].type = "file";
-
-        this.c[3].addEventListener( 'change', function(e){ this.fileSelect( e.target.files[0] ); }.bind(this), false );
-        //this.c[3].addEventListener( 'mousedown', function(e){  }.bind(this), false );
-
-        //this.c[2].events = [  ];
-        //this.c[3].events = [ 'change', 'mouseover', 'mousedown', 'mouseup', 'mouseout' ];
-
-        //this.hide = document.createElement('input');
-
-    }
-
-    fileSelect ( file ) {
-
-        let dataUrl = [ 'png', 'jpg', 'mp4', 'webm', 'ogg' ];
-        let dataBuf = [ 'sea', 'z', 'hex', 'bvh', 'BVH', 'glb' ];
-
-        //if( ! e.target.files ) return;
-
-        //let file = e.target.files[0];
-       
-        //this.c[3].type = "null";
-        // console.log( this.c[4] )
-
-        if( file === undefined ) return;
-
-        let reader = new FileReader();
-        let fname = file.name;
-        let type = fname.substring(fname.lastIndexOf('.')+1, fname.length );
-
-        if( dataUrl.indexOf( type ) !== -1 ) reader.readAsDataURL( file );
-        else if( dataBuf.indexOf( type ) !== -1 ) reader.readAsArrayBuffer( file );//reader.readAsArrayBuffer( file );
-        else reader.readAsText( file );
-
-        // if( type === 'png' || type === 'jpg' || type === 'mp4' || type === 'webm' || type === 'ogg' ) reader.readAsDataURL( file );
-        //else if( type === 'z' ) reader.readAsBinaryString( file );
-        //else if( type === 'sea' || type === 'bvh' || type === 'BVH' || type === 'z') reader.readAsArrayBuffer( file );
-        //else if(  ) reader.readAsArrayBuffer( file );
-        //else reader.readAsText( file );
-
-        reader.onload = function (e) {
-
-            if( this.callbackLoad ) this.callbackLoad( e.target.result, fname, type );
-            
-            //if( this.callback ) this.callback( e.target.result, fname, type );
-            //this.c[3].type = "file";
-            //this.send( e.target.result ); 
-        }.bind(this);
-
-    }
-
     label ( string, n ) {
 
         n = n || 2;
@@ -3287,13 +3237,12 @@ class Button extends Proto {
         let d = this.sa;
 
         let i = this.lng;
-        let dc =  3;
+        let dc = this.space;
         let size = Math.floor( ( w-(dc*(i-1)) ) / i );
 
-        if( this.customSize !== -1 ){ 
-            size = this.customSize;
-           // d = (this.s-size)*0.5
-
+        if( this.bw ){ 
+            size = this.bw < size ? this.bw : size;
+            d = Math.floor((this.w-( (size * i) + (dc * (i-1)) ))*0.5);
         }
 
         while( i-- ){
@@ -3304,16 +3253,6 @@ class Button extends Proto {
             s[i+2].left = this.tmp[i][0] + 'px';
             s[i+2].width = this.tmp[i][1] + 'px';
 
-        }
-
-        if( this.isDragButton ){ 
-            s[4].left = (d+size+dc) + 'px';
-            s[4].width = size + 'px';
-        }
-
-        if( this.isLoadButton ){
-            s[3].left = d + 'px';
-            s[3].width = size + 'px';
         }
 
     }
@@ -3345,6 +3284,7 @@ class Circular extends Proto {
         this.top = 0;
 
         this.c[0].style.width = this.w +'px';
+        this.c[0].style.display = 'block';
 
         if(this.c[1] !== undefined) {
 
@@ -3583,7 +3523,7 @@ class Color$1 extends Proto {
 	    }
 
 	    //this.c[0].style.textAlign = 'center';
-	    //this.c[0].style.flex = '1 0 auto'
+	    this.c[0].style.display = 'block';
 
 	    this.c[3] = this.getColorRing();
 	    this.c[3].style.visibility  = 'hidden';
@@ -4598,14 +4538,12 @@ class Group extends Proto {
 
         this.ADD = o.add;
 
-        this.uis = [];
-
-        this.isEmpty = true;
-
         this.autoHeight = true;
-        this.current = -1;
-        this.targetIn  = null;
 
+        this.uis = [];
+        this.current = -1;
+        this.proto = null;
+        this.isEmpty = true;
         this.decal = 0;
 
         this.baseH = this.h;
@@ -4631,9 +4569,6 @@ class Group extends Proto {
         if( this.isLine ) this.c[5] = this.dom( 'div', this.css.basic +  'background:rgba(255, 255, 255, 0.2); width:100%; left:0; height:1px; bottom:0px');
 
         let s = this.s;
-
-
-
         s[0].height = this.h + 'px';
         s[1].height = this.h + 'px';
         this.c[1].name = 'group';
@@ -4643,27 +4578,12 @@ class Group extends Proto {
         s[1].color = this.colors.text;
         s[1].fontWeight = 'bold';
 
-        if( this.radius !== 0 ) s[0].borderRadius = this.radius+'px'; 
-        //if( o.border ) s[0].border = '1px solid ' + o.border;
-
-
-        /*if(this.decal){
-            s[0].boxSizing = 'border-box';
-            s[0].backgroundClip = 'border-box';
-            s[0].border = (this.decal/3)+'px solid ' + o.group.colors.background;
-        }*/
-
-        
-
-        
+        if( this.radius !== 0 ) s[0].borderRadius = this.radius+'px';
         this.init();
 
         this.setBG( o.bg );
 
         if( o.open !== undefined ) this.open();
-
-
-        //s[0].background = this.bg;
 
     }
 
@@ -4686,12 +4606,13 @@ class Group extends Proto {
     clearTarget () {
 
         if( this.current === -1 ) return false;
-
-       // if(!this.targetIn ) return;
-        this.targetIn .uiout();
-        this.targetIn .reset();
+        if( this.proto.s ){
+            // if no s target is delete !!
+            this.proto.uiout();
+            this.proto.reset();
+        }
+        this.proto = null;
         this.current = -1;
-        this.targetIn  = null;
         this.cursor();
         return true;
 
@@ -4712,7 +4633,7 @@ class Group extends Proto {
         let type = e.type;
 
         let change = false;
-        let targetChange = false;
+        let protoChange = false;
 
         let name = this.testZone( e );
 
@@ -4725,9 +4646,7 @@ class Group extends Proto {
 
             if( Roots.isMobile && type === 'mousedown' ) this.getNext( e, change );
 
-            if( this.targetIn  ) targetChange = this.targetIn .handleEvent( e );
-
-            //if( type === 'mousemove' ) change = this.styles('def');
+            if( this.proto ) protoChange = this.proto.handleEvent( e );
 
             if( !Roots.lock ) this.getNext( e, change );
 
@@ -4744,7 +4663,7 @@ class Group extends Proto {
         }
 
         if( this.isDown ) change = true;
-        if( targetChange ) change = true;
+        if( protoChange ) change = true;
 
         return change;
 
@@ -4760,40 +4679,13 @@ class Group extends Proto {
         }
 
         if( next !== -1 ){ 
-            this.targetIn  = this.uis[ this.current ];
-            this.targetIn .uiover();
+            this.proto  = this.uis[ this.current ];
+            this.proto.uiover();
         }
 
     }
 
     // ----------------------
-
-    /*calcH () {
-
-        let lng = this.uis.length, i, u,  h=0, px=0, tmph=0;
-        for( i = 0; i < lng; i++){
-            u = this.uis[i];
-            if( !u.autoWidth ){
-
-                if(px===0) h += u.h+1;
-                else {
-                    if(tmph<u.h) h += u.h-tmph;
-                }
-                tmph = u.h;
-
-                //tmph = tmph < u.h ? u.h : tmph;
-                px += u.w;
-                if( px+u.w > this.w ) px = 0;
-
-            }
-            else h += u.h+1;
-        }
-
-        return h;
-    }*/
-
-    
-
 
     setBG ( bg ) {
 
@@ -4827,14 +4719,9 @@ class Group extends Proto {
             }
         }
 
-        //let n = add.apply( this, a );
         let u = this.ADD.apply( this, a );
 
         this.uis.push( u );
-
-        //this.calc()
-
-
 
         this.isEmpty = false;
 
@@ -4856,9 +4743,7 @@ class Group extends Proto {
 
         this.clear();
         if( this.isUI ) this.main.calc();
-
         super.dispose();
-        //Proto.prototype.clear.call( this );
 
     }
 
@@ -4942,12 +4827,6 @@ class Group extends Proto {
 
         this.s[0].height = this.h + 'px';
 
-        //console.log('G', this.h)
-
-        //if( !this.isOpen ) return;
-
-        //this.h = Roots.calcUis( this.uis, this.zone, this.zone.y + this.baseH )+this.baseH;
-
     }
 
     parentHeight ( t ) {
@@ -4959,22 +4838,9 @@ class Group extends Proto {
 
     calc ( y ) {
 
-        if( !this.isOpen ) return;
-
-        /*
-
-        if( y !== undefined ){ 
-            this.h += y;
-            if( this.isUI ) this.main.calc( y );
-        } else {
-            this.h = this.calcH() + this.baseH;
-        }
-        this.s[0].height = this.h + 'px';*/
-
-        // if(this.isOpen)
+        if( !this.isOpen ) return
         if( this.isUI ) this.main.calc();
         else this.calcUis();
-        
         this.s[0].height = this.h + 'px';
 
     }
@@ -4986,8 +4852,6 @@ class Group extends Proto {
             this.uis[i].setSize( this.w );
             this.uis[i].rSize();
         }
-
-        //this.calc()
 
     }
 
@@ -5030,6 +4894,7 @@ class Joystick extends Proto {
         this.tmp = new V2();
 
         this.interval = null;
+        this.c[0].style.display = 'block';
 
         //this.radius = this.w * 0.5;
         //this.distance = this.radius*0.25;
@@ -5271,6 +5136,7 @@ class Knob extends Proto {
         this.top = 0;
 
         this.c[0].style.width = this.w +'px';
+        this.c[0].style.display = 'block';
 
         if(this.c[1] !== undefined) {
 
@@ -7852,6 +7718,8 @@ class Pad2D extends Proto {
 
         //console.log(this.range)
 
+        this.c[0].style.display = 'block';
+
         
 
 
@@ -8195,6 +8063,7 @@ const autoType = function ( v, o ) {
 *    |___|_|_| |_| |_| 2017
 *    @author lo.th / https://github.com/lo-th
 */
+//import { saveAs } from '../saveAs.js';
 
 const Utils = {
 
@@ -8221,6 +8090,9 @@ const Utils = {
     clear: Tools$1.clear,
     setSvg: Tools$1.setSvg,
     hexToHtml: Tools$1.hexToHtml,
+
+    add: add$1,
+    files:Files,
 
     // bitmap
 
@@ -8261,6 +8133,10 @@ const Utils = {
 
     soundLibs: {},
 
+    empty: function(){
+         return Utils.dom( 'div', Utils.basic+'width:0px; height:0px; ');
+    },
+
     inRange: function( v, min, max, exclud ) {
         
         if( exclud ) return v>min && v<max 
@@ -8291,13 +8167,14 @@ const Utils = {
 
     linerBottom: function( t, color, color2 ){
 
+        if(t===2) return Utils.dom( 'div', Utils.basic+'width:100%; height:2px; bottom:0; background:none; pointer-events:none; border-top:1px solid '+color2+'; border-bottom:1px solid '+color+';');
+        //if(t===0) return Utils.dom( 'div', Utils.basic+'width:100%; height:1px; bottom:0; background:none; border-top:1px solid '+color2+';');
+
         if(color === undefined) color = '#888';
         if(color2 === undefined) color2 = '#rgba(128,128,128,0.5)';
 
         let scaleBar = Utils.dom( 'div', Utils.basic+'width:100%; height:'+t+'px; bottom:0; background:none; pointer-events:auto; cursor:row-resize; border-top:1px solid '+color2+'; border-bottom:1px solid '+color+';');
-        //let scaleBar = Utils.dom( 'div', Utils.basic+'width:100%; height:'+(t+1)+'px; bottom:0; background:none; pointer-events:auto; cursor:n-resize; border-top:1px solid '+color2+'; border-bottom:1px solid '+color+';');
-        //Utils.dom( 'div', Utils.basic+'width:100%; height:3px; top:2px; background:' + Utils.SlideBG, null, scaleBar  );
-        Utils.dom( 'div', Utils.basic+'width:100%; height:4px; top:1px; background:' + Utils.SlideBG, null, scaleBar  );
+        Utils.dom( 'div', Utils.basic+'width:100%; height:4px; top:1px; background:' + Utils.SlideBG, null, scaleBar );
         scaleBar.name = 'scaleBar';
         return scaleBar;
 
@@ -8318,6 +8195,40 @@ const Utils = {
         let p = Utils.dom( 'div', Utils.basic+'width:10px; height:10px; right:5px; top:'+(t||5)+'px; pointer-events:auto; cursor:pointer; background:'+ Utils.X0 +';' );
         p.name = 'dels';
         return p;
+
+    },
+    
+
+    loadJson: function( o, toFile ){
+
+        Files.load({ type:'json', callback: function(data){ 
+
+            o.clear();
+
+            // add track
+            let t;
+            for ( let name in data.track ) {
+                t = data.track[name];
+                o.add(t.type, { name:name, frame:t.frame });
+            }
+
+        }});
+
+    },
+
+    fromJson: function( o, result ){
+
+        if( result === undefined ) return;
+
+        o.clear();
+        let data = JSON.parse( result );
+
+        // add track
+        let t;
+        for ( let name in data.track ) {
+            t = data.track[name];
+            o.add(t.type, { name:name, frame:t.frame });
+        }
 
     },
 
@@ -8342,8 +8253,10 @@ const Utils = {
         output = output.replace('}}}}', '}}\n    }\n}');
 
         if( toFile ){
-            let blob = new Blob( [ output ], { type: 'text/plain;charset=utf-8' } );
-            saveAs(blob, "neo.json");
+
+            Files.save( { name:'neo', data:output, type:'json' } );
+            //let blob = new Blob( [ output ], { type: 'text/plain;charset=utf-8' } );
+            //saveAs(blob, "neo.json");
         } else {
             o.tmpJSON = output;
             console.log( 'timeline in memory' );
@@ -8360,23 +8273,7 @@ const Utils = {
 
     },
 
-    fromJson: function( o, result ){
-
-        if( result === undefined ) return;
-
-        o.clear();
-
-        let data = JSON.parse( result );
-
-        // add track
-        let t;
-        for ( let name in data.track ) {
-            t = data.track[name];
-            o.add(t.type, { name:name, frame:t.frame });
-        }
-
-
-    },
+    
 
 
     // VIDEO
@@ -9029,16 +8926,16 @@ class Pannel {
             //title:UIL.add('string', { target:this.content, value:'yoo', size:80, h:h, simple:true, pos:{ left:'-80px', top:'0px' } }),//.onChange( this.endEditName.bind(this) );
 
             // color
-            color : add$1( 'color', { target:this.content, callback:null, name:' ', color:'n', w:100, pos:{left:'10px', top:'0px' }, simple:true, side:'down', ctype:'hex', h:h }),
+            color : Utils.add( 'color', { target:this.content, callback:null, name:' ', color:'n', w:100, pos:{left:'10px', top:'0px' }, simple:true, side:'down', ctype:'hex', h:h }),
             // curve
-            curve1 : add$1( 'list', { target:this.content, list:[ 'linear','quad', 'cubic', 'quart', 'quint', 'sine', 'expo', 'circ', 'elastic', 'back', 'bounce' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
-            curve2 : add$1( 'list',{ target:this.content, list:[ '-in', '-out', '-in-out' ], w:80, pos:{left:'92px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
+            curve1 : Utils.add( 'list', { target:this.content, list:[ 'linear','quad', 'cubic', 'quart', 'quint', 'sine', 'expo', 'circ', 'elastic', 'back', 'bounce' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
+            curve2 : Utils.add( 'list',{ target:this.content, list:[ '-in', '-out', '-in-out' ], w:80, pos:{left:'92px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
             // lfo
-            lfo1 : add$1( 'list',{ target:this.content, list:[ 'sine', 'noise' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
-            lfo2 : add$1( 'number',{ target:this.content, name:'frequency', min:0, max:1, value:0, precision:2, pos:{left:'92px', top:'0px'}, w:124, p:60, h:h }),
-            lfo3 : add$1( 'number',{ target:this.content, name:'amplitude', min:0, max:1, value:0, precision:2, pos:{left:'210px', top:'0px'}, w:124, p:60,  h:h }),
-            lfo4 : add$1( 'number',{ target:this.content, name:'seed', min:0, max:999, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
-            lfo5 : add$1( 'number',{ target:this.content, name:'phase', min:0, max:360, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
+            lfo1 : Utils.add( 'list',{ target:this.content, list:[ 'sine', 'noise' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
+            lfo2 : Utils.add( 'number',{ target:this.content, name:'frequency', min:0, max:1, value:0, precision:2, pos:{left:'92px', top:'0px'}, w:124, p:60, h:h }),
+            lfo3 : Utils.add( 'number',{ target:this.content, name:'amplitude', min:0, max:1, value:0, precision:2, pos:{left:'210px', top:'0px'}, w:124, p:60,  h:h }),
+            lfo4 : Utils.add( 'number',{ target:this.content, name:'seed', min:0, max:999, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
+            lfo5 : Utils.add( 'number',{ target:this.content, name:'phase', min:0, max:360, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
 
         };
         
@@ -9360,7 +9257,7 @@ class KeyFlag extends Key {
         super( f );
 
         this.value = name || '';
-        this.flagName = add$1('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v; this.parent.showUpdate(); }.bind(this) );
+        this.flagName = Utils.add('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v; this.parent.showUpdate(); }.bind(this) );
 
     }
 
@@ -9725,7 +9622,7 @@ class KeyModule extends KeySwitch {
         this.ks.borderRight = '1px solid #FFF';
 
         Utils.dom( 'div', Utils.basic + 'top:1px; left:1px; right:1px; bottom:1px;  background:' + Utils.SlideBG_NN, null, this.key );
-        this.flagName = add$1('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v;  }.bind(this) ); 
+        this.flagName = Utils.add('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v;  }.bind(this) ); 
 
     }
 
@@ -9875,7 +9772,7 @@ class KeyVideo extends KeyFlag {
         this.cct = 'borderColor';
         //this.ks.background = 'none';
 
-        this.flagName = add$1('string', { target:this.content, value:this.name, w:80, h:18, simple:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.name = v; Utils.loadVideo(this.name, this); }.bind(this) );
+        this.flagName = Utils.add('string', { target:this.content, value:this.name, w:80, h:18, simple:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.name = v; Utils.loadVideo(this.name, this); }.bind(this) );
 
         if( this.name ) Utils.loadVideo( this.name, this );
 
@@ -9994,6 +9891,9 @@ class Track {
 
         this.parent = parent;
 
+        this.resize = o.resize !== undefined ? o.resize : true;
+        this.delete = o.del !== undefined ? o.del : true;
+
         this.autoName = o.name === undefined ? true : false;
         this.name = o.name || this.type;
 
@@ -10039,11 +9939,11 @@ class Track {
         this.drawdelay = null;
 
         this.top = 0;
-        this.tt = 20;//16;
-        this.tb = 8;
-        this.h = 50;
+        this.tt = 20;//20//16;
+        this.tb = this.resize ? 8 : 2;
+        this.h = o.h || 50;
 
-        this.oldH = 50;
+        this.oldH = this.h;
 
         this.tmpPool = [];
         this.callback = null;
@@ -10068,7 +9968,7 @@ class Track {
         c[1] = dom( 'div', Utils.css.txtselect +'left:20px; height:16px; top:2px; pointer-events:auto; cursor:pointer; border-color:transparent; ');
         c[2] = Utils.liner( this.tt, lc2 );
         c[3] = Utils.pins( this.tt );
-        c[4] = Utils.dels(ty);
+        c[4] = this.delete ? Utils.dels(ty) : Utils.empty(ty);
         c[5] = dom( 'div', basic+'top:' + this.tt + 'px; left:0; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; ' );
         c[6] = Utils.linerBottom( this.tb, lc1, lc2 );
         c[7] = dom( 'div', basic+'height:'+this.tt+'px;  width:100%; overflow:hidden; border-left:1px solid #555; border-right:1px solid #555; display:none;');
@@ -10135,10 +10035,10 @@ class Track {
 
         switch( this.type ){
             case 'bang': case 'switch':
-            //this.preview = UIL.add( 'bool',{ target:this.c[0], name:' ', p:0, value:false, pos:{left:'auto', right:'30px', top:'0px'}, w:50, h:19, lock:true })
+            //this.preview = Utils.add( 'bool',{ target:this.c[0], name:' ', p:0, value:false, pos:{left:'auto', right:'30px', top:'0px'}, w:50, h:19, lock:true })
             break;
             case 'color':
-            this.preview = add$1( 'color', { target:this.c[0], name:' ', pos:{left:'auto', right:'30px', top:'0px' }, simple:true, side:'down', ctype:'hex', w:20, h:19, radius:20, lock:true, notext:true });
+            this.preview = Utils.add( 'color', { target:this.c[0], name:' ', pos:{left:'auto', right:'30px', top:'0px' }, simple:true, side:'down', ctype:'hex', w:20, h:19, radius:20, lock:true, notext:true });
             break;
 
         }
@@ -10167,7 +10067,7 @@ class Track {
         this.parent.stopEditName();
 
         if( !this.tmpName ){ 
-            this.tmpName = add$1( this, 'name', { type:'string', target:this.c[0],  w:100, simple:true, allway:true, pos:{ left:'20px', top:'0px' } });
+            this.tmpName = Utils.add( this, 'name', { type:'string', target:this.c[0],  w:100, simple:true, allway:true, pos:{ left:'20px', top:'0px' } });
             this.tmpName.c[0].name = 'title';
         }
 
@@ -11036,7 +10936,7 @@ class Color extends Track {
         // start color
         i = this.linear.length;
         while(i--){
-            Utils.dom( 'stop', '', { offset:0, 'stop-color':Tools$1.hexToHtml(this.getColor(fbygrad*i)), 'stop-opacity':1 }, this.linear[i], 0 );
+            Utils.dom( 'stop', '', { offset:0, 'stop-color':Utils.hexToHtml(this.getColor(fbygrad*i)), 'stop-opacity':1 }, this.linear[i], 0 );
         }
 
         // mid color
@@ -11044,13 +10944,13 @@ class Color extends Track {
         for(i=0; i<lng; i++){
             percent = ((this.items[i].frame*100)/max).toFixed(4);
             gid = Math.floor( percent/pp );
-            Utils.dom( 'stop', '', { offset:((percent/pp)-gid), 'stop-color':Tools$1.hexToHtml(this.items[i].value), 'stop-opacity':1 }, this.linear[gid], 0 );
+            Utils.dom( 'stop', '', { offset:((percent/pp)-gid), 'stop-color':Utils.hexToHtml(this.items[i].value), 'stop-opacity':1 }, this.linear[gid], 0 );
         }
 
         // end color
         i = this.linear.length;
         while(i--){
-            Utils.dom( 'stop', '', { offset:1, 'stop-color':Tools$1.hexToHtml( this.getColor( (fbygrad*(i+1))-1) ), 'stop-opacity':1 }, this.linear[i], 0 );
+            Utils.dom( 'stop', '', { offset:1, 'stop-color':Utils.hexToHtml( this.getColor( (fbygrad*(i+1))-1) ), 'stop-opacity':1 }, this.linear[i], 0 );
         }
 
     }
@@ -11329,7 +11229,10 @@ class Curve extends Track {
 
         path.push( ' L ' + this.maxw + ' ' + this.basey[n] );
 
-        this.curves[n].childNodes[0].setAttributeNS( null, 'd', path.join('\n') );
+        let finalPath = path.toString().replace(/,/g, ' ');
+
+        //this.curves[n].childNodes[0].setAttributeNS( null, 'd', path.join('\n') );
+        this.curves[n].childNodes[0].setAttributeNS( null, 'd', finalPath );
 
     }
 
@@ -11897,7 +11800,7 @@ class Timeline {
         this.frame = 0;
         this.time = 0;
         this.leftFrame = 0;
-        this.zone = 50;
+        this.zone = o.zone || 50;
         this.trackSpace = [0,0];
 
         // TIME
@@ -12041,12 +11944,10 @@ class Timeline {
         this.initNavMenu( this.navmenu );
         this.miniUI();
 
-
-
+        this.setFps( this.fps );
 
         this.resize();
     
-
         if( o.open !== undefined ) if(!o.open) this.showHide();
     }
 
@@ -12054,8 +11955,8 @@ class Timeline {
 
         this.content2 = Utils.dom( 'div', Utils.basic + 'top:'+this.box.t+'px; left:10px; width:50px; height:71px' );
         
-        this.openButton = add$1('button',{ target:this.content2, w:44, h:44, pos:{ left:'0px', top:'3px' }, simple:true }).icon( Tools$1.icon( 'neo', '#888', 40 ) ).onChange( this.showHide.bind(this) );
-        this.playButton2 = add$1('button',{ target:this.content2, w:44, h:24, pos:{ left:'0px', top:'48px' }, simple:true }).onChange( this.play.bind(this) );
+        this.openButton = Utils.add('button',{ target:this.content2, w:44, h:44, pos:{ left:'0px', top:'3px' }, simple:true }).icon( Utils.icon( 'neo', '#888', 40 ) ).onChange( this.showHide.bind(this) );
+        this.playButton2 = Utils.add('button',{ target:this.content2, w:44, h:24, pos:{ left:'0px', top:'48px' }, simple:true }).onChange( this.play.bind(this) );
         this.playButton2.icon( this.playIcon, 2 );
         this.playButton2.display();
 
@@ -12102,9 +12003,9 @@ class Timeline {
 
         
         let x = 170+54;
-        add$1('button',{ target:this.navmenu, name:'+', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackAddLayer ); x+= 26;
-        add$1('button',{ target:this.navmenu, name:'-', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackRemoveLayer ); x+= 34;
-        this.layerSelector = add$1('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:x+'px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
+        Utils.add('button',{ target:this.navmenu, name:'+', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackAddLayer ); x+= 26;
+        Utils.add('button',{ target:this.navmenu, name:'-', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackRemoveLayer ); x+= 34;
+        this.layerSelector = Utils.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:x+'px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
 
     }
 
@@ -12114,7 +12015,7 @@ class Timeline {
 
         this.layers = this.layers.splice(0,this.layers.length-1);
         this.layerSelector.clear();
-        this.layerSelector = add$1('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
+        this.layerSelector = Utils.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
 
     }
 
@@ -12127,7 +12028,7 @@ class Timeline {
         this.layers.push( name );
 
         this.layerSelector.clear();
-        this.layerSelector = add$1('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:name });
+        this.layerSelector = Utils.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:name });
 
     }
 
@@ -12141,7 +12042,7 @@ class Timeline {
         let callbackMemo = function(v){ Utils.saveJson( this ); }.bind(this);
         let callbackBack = function(v){ Utils.fromJson( this, this.tmpJSON ); }.bind(this);
         let callbackSave = function(v){ Utils.saveJson( this, true ); }.bind(this);
-        let callbackLoad = function( result ){ Utils.fromJson( this, result ); }.bind(this);
+        let callbackLoad = function(){ Utils.loadJson( this ); }.bind(this);
 
         let callbackFps = function(v){ this.setFps(v); }.bind(this);
         let callbackMax  = function(v){ this.frameMax = v; this.setRange(); }.bind(this);
@@ -12156,27 +12057,26 @@ class Timeline {
     
         let h = 24, x = 170+54, s1 = 2, s2 = 10;
 
-        let startButton = add$1('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackStart ); x+=h+s1;
-        let prevButton  = add$1('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPrev ); x+=h+s1;
-        this.playButton = add$1('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPlay ); x+=40+s1;
-        let nextButton  = add$1('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackNext ); x+=h+s1;
-        let endButton   = add$1('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackEnd ); x+=h+s2;//290
+        let startButton = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackStart ); x+=h+s1;
+        let prevButton  = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPrev ); x+=h+s1;
+        this.playButton = Utils.add('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPlay ); x+=40+s1;
+        let nextButton  = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackNext ); x+=h+s1;
+        let endButton   = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackEnd ); x+=h+s2;//290
 
-        let addList = add$1('list',{ target:dom, list:this.types, w:80, staticTop:true, miniCanvas:true,  pos:{left:x+'px', top:'3px'}, simple:true, side:'down', full:true, h:h, itemBg:'#333' }).onChange( callbackList ); x+=80+s2; //324
+        let addList = Utils.add('list',{ target:dom, list:this.types, w:80, staticTop:true, miniCanvas:true,  pos:{left:x+'px', top:'3px'}, simple:true, side:'down', full:true, h:h, itemBg:'#333' }).onChange( callbackList ); x+=80+s2; //324
         this.addMiniTrackImg( addList );
 
-        add$1('button',{ target:dom, name:'memo', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackMemo ); x+=40+s1;
-        add$1('button',{ target:dom, name:'back', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackBack ); x+=40+s1;
-        add$1('button',{ target:dom, name:'save', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackSave ); x+=40+s1;
-        add$1('button',{ target:dom, name:'load', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h, loader:true }).onChange( callbackLoad ); x+=40+s2;
+        Utils.add('button',{ target:dom, name:'memo', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackMemo ); x+=40+s1;
+        Utils.add('button',{ target:dom, name:'back', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackBack ); x+=40+s1;
+        Utils.add('button',{ target:dom, name:'save', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackSave ); x+=40+s1;
+        Utils.add('button',{ target:dom, name:'load', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackLoad ); x+=40+s2;
 
-        this.recordButton = add$1('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackRecord ); x+=40+s1;
+        this.recordButton = Utils.add('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackRecord ); x+=40+s1;
 
         // right
 
-        add$1('number',{ target:dom, name:'max', min:1, value:this.frameMax, step:1, drag:false, w:100, sa:40, center:true, h:h, pos:{left:'auto', right:'80px', top:'3px' }}).onChange( callbackMax );
-        add$1('number',{ target:dom, name:'fps', min:12, max:144, value:this.fps, step:1, drag:false, w:80, sa:40, sb:30, center:true, h:h, pos:{left:'auto', right:'0px', top:'3px' }}).onChange( callbackFps );
-        
+        Utils.add('number',{ target:dom, name:'max', min:1, value:this.frameMax, precision:0, step:1, drag:false, w:100, sa:40, center:true, h:h, pos:{left:'auto', right:'80px', top:'3px' }}).onChange( callbackMax );
+        this.topFps = Utils.add('number',{ target:dom, name:'fps', min:1, max:240, value:this.fps, /*step:1,*/ precision:2, drag:false, w:80, sa:40, sb:30, center:true, h:h, pos:{left:'auto', right:'0px', top:'3px' }}).onChange( callbackFps );
         
 
         // SVG
@@ -12241,7 +12141,7 @@ class Timeline {
             this.selected();
             this.removeEvents();
             this.playButton2.display( true );
-            this.openButton.icon( Tools$1.icon( 'neo', '#CCC', 40 ));
+            this.openButton.icon( Utils.icon( 'neo', '#CCC', 40 ));
 
         } else {
 
@@ -12250,7 +12150,7 @@ class Timeline {
             this.pannel.display( true );
             this.activeEvents();
             this.playButton2.display();
-            this.openButton.icon( Tools$1.icon( 'neo', '#888', 40 ));
+            this.openButton.icon( Utils.icon( 'neo', '#888', 40 ));
 
         }
 
@@ -12841,6 +12741,7 @@ class Timeline {
 
     setFps( v ) {
 
+        if( this.topFps )this.topFps.setValue( v );
         this.fps = v;
         this.frameTime = 1 / this.fps; // in second
         this.timerStep = this.frameTime * 1000; //1000 / NEO.FPS;

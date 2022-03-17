@@ -1,5 +1,5 @@
+import { Utils } from '../core/Utils.js';
 import { Key } from '../core/Key.js';
-import * as UIL from '../../build/uil.module.js';
 
 export class KeyFlag extends Key {
 
@@ -8,7 +8,7 @@ export class KeyFlag extends Key {
         super( f )
 
         this.value = name || '';
-        this.flagName = UIL.add('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v; this.parent.showUpdate(); }.bind(this) );
+        this.flagName = Utils.add('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v; this.parent.showUpdate(); }.bind(this) );
 
     }
 

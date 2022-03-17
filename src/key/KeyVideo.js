@@ -1,6 +1,5 @@
 import { KeyFlag } from './KeyFlag.js';
 import { Utils } from '../core/Utils.js';
-import * as UIL from '../../build/uil.module.js';
 
 export class KeyVideo extends KeyFlag {
 
@@ -20,7 +19,7 @@ export class KeyVideo extends KeyFlag {
         this.cct = 'borderColor';
         //this.ks.background = 'none';
 
-        this.flagName = UIL.add('string', { target:this.content, value:this.name, w:80, h:18, simple:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.name = v; Utils.loadVideo(this.name, this) }.bind(this) );
+        this.flagName = Utils.add('string', { target:this.content, value:this.name, w:80, h:18, simple:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.name = v; Utils.loadVideo(this.name, this) }.bind(this) );
 
         if( this.name ) Utils.loadVideo( this.name, this );
 

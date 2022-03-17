@@ -4,8 +4,10 @@
 *    |___|_|_| |_| |_| 2017
 *    @author lo.th / https://github.com/lo-th
 */
-import { saveAs } from '../saveAs.js';
+
+//import * as UIL from 'uil';
 import * as UIL from '../../build/uil.module.js';
+//import { saveAs } from '../saveAs.js';
 
 export const Utils = {
 
@@ -32,6 +34,9 @@ export const Utils = {
     clear: UIL.Tools.clear,
     setSvg: UIL.Tools.setSvg,
     hexToHtml: UIL.Tools.hexToHtml,
+
+    add: UIL.add,
+    files:UIL.Files,
 
     // bitmap
 
@@ -72,6 +77,10 @@ export const Utils = {
 
     soundLibs: {},
 
+    empty: function(){
+         return Utils.dom( 'div', Utils.basic+'width:0px; height:0px; ');
+    },
+
     inRange: function( v, min, max, exclud ) {
         
         if( exclud ) return v>min && v<max 
@@ -102,13 +111,14 @@ export const Utils = {
 
     linerBottom: function( t, color, color2 ){
 
+        if(t===2) return Utils.dom( 'div', Utils.basic+'width:100%; height:2px; bottom:0; background:none; pointer-events:none; border-top:1px solid '+color2+'; border-bottom:1px solid '+color+';');
+        //if(t===0) return Utils.dom( 'div', Utils.basic+'width:100%; height:1px; bottom:0; background:none; border-top:1px solid '+color2+';');
+
         if(color === undefined) color = '#888';
         if(color2 === undefined) color2 = '#rgba(128,128,128,0.5)';
 
         let scaleBar = Utils.dom( 'div', Utils.basic+'width:100%; height:'+t+'px; bottom:0; background:none; pointer-events:auto; cursor:row-resize; border-top:1px solid '+color2+'; border-bottom:1px solid '+color+';');
-        //let scaleBar = Utils.dom( 'div', Utils.basic+'width:100%; height:'+(t+1)+'px; bottom:0; background:none; pointer-events:auto; cursor:n-resize; border-top:1px solid '+color2+'; border-bottom:1px solid '+color+';');
-        //Utils.dom( 'div', Utils.basic+'width:100%; height:3px; top:2px; background:' + Utils.SlideBG, null, scaleBar  );
-        Utils.dom( 'div', Utils.basic+'width:100%; height:4px; top:1px; background:' + Utils.SlideBG, null, scaleBar  );
+        Utils.dom( 'div', Utils.basic+'width:100%; height:4px; top:1px; background:' + Utils.SlideBG, null, scaleBar );
         scaleBar.name = 'scaleBar';
         return scaleBar;
 
@@ -129,6 +139,40 @@ export const Utils = {
         let p = Utils.dom( 'div', Utils.basic+'width:10px; height:10px; right:5px; top:'+(t||5)+'px; pointer-events:auto; cursor:pointer; background:'+ Utils.X0 +';' );
         p.name = 'dels'
         return p;
+
+    },
+    
+
+    loadJson: function( o, toFile ){
+
+        UIL.Files.load({ type:'json', callback: function(data){ 
+
+            o.clear();
+
+            // add track
+            let t;
+            for ( let name in data.track ) {
+                t = data.track[name];
+                o.add(t.type, { name:name, frame:t.frame });
+            }
+
+        }})
+
+    },
+
+    fromJson: function( o, result ){
+
+        if( result === undefined ) return;
+
+        o.clear()
+        let data = JSON.parse( result );
+
+        // add track
+        let t;
+        for ( let name in data.track ) {
+            t = data.track[name];
+            o.add(t.type, { name:name, frame:t.frame });
+        }
 
     },
 
@@ -153,8 +197,10 @@ export const Utils = {
         output = output.replace('}}}}', '}}\n    }\n}');
 
         if( toFile ){
-            let blob = new Blob( [ output ], { type: 'text/plain;charset=utf-8' } );
-            saveAs(blob, "neo.json");
+
+            UIL.Files.save( { name:'neo', data:output, type:'json' } )
+            //let blob = new Blob( [ output ], { type: 'text/plain;charset=utf-8' } );
+            //saveAs(blob, "neo.json");
         } else {
             o.tmpJSON = output;
             console.log( 'timeline in memory' );
@@ -171,23 +217,7 @@ export const Utils = {
 
     },
 
-    fromJson: function( o, result ){
-
-        if( result === undefined ) return;
-
-        o.clear();
-
-        let data = JSON.parse( result );
-
-        // add track
-        let t;
-        for ( let name in data.track ) {
-            t = data.track[name];
-            o.add(t.type, { name:name, frame:t.frame });
-        }
-
-
-    },
+    
 
 
     // VIDEO

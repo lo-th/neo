@@ -1,4 +1,3 @@
-import * as UIL from '../../build/uil.module.js';
 import { KeySwitch } from './KeySwitch.js';
 import { Utils } from '../core/Utils.js';
 
@@ -22,7 +21,7 @@ export class KeyModule extends KeySwitch {
         this.ks.borderRight = '1px solid #FFF';
 
         Utils.dom( 'div', Utils.basic + 'top:1px; left:1px; right:1px; bottom:1px;  background:' + Utils.SlideBG_NN, null, this.key );
-        this.flagName = UIL.add('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v;  }.bind(this) ); 
+        this.flagName = Utils.add('string', { target:this.content, value:this.value, w:80, h:18, simple:true, allway:true, pos:{ left:this.w+'px', top:'0px' } }).onChange( function(v){ this.value = v;  }.bind(this) ); 
 
     }
 

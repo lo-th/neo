@@ -94,160 +94,6 @@
 		})();
 	}
 
-	/*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
-	var saveAs = function (e) {
-
-		if (typeof e === "undefined" || typeof navigator !== "undefined" && /MSIE [1-9]\./.test(navigator.userAgent)) {
-			return;
-		}
-
-		var t = e.document,
-				n = function () {
-			return e.URL || e.webkitURL || e;
-		},
-				r = t.createElementNS("http://www.w3.org/1999/xhtml", "a"),
-				o = ("download" in r),
-				a = function (e) {
-			var t = new MouseEvent("click");
-			e.dispatchEvent(t);
-		},
-				i = /constructor/i.test(e.HTMLElement) || e.safari,
-				f = /CriOS\/[\d]+/.test(navigator.userAgent),
-				u = function (t) {
-			(e.setImmediate || e.setTimeout)(function () {
-				throw t;
-			}, 0);
-		},
-				s = "application/octet-stream",
-				d = 1e3 * 40,
-				c = function (e) {
-			var t = function () {
-				if (typeof e === "string") {
-					n().revokeObjectURL(e);
-				} else {
-					e.remove();
-				}
-			};
-
-			setTimeout(t, d);
-		},
-				l = function (e, t, n) {
-			t = [].concat(t);
-			var r = t.length;
-
-			while (r--) {
-				var o = e["on" + t[r]];
-
-				if (typeof o === "function") {
-					try {
-						o.call(e, n || e);
-					} catch (a) {
-						u(a);
-					}
-				}
-			}
-		},
-				p = function (e) {
-			if (/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(e.type)) {
-				return new Blob([String.fromCharCode(65279), e], {
-					type: e.type
-				});
-			}
-
-			return e;
-		},
-				v = function (t, u, d) {
-			if (!d) {
-				t = p(t);
-			}
-
-			var v = this,
-					w = t.type,
-					m = w === s,
-					y,
-					h = function () {
-				l(v, "writestart progress write writeend".split(" "));
-			},
-					S = function () {
-				if ((f || m && i) && e.FileReader) {
-					var r = new FileReader();
-
-					r.onloadend = function () {
-						var t = f ? r.result : r.result.replace(/^data:[^;]*;/, "data:attachment/file;");
-						var n = e.open(t, "_blank");
-						if (!n) e.location.href = t;
-						t = undefined;
-						v.readyState = v.DONE;
-						h();
-					};
-
-					r.readAsDataURL(t);
-					v.readyState = v.INIT;
-					return;
-				}
-
-				if (!y) {
-					y = n().createObjectURL(t);
-				}
-
-				if (m) {
-					e.location.href = y;
-				} else {
-					var o = e.open(y, "_blank");
-
-					if (!o) {
-						e.location.href = y;
-					}
-				}
-
-				v.readyState = v.DONE;
-				h();
-				c(y);
-			};
-
-			v.readyState = v.INIT;
-
-			if (o) {
-				y = n().createObjectURL(t);
-				setTimeout(function () {
-					r.href = y;
-					r.download = u;
-					a(r);
-					h();
-					c(y);
-					v.readyState = v.DONE;
-				});
-				return;
-			}
-
-			S();
-		},
-				w = v.prototype,
-				m = function (e, t, n) {
-			return new v(e, t || e.name || "download", n);
-		};
-
-		if (typeof navigator !== "undefined" && navigator.msSaveOrOpenBlob) {
-			return function (e, t, n) {
-				t = t || e.name || "download";
-
-				if (!n) {
-					e = p(e);
-				}
-
-				return navigator.msSaveOrOpenBlob(e, t);
-			};
-		}
-
-		w.abort = function () {};
-
-		w.readyState = w.INIT = 0;
-		w.WRITING = 1;
-		w.DONE = 2;
-		w.error = w.onwritestart = w.onprogress = w.onwrite = w.onabort = w.onerror = w.onwriteend = null;
-		return m;
-	}(typeof self !== "undefined" && self || typeof window !== "undefined" && window);
-
 	/**
 	 * @license
 	 * Copyright 2010-2021 Uil.js Authors
@@ -1809,6 +1655,203 @@
 	T.setText();
 	const Tools$1 = T; ///https://wicg.github.io/file-system-access/#api-filesystemfilehandle-getfile
 
+	class Files {
+		//-----------------------------
+		//	FILE TYPE
+		//-----------------------------
+		static autoTypes(type) {
+			let t = [];
+
+			switch (type) {
+				case 'svg':
+					t = [{
+						accept: {
+							'image/svg+xml': '.svg'
+						}
+					}];
+					break;
+
+				case 'text':
+					t = [{
+						description: 'Text Files',
+						accept: {
+							'text/plain': ['.txt', '.text'],
+							'text/html': ['.html', '.htm']
+						}
+					}];
+					break;
+
+				case 'json':
+					t = [{
+						description: 'JSON Files',
+						accept: {
+							'text/plain': ['.json']
+						}
+					}];
+					break;
+
+				case 'image':
+					t = [{
+						description: 'Images',
+						accept: {
+							'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+						}
+					}];
+					break;
+			}
+
+			return t;
+		} //-----------------------------
+		//	LOAD
+		//-----------------------------
+
+
+		static async load(o = {}) {
+			if (typeof window.showOpenFilePicker !== 'function') {
+				window.showOpenFilePicker = this.showOpenFilePickerPolyfill;
+			}
+
+			try {
+				let type = o.type || '';
+				const options = {
+					excludeAcceptAllOption: type ? true : false,
+					multiple: false //startIn:'./assets'
+
+				};
+				options.types = this.autoTypes(type); // create a new handle
+
+				const handle = await window.showOpenFilePicker(options);
+				const file = await handle[0].getFile(); //let content = await file.text()
+
+				if (!file) return null;
+				let fname = file.name;
+				let ftype = fname.substring(fname.lastIndexOf('.') + 1, fname.length);
+				const dataUrl = ['png', 'jpg', 'jpeg', 'mp4', 'webm', 'ogg', 'mp3'];
+				const dataBuf = ['sea', 'z', 'hex', 'bvh', 'BVH', 'glb', 'gltf'];
+				const reader = new FileReader();
+				if (dataUrl.indexOf(ftype) !== -1) reader.readAsDataURL(file);else if (dataBuf.indexOf(ftype) !== -1) reader.readAsArrayBuffer(file);else reader.readAsText(file);
+
+				reader.onload = function (e) {
+					let content = e.target.result;
+
+					switch (type) {
+						case 'image':
+							let img = new Image();
+
+							img.onload = function () {
+								if (o.callback) o.callback(img, fname);
+							};
+
+							img.src = content;
+							break;
+
+						case 'json':
+							if (o.callback) o.callback(JSON.parse(content), fname);
+							break;
+
+						default:
+							if (o.callback) o.callback(content, fname);
+							break;
+					}
+				};
+			} catch (e) {
+				console.log(e);
+			}
+		}
+
+		static showOpenFilePickerPolyfill(options) {
+			return new Promise(resolve => {
+				const input = document.createElement("input");
+				input.type = "file";
+				input.multiple = options.multiple;
+				input.accept = options.types.map(type => type.accept).flatMap(inst => Object.keys(inst).flatMap(key => inst[key])).join(",");
+				input.addEventListener("change", () => {
+					resolve([...input.files].map(file => {
+						return {
+							getFile: async () => new Promise(resolve => {
+								resolve(file);
+							})
+						};
+					}));
+				});
+				input.click();
+			});
+		} //-----------------------------
+		//	SAVE
+		//-----------------------------
+
+
+		static async save(o = {}) {
+			this.usePoly = false;
+
+			if (typeof window.showSaveFilePicker !== 'function') {
+				window.showSaveFilePicker = this.showSaveFilePickerPolyfill;
+				this.usePoly = true;
+			}
+
+			try {
+				let type = o.type || '';
+				const options = {
+					suggestedName: o.name || 'hello',
+					data: o.data || ''
+				};
+				options.types = this.autoTypes(type);
+				options.finalType = Object.keys(options.types[0].accept)[0];
+				options.suggestedName += options.types[0].accept[options.finalType][0]; // create a new handle
+
+				const handle = await window.showSaveFilePicker(options);
+				if (this.usePoly) return; // create a FileSystemWritableFileStream to write to
+
+				const file = await handle.createWritable();
+				let blob = new Blob([options.data], {
+					type: options.finalType
+				}); // write our file
+
+				await file.write(blob); // close the file and write the contents to disk.
+
+				await file.close();
+			} catch (e) {
+				console.log(e);
+			}
+		}
+
+		static showSaveFilePickerPolyfill(options) {
+			return new Promise(resolve => {
+				const a = document.createElement("a");
+				a.download = options.suggestedName || "my-file.txt";
+				let blob = new Blob([options.data], {
+					type: options.finalType
+				});
+				a.href = URL.createObjectURL(blob);
+				a.addEventListener("click", () => {
+					resolve(setTimeout(() => URL.revokeObjectURL(a.href), 1000));
+				});
+				a.click();
+			});
+		} //-----------------------------
+		//	FOLDER not possible in poly
+		//-----------------------------
+
+
+		static async getFolder() {
+			try {
+				const handle = await window.showDirectoryPicker();
+				const files = [];
+
+				for await (const entry of handle.values()) {
+					const file = await entry.getFile();
+					files.push(file);
+				}
+
+				console.log(files);
+				return files;
+			} catch (e) {
+				console.log(e);
+			}
+		}
+
+	}
+
 	class V2 {
 		constructor(x = 0, y = 0) {
 			this.x = x;
@@ -1920,9 +1963,7 @@
 			this.main = o.main || null;
 			this.isUI = o.isUI || false;
 			this.group = o.group || null;
-			this.isListen = false; //this.parentGroup = null;
-			//if( o.select !== undefined ) o.selectable = o.select
-
+			this.isListen = false;
 			this.isSelectable = o.selectable !== undefined ? o.selectable : false;
 			this.unselectable = o.unselect !== undefined ? o.unselect : this.isSelectable;
 			this.ontop = o.ontop ? o.ontop : false; // 'beforebegin' 'afterbegin' 'beforeend' 'afterend'
@@ -1948,11 +1989,6 @@
 			if (!this.isSpace) this.h = this.h < 11 ? 11 : this.h;else this.lock = true; // decale for canvas only
 
 			this.fw = o.fw || 0;
-			/*this.dc = 0
-			if(this.isUI){
-					if( this.main.isCanvasOnly && this.fw) this.dc = (this.main.zone.w - this.w)*0.5
-			}*/
-
 			this.autoWidth = o.auto || true; // auto width or flex 
 
 			this.isOpen = false; // open statu
@@ -1999,13 +2035,10 @@
 
 			this.c = []; // style 
 
-			this.s = []; //this.c[0] = Tools.dom( 'div', this.css.basic + this.css.button +'align-self:stretch; position:relative; height:20px; overflow:hidden;'); //float:left;
-			//this.c[0] = Tools.dom( 'div',	'order: 1;' ); //
-
+			this.s = [];
 			this.useFlex = this.isUI ? this.main.useFlex : false;
-			let flexible = this.useFlex ? 'disply:flex; justify-content:center; align-items:center; text-align:center; flex: 1 100%;' : 'float:left;';
-			this.c[0] = Tools$1.dom('div', this.css.basic + flexible + 'position:relative; height:20px;'); //this.c[0] = Tools.dom( 'div', this.css.basic +'position:relative; height:20px; align-self: auto;');
-
+			let flexible = this.useFlex ? 'display:flex; justify-content:center; align-items:center; text-align:center; flex: 1 100%;' : 'float:left;';
+			this.c[0] = Tools$1.dom('div', this.css.basic + flexible + 'position:relative; height:20px;');
 			this.s[0] = this.c[0].style; // bottom margin
 
 			this.margin = o.margin || 1;
@@ -2088,7 +2121,9 @@
 				this.c[0].style.pointerEvents = 'auto';
 				Roots.add(this);
 			}
+		}
 
+		addTransition() {
 			if (this.baseH && this.transition && this.isUI) {
 				this.c[0].style.transition = 'height ' + this.transition + 's ease-out';
 			}
@@ -2340,7 +2375,6 @@
 
 
 		handleEvent(e) {
-			//if(!this.s) return false
 			if (this.lock) return;
 			if (this.neverlock) Roots.lock = false;
 			if (!this[e.type]) return console.error(e.type, 'this type of event no existe !');
@@ -2369,14 +2403,7 @@
 
 		keyup(e) {
 			return false;
-		}
-		/*dragstart ( e ) { return false; }
-		dragover ( e ) { return false; }
-		dragenter ( e ) { return false; }
-		dragleave ( e ) { return false; }
-		dragend ( e ) { return false; }
-		drop ( e ) { return false; }*/
-		// ----------------------
+		} // ----------------------
 		// object referency
 		// ----------------------
 
@@ -2386,9 +2413,8 @@
 			this.val = val;
 		}
 
-		display(v) {
-			v = v || false;
-			this.s[0].visibility = v ? 'visible' : 'hidden'; //this.s[0].display = v ? (this.useFlex? 'flex':'block') : 'none'
+		display(v = false) {
+			this.s[0].visibility = v ? 'visible' : 'hidden';
 		} // ----------------------
 		// resize height 
 		// ----------------------
@@ -2590,15 +2616,15 @@
 			this.values = o.value || this.txt;
 			if (o.values) this.values = o.values;
 			this.onName = o.onName || null;
-			this.on = false;
-			this.customSize = o.forceWidth || -1;
+			this.on = false; // force button width
+
+			this.bw = o.forceWidth || 0;
+			if (o.bw) this.bw = o.bw;
+			this.space = o.space || 3;
 			if (typeof this.values === 'string') this.values = [this.values];
 			this.isDown = false;
 			this.neverlock = true;
-			this.isLoadButton = o.loader || false;
-			this.isDragButton = o.drag || false;
 			this.res = 0;
-			if (this.isDragButton) this.isLoadButton = true;
 			this.lng = this.values.length;
 			this.tmp = [];
 			this.stat = [];
@@ -2617,21 +2643,11 @@
 
 			if (!o.value && !o.values) {
 				if (this.c[1] !== undefined) {
-					this.txt = '';
-					this.c[1].textContent = '';
+					this.c[1].textContent = ''; //this.txt = ''
 				}
 			}
 
-			if (!this.txt) this.p = 0; //
-
-			if (this.isLoadButton) this.initLoader();
-
-			if (this.isDragButton) {
-				this.lng++;
-				this.initDrager();
-			} //if( this.onName !== '' ) this.values[0] = this.on;
-
-
+			if (!this.txt) this.p = 0;
 			this.init();
 		}
 
@@ -2663,7 +2679,7 @@
 			if (this.res !== -1) {
 				if (this.value === this.values[this.res] && this.unselectable) this.value = '';else this.value = this.values[this.res];
 				if (this.onName !== null) this.onOff();
-				if (!this.isLoadButton) this.send();
+				this.send();
 			}
 
 			return this.mousemove(e);
@@ -2757,95 +2773,6 @@
 			this.res = -1;
 			this.cursor();
 			return this.modes();
-		} // ----------------------
-
-
-		dragover(e) {
-			e.preventDefault();
-			this.s[4].borderColor = this.colors.select;
-			this.s[4].color = this.colors.select;
-		}
-
-		dragend(e) {
-			e.preventDefault();
-			this.s[4].borderColor = this.color.text;
-			this.s[4].color = this.color.text;
-		}
-
-		drop(e) {
-			e.preventDefault();
-			this.dragend(e);
-			this.fileSelect(e.dataTransfer.files[0]);
-		}
-
-		initDrager() {
-			this.c[4] = this.dom('div', this.css.txt + ' text-align:center; line-height:' + (this.h - 8) + 'px; border:1px dashed ' + this.color.text + '; top:2px;	height:' + (this.h - 4) + 'px; border-radius:' + this.radius + 'px; pointer-events:auto;'); // cursor:default;
-
-			this.c[4].textContent = 'DRAG';
-			this.c[4].addEventListener('dragover', function (e) {
-				this.dragover(e);
-			}.bind(this), false);
-			this.c[4].addEventListener('dragend', function (e) {
-				this.dragend(e);
-			}.bind(this), false);
-			this.c[4].addEventListener('dragleave', function (e) {
-				this.dragend(e);
-			}.bind(this), false);
-			this.c[4].addEventListener('drop', function (e) {
-				this.drop(e);
-			}.bind(this), false); //this.c[2].events = [	];
-			//this.c[4].events = [ 'dragover', 'dragend', 'dragleave', 'drop' ];
-		}
-
-		addLoader(n, callbackLoad) {
-			this.callbackLoad = callbackLoad;
-			let l = this.dom('input', this.css.basic + 'top:0px; opacity:0; height:100%; width:100%; pointer-events:auto; cursor:pointer;'); //
-
-			l.name = 'loader';
-			l.type = "file";
-			l.addEventListener('change', function (e) {
-				this.fileSelect(e.target.files[0]);
-			}.bind(this), false);
-			this.c[n].appendChild(l);
-			return this;
-		}
-
-		initLoader() {
-			this.c[3] = this.dom('input', this.css.basic + 'top:0px; opacity:0; height:' + this.h + 'px; pointer-events:auto; cursor:pointer;'); //
-
-			this.c[3].name = 'loader';
-			this.c[3].type = "file";
-			this.c[3].addEventListener('change', function (e) {
-				this.fileSelect(e.target.files[0]);
-			}.bind(this), false); //this.c[3].addEventListener( 'mousedown', function(e){	}.bind(this), false );
-			//this.c[2].events = [	];
-			//this.c[3].events = [ 'change', 'mouseover', 'mousedown', 'mouseup', 'mouseout' ];
-			//this.hide = document.createElement('input');
-		}
-
-		fileSelect(file) {
-			let dataUrl = ['png', 'jpg', 'mp4', 'webm', 'ogg'];
-			let dataBuf = ['sea', 'z', 'hex', 'bvh', 'BVH', 'glb']; //if( ! e.target.files ) return;
-			//let file = e.target.files[0];
-			//this.c[3].type = "null";
-			// console.log( this.c[4] )
-
-			if (file === undefined) return;
-			let reader = new FileReader();
-			let fname = file.name;
-			let type = fname.substring(fname.lastIndexOf('.') + 1, fname.length);
-			if (dataUrl.indexOf(type) !== -1) reader.readAsDataURL(file);else if (dataBuf.indexOf(type) !== -1) reader.readAsArrayBuffer(file); //reader.readAsArrayBuffer( file );
-			else reader.readAsText(file); // if( type === 'png' || type === 'jpg' || type === 'mp4' || type === 'webm' || type === 'ogg' ) reader.readAsDataURL( file );
-			//else if( type === 'z' ) reader.readAsBinaryString( file );
-			//else if( type === 'sea' || type === 'bvh' || type === 'BVH' || type === 'z') reader.readAsArrayBuffer( file );
-			//else if(	) reader.readAsArrayBuffer( file );
-			//else reader.readAsText( file );
-
-			reader.onload = function (e) {
-				if (this.callbackLoad) this.callbackLoad(e.target.result, fname, type); //if( this.callback ) this.callback( e.target.result, fname, type );
-				//this.c[3].type = "file";
-				//this.send( e.target.result ); 
-			}.bind(this);
 		}
 
 		label(string, n) {
@@ -2866,11 +2793,12 @@
 			let w = this.sb;
 			let d = this.sa;
 			let i = this.lng;
-			let dc = 3;
+			let dc = this.space;
 			let size = Math.floor((w - dc * (i - 1)) / i);
 
-			if (this.customSize !== -1) {
-				size = this.customSize; // d = (this.s-size)*0.5
+			if (this.bw) {
+				size = this.bw < size ? this.bw : size;
+				d = Math.floor((this.w - (size * i + dc * (i - 1))) * 0.5);
 			}
 
 			while (i--) {
@@ -2878,16 +2806,6 @@
 				this.tmp[i][2] = this.tmp[i][0] + this.tmp[i][1];
 				s[i + 2].left = this.tmp[i][0] + 'px';
 				s[i + 2].width = this.tmp[i][1] + 'px';
-			}
-
-			if (this.isDragButton) {
-				s[4].left = d + size + dc + 'px';
-				s[4].width = size + 'px';
-			}
-
-			if (this.isLoadButton) {
-				s[3].left = d + 'px';
-				s[3].width = size + 'px';
 			}
 		}
 
@@ -2909,6 +2827,7 @@
 			this.h = o.h || this.w + 10;
 			this.top = 0;
 			this.c[0].style.width = this.w + 'px';
+			this.c[0].style.display = 'block';
 
 			if (this.c[1] !== undefined) {
 				this.c[1].style.width = '100%';
@@ -3091,9 +3010,9 @@
 				this.s[2].top = 'auto';
 				this.s[2].bottom = '2px';
 			} //this.c[0].style.textAlign = 'center';
-			//this.c[0].style.flex = '1 0 auto'
 
 
+			this.c[0].style.display = 'block';
 			this.c[3] = this.getColorRing();
 			this.c[3].style.visibility = 'hidden';
 			this.hsl = null;
@@ -3893,11 +3812,11 @@
 			super(o);
 			this.isGroup = true;
 			this.ADD = o.add;
-			this.uis = [];
-			this.isEmpty = true;
 			this.autoHeight = true;
+			this.uis = [];
 			this.current = -1;
-			this.targetIn = null;
+			this.proto = null;
+			this.isEmpty = true;
 			this.decal = 0;
 			this.baseH = this.h;
 			let fltop = Math.floor(this.h * 0.5) - 6;
@@ -3933,17 +3852,10 @@
 			s[1].lineHeight = this.h - 4;
 			s[1].color = this.colors.text;
 			s[1].fontWeight = 'bold';
-			if (this.radius !== 0) s[0].borderRadius = this.radius + 'px'; //if( o.border ) s[0].border = '1px solid ' + o.border;
-
-			/*if(this.decal){
-					s[0].boxSizing = 'border-box';
-					s[0].backgroundClip = 'border-box';
-					s[0].border = (this.decal/3)+'px solid ' + o.group.colors.background;
-			}*/
-
+			if (this.radius !== 0) s[0].borderRadius = this.radius + 'px';
 			this.init();
 			this.setBG(o.bg);
-			if (o.open !== undefined) this.open(); //s[0].background = this.bg;
+			if (o.open !== undefined) this.open();
 		}
 
 		testZone(e) {
@@ -3957,12 +3869,16 @@
 		}
 
 		clearTarget() {
-			if (this.current === -1) return false; // if(!this.targetIn ) return;
+			if (this.current === -1) return false;
 
-			this.targetIn.uiout();
-			this.targetIn.reset();
+			if (this.proto.s) {
+				// if no s target is delete !!
+				this.proto.uiout();
+				this.proto.reset();
+			}
+
+			this.proto = null;
 			this.current = -1;
-			this.targetIn = null;
 			this.cursor();
 			return true;
 		}
@@ -3977,7 +3893,7 @@
 		handleEvent(e) {
 			let type = e.type;
 			let change = false;
-			let targetChange = false;
+			let protoChange = false;
 			let name = this.testZone(e);
 			if (!name) return;
 
@@ -3985,8 +3901,7 @@
 				case 'content':
 					this.cursor();
 					if (Roots.isMobile && type === 'mousedown') this.getNext(e, change);
-					if (this.targetIn) targetChange = this.targetIn.handleEvent(e); //if( type === 'mousemove' ) change = this.styles('def');
-
+					if (this.proto) protoChange = this.proto.handleEvent(e);
 					if (!Roots.lock) this.getNext(e, change);
 					break;
 
@@ -4001,7 +3916,7 @@
 			}
 
 			if (this.isDown) change = true;
-			if (targetChange) change = true;
+			if (protoChange) change = true;
 			return change;
 		}
 
@@ -4014,29 +3929,10 @@
 			}
 
 			if (next !== -1) {
-				this.targetIn = this.uis[this.current];
-				this.targetIn.uiover();
+				this.proto = this.uis[this.current];
+				this.proto.uiover();
 			}
 		} // ----------------------
-
-		/*calcH () {
-					let lng = this.uis.length, i, u,	h=0, px=0, tmph=0;
-				for( i = 0; i < lng; i++){
-						u = this.uis[i];
-						if( !u.autoWidth ){
-									if(px===0) h += u.h+1;
-								else {
-										if(tmph<u.h) h += u.h-tmph;
-								}
-								tmph = u.h;
-									//tmph = tmph < u.h ? u.h : tmph;
-								px += u.w;
-								if( px+u.w > this.w ) px = 0;
-							}
-						else h += u.h+1;
-				}
-					return h;
-		}*/
 
 
 		setBG(bg) {
@@ -4068,12 +3964,10 @@
 					a[2].main = this.main;
 					a[2].group = this;
 				}
-			} //let n = add.apply( this, a );
-
+			}
 
 			let u = this.ADD.apply(this, a);
-			this.uis.push(u); //this.calc()
-
+			this.uis.push(u);
 			this.isEmpty = false;
 			return u;
 		} // remove one node
@@ -4087,7 +3981,7 @@
 		dispose() {
 			this.clear();
 			if (this.isUI) this.main.calc();
-			super.dispose(); //Proto.prototype.clear.call( this );
+			super.dispose();
 		}
 
 		clear() {
@@ -4144,9 +4038,7 @@
 
 		calcUis() {
 			if (!this.isOpen) this.h = this.baseH;else this.h = Roots.calcUis(this.uis, this.zone, this.zone.y + this.baseH) + this.baseH;
-			this.s[0].height = this.h + 'px'; //console.log('G', this.h)
-			//if( !this.isOpen ) return;
-			//this.h = Roots.calcUis( this.uis, this.zone, this.zone.y + this.baseH )+this.baseH;
+			this.s[0].height = this.h + 'px';
 		}
 
 		parentHeight(t) {
@@ -4155,16 +4047,6 @@
 
 		calc(y) {
 			if (!this.isOpen) return;
-			/*
-				if( y !== undefined ){ 
-					this.h += y;
-					if( this.isUI ) this.main.calc( y );
-			} else {
-					this.h = this.calcH() + this.baseH;
-			}
-			this.s[0].height = this.h + 'px';*/
-			// if(this.isOpen)
-
 			if (this.isUI) this.main.calc();else this.calcUis();
 			this.s[0].height = this.h + 'px';
 		}
@@ -4175,8 +4057,7 @@
 			while (i--) {
 				this.uis[i].setSize(this.w);
 				this.uis[i].rSize();
-			} //this.calc()
-
+			}
 		}
 
 		rSize() {
@@ -4203,7 +4084,8 @@
 			this.multiplicator = o.multiplicator || 1;
 			this.pos = new V2();
 			this.tmp = new V2();
-			this.interval = null; //this.radius = this.w * 0.5;
+			this.interval = null;
+			this.c[0].style.display = 'block'; //this.radius = this.w * 0.5;
 			//this.distance = this.radius*0.25;
 
 			this.distance = this.diam * 0.5 * 0.25;
@@ -4391,6 +4273,7 @@
 			this.h = o.h || this.w + 10;
 			this.top = 0;
 			this.c[0].style.width = this.w + 'px';
+			this.c[0].style.display = 'block';
 
 			if (this.c[1] !== undefined) {
 				this.c[1].style.width = '100%';
@@ -6470,6 +6353,7 @@
 			this.range = (this.max - this.min) * 0.5;
 			this.cmode = 0; //console.log(this.range)
 
+			this.c[0].style.display = 'block';
 			this.precision = o.precision === undefined ? 2 : o.precision;
 			/*this.bounds = {};
 			this.bounds.x1 = o.x1 || -1;
@@ -6783,6 +6667,7 @@
 	*		|___|_|_| |_| |_| 2017
 	*		@author lo.th / https://github.com/lo-th
 	*/
+
 	const Utils = {
 		doc: document,
 		Dom: document.body,
@@ -6800,6 +6685,8 @@
 		clear: Tools$1.clear,
 		setSvg: Tools$1.setSvg,
 		hexToHtml: Tools$1.hexToHtml,
+		add: add$1,
+		files: Files,
 		// bitmap
 		TRACK: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAAUCAYAAAAk0RfcAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAl1JREFUeNrsWkFWwjAQbUJ34AHwALhwiXuee7YegXIALlAOoHtk6dKlHED3cAAvoM+13ZI4rQmmpS1JU1/TMv
 		Pe0GRe81+S+ZlMUjwPBaVDQmQhDENuAwTtSaaOeIjXDJ4tWBYD8RCvKTyKmxRKl8SXhbvNZmyFtN2mqoiHeE3g+YXJNWPJG5zSGx27UeIuMKrgHNpSuip9kbG5Dr7al1LMCnh9oQOh/cwzlqeK88gZG0LSeKkchla2fqn1cKbwBPo2g3xgbXCwm2XnPc9HeZjUlYE7IdnJc1jAcYHH+Z
@@ -6836,6 +6723,9 @@
 		},
 		keyColor: ['#6BB', '#BB6', '#F66'],
 		soundLibs: {},
+		empty: function () {
+			return Utils.dom('div', Utils.basic + 'width:0px; height:0px; ');
+		},
 		inRange: function (v, min, max, exclud) {
 			if (exclud) return v > min && v < max;else return v >= min && v <= max;
 		},
@@ -6852,11 +6742,11 @@
 			return Utils.dom('div', Utils.basic + 'width:1px; height:100%; background:' + color + ';' + css);
 		},
 		linerBottom: function (t, color, color2) {
+			if (t === 2) return Utils.dom('div', Utils.basic + 'width:100%; height:2px; bottom:0; background:none; pointer-events:none; border-top:1px solid ' + color2 + '; border-bottom:1px solid ' + color + ';'); //if(t===0) return Utils.dom( 'div', Utils.basic+'width:100%; height:1px; bottom:0; background:none; border-top:1px solid '+color2+';');
+
 			if (color === undefined) color = '#888';
 			if (color2 === undefined) color2 = '#rgba(128,128,128,0.5)';
-			let scaleBar = Utils.dom('div', Utils.basic + 'width:100%; height:' + t + 'px; bottom:0; background:none; pointer-events:auto; cursor:row-resize; border-top:1px solid ' + color2 + '; border-bottom:1px solid ' + color + ';'); //let scaleBar = Utils.dom( 'div', Utils.basic+'width:100%; height:'+(t+1)+'px; bottom:0; background:none; pointer-events:auto; cursor:n-resize; border-top:1px solid '+color2+'; border-bottom:1px solid '+color+';');
-			//Utils.dom( 'div', Utils.basic+'width:100%; height:3px; top:2px; background:' + Utils.SlideBG, null, scaleBar	);
-
+			let scaleBar = Utils.dom('div', Utils.basic + 'width:100%; height:' + t + 'px; bottom:0; background:none; pointer-events:auto; cursor:row-resize; border-top:1px solid ' + color2 + '; border-bottom:1px solid ' + color + ';');
 			Utils.dom('div', Utils.basic + 'width:100%; height:4px; top:1px; background:' + Utils.SlideBG, null, scaleBar);
 			scaleBar.name = 'scaleBar';
 			return scaleBar;
@@ -6872,6 +6762,39 @@
 			let p = Utils.dom('div', Utils.basic + 'width:10px; height:10px; right:5px; top:' + (t || 5) + 'px; pointer-events:auto; cursor:pointer; background:' + Utils.X0 + ';');
 			p.name = 'dels';
 			return p;
+		},
+		loadJson: function (o, toFile) {
+			Files.load({
+				type: 'json',
+				callback: function (data) {
+					o.clear(); // add track
+
+					let t;
+
+					for (let name in data.track) {
+						t = data.track[name];
+						o.add(t.type, {
+							name: name,
+							frame: t.frame
+						});
+					}
+				}
+			});
+		},
+		fromJson: function (o, result) {
+			if (result === undefined) return;
+			o.clear();
+			let data = JSON.parse(result); // add track
+
+			let t;
+
+			for (let name in data.track) {
+				t = data.track[name];
+				o.add(t.type, {
+					name: name,
+					frame: t.frame
+				});
+			}
 		},
 		saveJson: function (o, toFile) {
 			let data = {
@@ -6897,10 +6820,12 @@
 			output = output.replace('}}}}', '}}\n		}\n}');
 
 			if (toFile) {
-				let blob = new Blob([output], {
-					type: 'text/plain;charset=utf-8'
-				});
-				saveAs(blob, "neo.json");
+				Files.save({
+					name: 'neo',
+					data: output,
+					type: 'json'
+				}); //let blob = new Blob( [ output ], { type: 'text/plain;charset=utf-8' } );
+				//saveAs(blob, "neo.json");
 			} else {
 				o.tmpJSON = output;
 				console.log('timeline in memory');
@@ -6912,21 +6837,6 @@
 			window.focus();
 				*/
 
-		},
-		fromJson: function (o, result) {
-			if (result === undefined) return;
-			o.clear();
-			let data = JSON.parse(result); // add track
-
-			let t;
-
-			for (let name in data.track) {
-				t = data.track[name];
-				o.add(t.type, {
-					name: name,
-					frame: t.frame
-				});
-			}
 		},
 		// VIDEO
 		loadVideo: function (url, k) {
@@ -7560,7 +7470,7 @@
 			let p = {
 				//title:UIL.add('string', { target:this.content, value:'yoo', size:80, h:h, simple:true, pos:{ left:'-80px', top:'0px' } }),//.onChange( this.endEditName.bind(this) );
 				// color
-				color: add$1('color', {
+				color: Utils.add('color', {
 					target: this.content,
 					callback: null,
 					name: ' ',
@@ -7576,7 +7486,7 @@
 					h: h
 				}),
 				// curve
-				curve1: add$1('list', {
+				curve1: Utils.add('list', {
 					target: this.content,
 					list: ['linear', 'quad', 'cubic', 'quart', 'quint', 'sine', 'expo', 'circ', 'elastic', 'back', 'bounce'],
 					w: 80,
@@ -7590,7 +7500,7 @@
 					h: h,
 					align: 'left'
 				}),
-				curve2: add$1('list', {
+				curve2: Utils.add('list', {
 					target: this.content,
 					list: ['-in', '-out', '-in-out'],
 					w: 80,
@@ -7605,7 +7515,7 @@
 					align: 'left'
 				}),
 				// lfo
-				lfo1: add$1('list', {
+				lfo1: Utils.add('list', {
 					target: this.content,
 					list: ['sine', 'noise'],
 					w: 80,
@@ -7619,7 +7529,7 @@
 					h: h,
 					align: 'left'
 				}),
-				lfo2: add$1('number', {
+				lfo2: Utils.add('number', {
 					target: this.content,
 					name: 'frequency',
 					min: 0,
@@ -7634,7 +7544,7 @@
 					p: 60,
 					h: h
 				}),
-				lfo3: add$1('number', {
+				lfo3: Utils.add('number', {
 					target: this.content,
 					name: 'amplitude',
 					min: 0,
@@ -7649,7 +7559,7 @@
 					p: 60,
 					h: h
 				}),
-				lfo4: add$1('number', {
+				lfo4: Utils.add('number', {
 					target: this.content,
 					name: 'seed',
 					min: 0,
@@ -7664,7 +7574,7 @@
 					p: 50,
 					h: h
 				}),
-				lfo5: add$1('number', {
+				lfo5: Utils.add('number', {
 					target: this.content,
 					name: 'phase',
 					min: 0,
@@ -7933,7 +7843,7 @@
 		constructor(f, name) {
 			super(f);
 			this.value = name || '';
-			this.flagName = add$1('string', {
+			this.flagName = Utils.add('string', {
 				target: this.content,
 				value: this.value,
 				w: 80,
@@ -8215,7 +8125,7 @@
 			this.ks.borderLeft = '1px solid #FFF';
 			this.ks.borderRight = '1px solid #FFF';
 			Utils.dom('div', Utils.basic + 'top:1px; left:1px; right:1px; bottom:1px;	background:' + Utils.SlideBG_NN, null, this.key);
-			this.flagName = add$1('string', {
+			this.flagName = Utils.add('string', {
 				target: this.content,
 				value: this.value,
 				w: 80,
@@ -8343,7 +8253,7 @@
 			this.ks.borderRight = '1px solid ' + this.co[0];
 			this.cct = 'borderColor'; //this.ks.background = 'none';
 
-			this.flagName = add$1('string', {
+			this.flagName = Utils.add('string', {
 				target: this.content,
 				value: this.name,
 				w: 80,
@@ -8441,6 +8351,8 @@
 	class Track {
 		constructor(o = {}, parent) {
 			this.parent = parent;
+			this.resize = o.resize !== undefined ? o.resize : true;
+			this.delete = o.del !== undefined ? o.del : true;
 			this.autoName = o.name === undefined ? true : false;
 			this.name = o.name || this.type;
 			this.select = false;
@@ -8472,11 +8384,11 @@
 			this.timer = null;
 			this.drawdelay = null;
 			this.top = 0;
-			this.tt = 20; //16;
+			this.tt = 20; //20//16;
 
-			this.tb = 8;
-			this.h = 50;
-			this.oldH = 50;
+			this.tb = this.resize ? 8 : 2;
+			this.h = o.h || 50;
+			this.oldH = this.h;
 			this.tmpPool = [];
 			this.callback = null;
 			let ty = Utils.int((this.tt - 10) * 0.5);
@@ -8492,7 +8404,7 @@
 			c[1] = dom('div', Utils.css.txtselect + 'left:20px; height:16px; top:2px; pointer-events:auto; cursor:pointer; border-color:transparent; ');
 			c[2] = Utils.liner(this.tt, lc2);
 			c[3] = Utils.pins(this.tt);
-			c[4] = Utils.dels(ty);
+			c[4] = this.delete ? Utils.dels(ty) : Utils.empty(ty);
 			c[5] = dom('div', basic + 'top:' + this.tt + 'px; left:0; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; ');
 			c[6] = Utils.linerBottom(this.tb, lc1, lc2);
 			c[7] = dom('div', basic + 'height:' + this.tt + 'px;	width:100%; overflow:hidden; border-left:1px solid #555; border-right:1px solid #555; display:none;');
@@ -8543,11 +8455,11 @@
 			switch (this.type) {
 				case 'bang':
 				case 'switch':
-					//this.preview = UIL.add( 'bool',{ target:this.c[0], name:' ', p:0, value:false, pos:{left:'auto', right:'30px', top:'0px'}, w:50, h:19, lock:true })
+					//this.preview = Utils.add( 'bool',{ target:this.c[0], name:' ', p:0, value:false, pos:{left:'auto', right:'30px', top:'0px'}, w:50, h:19, lock:true })
 					break;
 
 				case 'color':
-					this.preview = add$1('color', {
+					this.preview = Utils.add('color', {
 						target: this.c[0],
 						name: ' ',
 						pos: {
@@ -8582,7 +8494,7 @@
 			this.parent.stopEditName();
 
 			if (!this.tmpName) {
-				this.tmpName = add$1(this, 'name', {
+				this.tmpName = Utils.add(this, 'name', {
 					type: 'string',
 					target: this.c[0],
 					w: 100,
@@ -9323,7 +9235,7 @@
 			while (i--) {
 				Utils.dom('stop', '', {
 					offset: 0,
-					'stop-color': Tools$1.hexToHtml(this.getColor(fbygrad * i)),
+					'stop-color': Utils.hexToHtml(this.getColor(fbygrad * i)),
 					'stop-opacity': 1
 				}, this.linear[i], 0);
 			} // mid color
@@ -9338,7 +9250,7 @@
 				gid = Math.floor(percent / pp);
 				Utils.dom('stop', '', {
 					offset: percent / pp - gid,
-					'stop-color': Tools$1.hexToHtml(this.items[i].value),
+					'stop-color': Utils.hexToHtml(this.items[i].value),
 					'stop-opacity': 1
 				}, this.linear[gid], 0);
 			} // end color
@@ -9349,7 +9261,7 @@
 			while (i--) {
 				Utils.dom('stop', '', {
 					offset: 1,
-					'stop-color': Tools$1.hexToHtml(this.getColor(fbygrad * (i + 1) - 1)),
+					'stop-color': Utils.hexToHtml(this.getColor(fbygrad * (i + 1) - 1)),
 					'stop-opacity': 1
 				}, this.linear[i], 0);
 			}
@@ -9609,7 +9521,9 @@
 			}
 
 			path.push(' L ' + this.maxw + ' ' + this.basey[n]);
-			this.curves[n].childNodes[0].setAttributeNS(null, 'd', path.join('\n'));
+			let finalPath = path.toString().replace(/,/g, ' '); //this.curves[n].childNodes[0].setAttributeNS( null, 'd', path.join('\n') );
+
+			this.curves[n].childNodes[0].setAttributeNS(null, 'd', finalPath);
 		}
 
 		besierSpline(type, item1, item2, path, n) {
@@ -10068,7 +9982,7 @@
 			this.frame = 0;
 			this.time = 0;
 			this.leftFrame = 0;
-			this.zone = 50;
+			this.zone = o.zone || 50;
 			this.trackSpace = [0, 0]; // TIME
 
 			this.temp = 0;
@@ -10234,13 +10148,14 @@
 			this.initTopMenu(this.topmenu);
 			this.initNavMenu(this.navmenu);
 			this.miniUI();
+			this.setFps(this.fps);
 			this.resize();
 			if (o.open !== undefined) if (!o.open) this.showHide();
 		}
 
 		miniUI() {
 			this.content2 = Utils.dom('div', Utils.basic + 'top:' + this.box.t + 'px; left:10px; width:50px; height:71px');
-			this.openButton = add$1('button', {
+			this.openButton = Utils.add('button', {
 				target: this.content2,
 				w: 44,
 				h: 44,
@@ -10249,8 +10164,8 @@
 					top: '3px'
 				},
 				simple: true
-			}).icon(Tools$1.icon('neo', '#888', 40)).onChange(this.showHide.bind(this));
-			this.playButton2 = add$1('button', {
+			}).icon(Utils.icon('neo', '#888', 40)).onChange(this.showHide.bind(this));
+			this.playButton2 = Utils.add('button', {
 				target: this.content2,
 				w: 44,
 				h: 24,
@@ -10299,7 +10214,7 @@
 
 			this.layers.push('ROOT');
 			let x = 170 + 54;
-			add$1('button', {
+			Utils.add('button', {
 				target: this.navmenu,
 				name: '+',
 				pos: {
@@ -10310,7 +10225,7 @@
 				h: 18
 			}).onChange(callbackAddLayer);
 			x += 26;
-			add$1('button', {
+			Utils.add('button', {
 				target: this.navmenu,
 				name: '-',
 				pos: {
@@ -10321,7 +10236,7 @@
 				h: 18
 			}).onChange(callbackRemoveLayer);
 			x += 34;
-			this.layerSelector = add$1('selector', {
+			this.layerSelector = Utils.add('selector', {
 				target: this.navmenu,
 				simple: true,
 				w: 60 * this.layers.length,
@@ -10340,7 +10255,7 @@
 			if (this.layers.length < 2) return;
 			this.layers = this.layers.splice(0, this.layers.length - 1);
 			this.layerSelector.clear();
-			this.layerSelector = add$1('selector', {
+			this.layerSelector = Utils.add('selector', {
 				target: this.navmenu,
 				simple: true,
 				w: 60 * this.layers.length,
@@ -10360,7 +10275,7 @@
 			let name = 'LAYER' + (this.layers.length - 1);
 			this.layers.push(name);
 			this.layerSelector.clear();
-			this.layerSelector = add$1('selector', {
+			this.layerSelector = Utils.add('selector', {
 				target: this.navmenu,
 				simple: true,
 				w: 60 * this.layers.length,
@@ -10391,8 +10306,8 @@
 				Utils.saveJson(this, true);
 			}.bind(this);
 
-			let callbackLoad = function (result) {
-				Utils.fromJson(this, result);
+			let callbackLoad = function () {
+				Utils.loadJson(this);
 			}.bind(this);
 
 			let callbackFps = function (v) {
@@ -10435,7 +10350,7 @@
 					x = 170 + 54,
 					s1 = 2,
 					s2 = 10;
-			let startButton = add$1('button', {
+			let startButton = Utils.add('button', {
 				target: dom,
 				w: h,
 				pos: {
@@ -10446,7 +10361,7 @@
 				h: h
 			}).onChange(callbackStart);
 			x += h + s1;
-			let prevButton = add$1('button', {
+			let prevButton = Utils.add('button', {
 				target: dom,
 				w: h,
 				pos: {
@@ -10457,7 +10372,7 @@
 				h: h
 			}).onChange(callbackPrev);
 			x += h + s1;
-			this.playButton = add$1('button', {
+			this.playButton = Utils.add('button', {
 				target: dom,
 				w: 40,
 				pos: {
@@ -10468,7 +10383,7 @@
 				h: h
 			}).onChange(callbackPlay);
 			x += 40 + s1;
-			let nextButton = add$1('button', {
+			let nextButton = Utils.add('button', {
 				target: dom,
 				w: h,
 				pos: {
@@ -10479,7 +10394,7 @@
 				h: h
 			}).onChange(callbackNext);
 			x += h + s1;
-			let endButton = add$1('button', {
+			let endButton = Utils.add('button', {
 				target: dom,
 				w: h,
 				pos: {
@@ -10491,7 +10406,7 @@
 			}).onChange(callbackEnd);
 			x += h + s2; //290
 
-			let addList = add$1('list', {
+			let addList = Utils.add('list', {
 				target: dom,
 				list: this.types,
 				w: 80,
@@ -10510,7 +10425,7 @@
 			x += 80 + s2; //324
 
 			this.addMiniTrackImg(addList);
-			add$1('button', {
+			Utils.add('button', {
 				target: dom,
 				name: 'memo',
 				w: 40,
@@ -10522,7 +10437,7 @@
 				h: h
 			}).onChange(callbackMemo);
 			x += 40 + s1;
-			add$1('button', {
+			Utils.add('button', {
 				target: dom,
 				name: 'back',
 				w: 40,
@@ -10534,7 +10449,7 @@
 				h: h
 			}).onChange(callbackBack);
 			x += 40 + s1;
-			add$1('button', {
+			Utils.add('button', {
 				target: dom,
 				name: 'save',
 				w: 40,
@@ -10546,7 +10461,7 @@
 				h: h
 			}).onChange(callbackSave);
 			x += 40 + s1;
-			add$1('button', {
+			Utils.add('button', {
 				target: dom,
 				name: 'load',
 				w: 40,
@@ -10555,11 +10470,10 @@
 					top: '3px'
 				},
 				simple: true,
-				h: h,
-				loader: true
+				h: h
 			}).onChange(callbackLoad);
 			x += 40 + s2;
-			this.recordButton = add$1('button', {
+			this.recordButton = Utils.add('button', {
 				target: dom,
 				w: 40,
 				pos: {
@@ -10571,11 +10485,12 @@
 			}).onChange(callbackRecord);
 			x += 40 + s1; // right
 
-			add$1('number', {
+			Utils.add('number', {
 				target: dom,
 				name: 'max',
 				min: 1,
 				value: this.frameMax,
+				precision: 0,
 				step: 1,
 				drag: false,
 				w: 100,
@@ -10588,13 +10503,15 @@
 					top: '3px'
 				}
 			}).onChange(callbackMax);
-			add$1('number', {
+			this.topFps = Utils.add('number', {
 				target: dom,
 				name: 'fps',
-				min: 12,
-				max: 144,
+				min: 1,
+				max: 240,
 				value: this.fps,
-				step: 1,
+
+				/*step:1,*/
+				precision: 2,
 				drag: false,
 				w: 80,
 				sa: 40,
@@ -10656,14 +10573,14 @@
 				this.selected();
 				this.removeEvents();
 				this.playButton2.display(true);
-				this.openButton.icon(Tools$1.icon('neo', '#CCC', 40));
+				this.openButton.icon(Utils.icon('neo', '#CCC', 40));
 			} else {
 				this.visible = true;
 				this.content.style.visibility = 'visible';
 				this.pannel.display(true);
 				this.activeEvents();
 				this.playButton2.display();
-				this.openButton.icon(Tools$1.icon('neo', '#888', 40));
+				this.openButton.icon(Utils.icon('neo', '#888', 40));
 			}
 		} // ----------------------
 		//	 Events dispatch
@@ -11178,6 +11095,7 @@
 		}
 
 		setFps(v) {
+			if (this.topFps) this.topFps.setValue(v);
 			this.fps = v;
 			this.frameTime = 1 / this.fps; // in second
 

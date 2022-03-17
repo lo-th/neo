@@ -5,8 +5,6 @@
 *    @author lo.th / https://github.com/lo-th
 */
 
-import * as UIL from '../../build/uil.module.js';
-
 import { Utils } from './Utils.js';
 import { Pannel } from './Pannel.js';
 
@@ -56,7 +54,7 @@ export class Timeline {
         this.frame = 0;
         this.time = 0;
         this.leftFrame = 0;
-        this.zone = 50;
+        this.zone = o.zone || 50;
         this.trackSpace = [0,0]
 
         // TIME
@@ -200,12 +198,10 @@ export class Timeline {
         this.initNavMenu( this.navmenu )
         this.miniUI()
 
-
-
+        this.setFps( this.fps )
 
         this.resize()
     
-
         if( o.open !== undefined ) if(!o.open) this.showHide()
     }
 
@@ -213,8 +209,8 @@ export class Timeline {
 
         this.content2 = Utils.dom( 'div', Utils.basic + 'top:'+this.box.t+'px; left:10px; width:50px; height:71px' );
         
-        this.openButton = UIL.add('button',{ target:this.content2, w:44, h:44, pos:{ left:'0px', top:'3px' }, simple:true }).icon( UIL.Tools.icon( 'neo', '#888', 40 ) ).onChange( this.showHide.bind(this) );
-        this.playButton2 = UIL.add('button',{ target:this.content2, w:44, h:24, pos:{ left:'0px', top:'48px' }, simple:true }).onChange( this.play.bind(this) );
+        this.openButton = Utils.add('button',{ target:this.content2, w:44, h:44, pos:{ left:'0px', top:'3px' }, simple:true }).icon( Utils.icon( 'neo', '#888', 40 ) ).onChange( this.showHide.bind(this) );
+        this.playButton2 = Utils.add('button',{ target:this.content2, w:44, h:24, pos:{ left:'0px', top:'48px' }, simple:true }).onChange( this.play.bind(this) );
         this.playButton2.icon( this.playIcon, 2 )
         this.playButton2.display();
 
@@ -261,9 +257,9 @@ export class Timeline {
 
         
         let x = 170+54
-        UIL.add('button',{ target:this.navmenu, name:'+', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackAddLayer ); x+= 26
-        UIL.add('button',{ target:this.navmenu, name:'-', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackRemoveLayer ); x+= 34
-        this.layerSelector = UIL.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:x+'px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
+        Utils.add('button',{ target:this.navmenu, name:'+', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackAddLayer ); x+= 26
+        Utils.add('button',{ target:this.navmenu, name:'-', pos:{left:x+'px'}, simple:true, w:24, h:18 }).onChange( callbackRemoveLayer ); x+= 34
+        this.layerSelector = Utils.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:x+'px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
 
     }
 
@@ -273,7 +269,7 @@ export class Timeline {
 
         this.layers = this.layers.splice(0,this.layers.length-1)
         this.layerSelector.clear()
-        this.layerSelector = UIL.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
+        this.layerSelector = Utils.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:'ROOT' });
 
     }
 
@@ -286,7 +282,7 @@ export class Timeline {
         this.layers.push( name )
 
         this.layerSelector.clear()
-        this.layerSelector = UIL.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:name });
+        this.layerSelector = Utils.add('selector', { target:this.navmenu, simple:true, w:60*(this.layers.length), h:18, pos:{left:'230px'}, bDown:'#888', h:18, values:this.layers, value:name });
 
     }
 
@@ -300,7 +296,7 @@ export class Timeline {
         let callbackMemo = function(v){ Utils.saveJson( this ); }.bind(this);
         let callbackBack = function(v){ Utils.fromJson( this, this.tmpJSON ); }.bind(this);
         let callbackSave = function(v){ Utils.saveJson( this, true ); }.bind(this);
-        let callbackLoad = function( result ){ Utils.fromJson( this, result ); }.bind(this);
+        let callbackLoad = function(){ Utils.loadJson( this ); }.bind(this)
 
         let callbackFps = function(v){ this.setFps(v); }.bind(this);
         let callbackMax  = function(v){ this.frameMax = v; this.setRange(); }.bind(this);
@@ -315,27 +311,26 @@ export class Timeline {
     
         let h = 24, x = 170+54, s1 = 2, s2 = 10
 
-        let startButton = UIL.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackStart ); x+=h+s1;
-        let prevButton  = UIL.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPrev ); x+=h+s1;
-        this.playButton = UIL.add('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPlay ); x+=40+s1;
-        let nextButton  = UIL.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackNext ); x+=h+s1;
-        let endButton   = UIL.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackEnd ); x+=h+s2;//290
+        let startButton = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackStart ); x+=h+s1;
+        let prevButton  = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPrev ); x+=h+s1;
+        this.playButton = Utils.add('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackPlay ); x+=40+s1;
+        let nextButton  = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackNext ); x+=h+s1;
+        let endButton   = Utils.add('button',{ target:dom, w:h,  pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackEnd ); x+=h+s2;//290
 
-        let addList = UIL.add('list',{ target:dom, list:this.types, w:80, staticTop:true, miniCanvas:true,  pos:{left:x+'px', top:'3px'}, simple:true, side:'down', full:true, h:h, itemBg:'#333' }).onChange( callbackList ); x+=80+s2; //324
+        let addList = Utils.add('list',{ target:dom, list:this.types, w:80, staticTop:true, miniCanvas:true,  pos:{left:x+'px', top:'3px'}, simple:true, side:'down', full:true, h:h, itemBg:'#333' }).onChange( callbackList ); x+=80+s2; //324
         this.addMiniTrackImg( addList )
 
-        UIL.add('button',{ target:dom, name:'memo', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackMemo ); x+=40+s1;
-        UIL.add('button',{ target:dom, name:'back', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackBack ); x+=40+s1;
-        UIL.add('button',{ target:dom, name:'save', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackSave ); x+=40+s1;
-        UIL.add('button',{ target:dom, name:'load', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h, loader:true }).onChange( callbackLoad ); x+=40+s2
+        Utils.add('button',{ target:dom, name:'memo', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackMemo ); x+=40+s1;
+        Utils.add('button',{ target:dom, name:'back', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackBack ); x+=40+s1;
+        Utils.add('button',{ target:dom, name:'save', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackSave ); x+=40+s1;
+        Utils.add('button',{ target:dom, name:'load', w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackLoad ); x+=40+s2;
 
-        this.recordButton = UIL.add('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackRecord ); x+=40+s1;
+        this.recordButton = Utils.add('button',{ target:dom, w:40, pos:{ left:x+'px', top:'3px' }, simple:true, h:h }).onChange( callbackRecord ); x+=40+s1;
 
         // right
 
-        UIL.add('number',{ target:dom, name:'max', min:1, value:this.frameMax, step:1, drag:false, w:100, sa:40, center:true, h:h, pos:{left:'auto', right:'80px', top:'3px' }}).onChange( callbackMax );
-        UIL.add('number',{ target:dom, name:'fps', min:12, max:144, value:this.fps, step:1, drag:false, w:80, sa:40, sb:30, center:true, h:h, pos:{left:'auto', right:'0px', top:'3px' }}).onChange( callbackFps );
-        
+        Utils.add('number',{ target:dom, name:'max', min:1, value:this.frameMax, precision:0, step:1, drag:false, w:100, sa:40, center:true, h:h, pos:{left:'auto', right:'80px', top:'3px' }}).onChange( callbackMax );
+        this.topFps = Utils.add('number',{ target:dom, name:'fps', min:1, max:240, value:this.fps, /*step:1,*/ precision:2, drag:false, w:80, sa:40, sb:30, center:true, h:h, pos:{left:'auto', right:'0px', top:'3px' }}).onChange( callbackFps );
         
 
         // SVG
@@ -400,7 +395,7 @@ export class Timeline {
             this.selected()
             this.removeEvents()
             this.playButton2.display( true )
-            this.openButton.icon( UIL.Tools.icon( 'neo', '#CCC', 40 ))
+            this.openButton.icon( Utils.icon( 'neo', '#CCC', 40 ))
 
         } else {
 
@@ -409,7 +404,7 @@ export class Timeline {
             this.pannel.display( true )
             this.activeEvents()
             this.playButton2.display()
-            this.openButton.icon( UIL.Tools.icon( 'neo', '#888', 40 ))
+            this.openButton.icon( Utils.icon( 'neo', '#888', 40 ))
 
         }
 
@@ -1001,6 +996,7 @@ export class Timeline {
 
     setFps( v ) {
 
+        if( this.topFps )this.topFps.setValue( v )
         this.fps = v;
         this.frameTime = 1 / this.fps; // in second
         this.timerStep = this.frameTime * 1000; //1000 / NEO.FPS;

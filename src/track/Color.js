@@ -1,4 +1,3 @@
-import * as UIL from '../../build/uil.module.js';
 import { Track } from '../core/Track.js';
 import { Utils } from '../core/Utils.js';
 import { _Math } from '../core/Math.js';
@@ -106,7 +105,7 @@ export class Color extends Track {
         // start color
         i = this.linear.length;
         while(i--){
-            Utils.dom( 'stop', '', { offset:0, 'stop-color':UIL.Tools.hexToHtml(this.getColor(fbygrad*i)), 'stop-opacity':1 }, this.linear[i], 0 )
+            Utils.dom( 'stop', '', { offset:0, 'stop-color':Utils.hexToHtml(this.getColor(fbygrad*i)), 'stop-opacity':1 }, this.linear[i], 0 )
         }
 
         // mid color
@@ -114,13 +113,13 @@ export class Color extends Track {
         for(i=0; i<lng; i++){
             percent = ((this.items[i].frame*100)/max).toFixed(4);
             gid = Math.floor( percent/pp );
-            Utils.dom( 'stop', '', { offset:((percent/pp)-gid), 'stop-color':UIL.Tools.hexToHtml(this.items[i].value), 'stop-opacity':1 }, this.linear[gid], 0 )
+            Utils.dom( 'stop', '', { offset:((percent/pp)-gid), 'stop-color':Utils.hexToHtml(this.items[i].value), 'stop-opacity':1 }, this.linear[gid], 0 )
         }
 
         // end color
         i = this.linear.length;
         while(i--){
-            Utils.dom( 'stop', '', { offset:1, 'stop-color':UIL.Tools.hexToHtml( this.getColor( (fbygrad*(i+1))-1) ), 'stop-opacity':1 }, this.linear[i], 0 )
+            Utils.dom( 'stop', '', { offset:1, 'stop-color':Utils.hexToHtml( this.getColor( (fbygrad*(i+1))-1) ), 'stop-opacity':1 }, this.linear[i], 0 )
         }
 
     }

@@ -1,4 +1,4 @@
-import * as UIL from '../../build/uil.module.js';
+
 import { Utils } from './Utils.js';
 import { _Math } from '../core/Math.js';
 
@@ -30,16 +30,16 @@ export class Pannel {
             //title:UIL.add('string', { target:this.content, value:'yoo', size:80, h:h, simple:true, pos:{ left:'-80px', top:'0px' } }),//.onChange( this.endEditName.bind(this) );
 
             // color
-            color : UIL.add( 'color', { target:this.content, callback:null, name:' ', color:'n', w:100, pos:{left:'10px', top:'0px' }, simple:true, side:'down', ctype:'hex', h:h }),
+            color : Utils.add( 'color', { target:this.content, callback:null, name:' ', color:'n', w:100, pos:{left:'10px', top:'0px' }, simple:true, side:'down', ctype:'hex', h:h }),
             // curve
-            curve1 : UIL.add( 'list', { target:this.content, list:[ 'linear','quad', 'cubic', 'quart', 'quint', 'sine', 'expo', 'circ', 'elastic', 'back', 'bounce' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
-            curve2 : UIL.add( 'list',{ target:this.content, list:[ '-in', '-out', '-in-out' ], w:80, pos:{left:'92px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
+            curve1 : Utils.add( 'list', { target:this.content, list:[ 'linear','quad', 'cubic', 'quart', 'quint', 'sine', 'expo', 'circ', 'elastic', 'back', 'bounce' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
+            curve2 : Utils.add( 'list',{ target:this.content, list:[ '-in', '-out', '-in-out' ], w:80, pos:{left:'92px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
             // lfo
-            lfo1 : UIL.add( 'list',{ target:this.content, list:[ 'sine', 'noise' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
-            lfo2 : UIL.add( 'number',{ target:this.content, name:'frequency', min:0, max:1, value:0, precision:2, pos:{left:'92px', top:'0px'}, w:124, p:60, h:h }),
-            lfo3 : UIL.add( 'number',{ target:this.content, name:'amplitude', min:0, max:1, value:0, precision:2, pos:{left:'210px', top:'0px'}, w:124, p:60,  h:h }),
-            lfo4 : UIL.add( 'number',{ target:this.content, name:'seed', min:0, max:999, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
-            lfo5 : UIL.add( 'number',{ target:this.content, name:'phase', min:0, max:360, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
+            lfo1 : Utils.add( 'list',{ target:this.content, list:[ 'sine', 'noise' ], w:80, pos:{left:'10px', top:'0px'}, simple:true, side:'down', full:true, h:h, align:'left' }),
+            lfo2 : Utils.add( 'number',{ target:this.content, name:'frequency', min:0, max:1, value:0, precision:2, pos:{left:'92px', top:'0px'}, w:124, p:60, h:h }),
+            lfo3 : Utils.add( 'number',{ target:this.content, name:'amplitude', min:0, max:1, value:0, precision:2, pos:{left:'210px', top:'0px'}, w:124, p:60,  h:h }),
+            lfo4 : Utils.add( 'number',{ target:this.content, name:'seed', min:0, max:999, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
+            lfo5 : Utils.add( 'number',{ target:this.content, name:'phase', min:0, max:360, value:0, precision:0, pos:{left:'336px', top:'0px'}, w:100, p:50,  h:h }),
 
         };
         

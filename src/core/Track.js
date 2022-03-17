@@ -1,4 +1,3 @@
-import * as UIL from '../../build/uil.module.js';
 
 import { Utils } from './Utils.js';
 import { Key } from './Key.js';
@@ -18,6 +17,9 @@ export class Track {
     constructor( o = {}, parent ) {
 
         this.parent = parent;
+
+        this.resize = o.resize !== undefined ? o.resize : true
+        this.delete = o.del !== undefined ? o.del : true
 
         this.autoName = o.name === undefined ? true : false;
         this.name = o.name || this.type;
@@ -64,11 +66,11 @@ export class Track {
         this.drawdelay = null
 
         this.top = 0;
-        this.tt = 20//16;
-        this.tb = 8;
-        this.h = 50;
+        this.tt = 20//20//16;
+        this.tb = this.resize ? 8 : 2;
+        this.h = o.h || 50;
 
-        this.oldH = 50;
+        this.oldH = this.h;
 
         this.tmpPool = [];
         this.callback = null;
@@ -93,7 +95,7 @@ export class Track {
         c[1] = dom( 'div', Utils.css.txtselect +'left:20px; height:16px; top:2px; pointer-events:auto; cursor:pointer; border-color:transparent; ')
         c[2] = Utils.liner( this.tt, lc2 )
         c[3] = Utils.pins( this.tt )
-        c[4] = Utils.dels(ty)
+        c[4] = this.delete ? Utils.dels(ty) : Utils.empty(ty)
         c[5] = dom( 'div', basic+'top:' + this.tt + 'px; left:0; width:100px; height:60px; overflow:hidden; pointer-events:auto; cursor:pointer; ' )
         c[6] = Utils.linerBottom( this.tb, lc1, lc2 )
         c[7] = dom( 'div', basic+'height:'+this.tt+'px;  width:100%; overflow:hidden; border-left:1px solid #555; border-right:1px solid #555; display:none;')
@@ -160,10 +162,10 @@ export class Track {
 
         switch( this.type ){
             case 'bang': case 'switch':
-            //this.preview = UIL.add( 'bool',{ target:this.c[0], name:' ', p:0, value:false, pos:{left:'auto', right:'30px', top:'0px'}, w:50, h:19, lock:true })
+            //this.preview = Utils.add( 'bool',{ target:this.c[0], name:' ', p:0, value:false, pos:{left:'auto', right:'30px', top:'0px'}, w:50, h:19, lock:true })
             break;
             case 'color':
-            this.preview = UIL.add( 'color', { target:this.c[0], name:' ', pos:{left:'auto', right:'30px', top:'0px' }, simple:true, side:'down', ctype:'hex', w:20, h:19, radius:20, lock:true, notext:true })
+            this.preview = Utils.add( 'color', { target:this.c[0], name:' ', pos:{left:'auto', right:'30px', top:'0px' }, simple:true, side:'down', ctype:'hex', w:20, h:19, radius:20, lock:true, notext:true })
             break;
 
         }
@@ -192,7 +194,7 @@ export class Track {
         this.parent.stopEditName()
 
         if( !this.tmpName ){ 
-            this.tmpName = UIL.add( this, 'name', { type:'string', target:this.c[0],  w:100, simple:true, allway:true, pos:{ left:'20px', top:'0px' } })
+            this.tmpName = Utils.add( this, 'name', { type:'string', target:this.c[0],  w:100, simple:true, allway:true, pos:{ left:'20px', top:'0px' } })
             this.tmpName.c[0].name = 'title'
         }
 

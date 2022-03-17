@@ -236,7 +236,10 @@ export class Curve extends Track {
 
         path.push( ' L ' + this.maxw + ' ' + this.basey[n] );
 
-        this.curves[n].childNodes[0].setAttributeNS( null, 'd', path.join('\n') );
+        let finalPath = path.toString().replace(/,/g, ' ');
+
+        //this.curves[n].childNodes[0].setAttributeNS( null, 'd', path.join('\n') );
+        this.curves[n].childNodes[0].setAttributeNS( null, 'd', finalPath );
 
     }
 
